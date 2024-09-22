@@ -1,5 +1,5 @@
 # Códigos para as aulas do curso de Sistemas de Informação
-###Laboratório de Programação 1
+### Laboratório de Programação 1
 | Aula |  Data  | Assunto
 | ---: | -----: | :--------
 |  1  |  10-09  | Primeira aula
