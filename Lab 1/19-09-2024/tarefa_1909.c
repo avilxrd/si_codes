@@ -5,6 +5,7 @@ int le_valor3(){
   int val, enter;
   int cent, dez, uni;
 
+  printf("Digite um valor (decimal): ");
   cent = getchar() - '0';
   dez = getchar() - '0';
   uni = getchar() - '0';
@@ -14,7 +15,6 @@ int le_valor3(){
   return val;
 }
 
-
 //04.Quebrar linha ao final
 void imp_valor(int val){
   int cent, dez, uni;
@@ -23,9 +23,35 @@ void imp_valor(int val){
   dez = val/10%10;
   cent = val/100%10;
 
+  printf("Valor em decimal: ");
   putchar(cent + '0');
   putchar(dez + '0');
   putchar(uni + '0');
+  putchar('\n');
+
+}
+
+void imp_binario(int val){
+  int b0, b1, b2, b3, b4, b5, b6, b7;
+
+  b7 = val%2;
+  b6 = val/2%2;
+  b5 = val/4%2;
+  b4 = val/8%2;
+  b3 = val/16%2;
+  b2 = val/32%2;
+  b1 = val/64%2;
+  b0 = val/128%2;
+
+  printf("Valor em binario: ");
+  putchar(b0 + '0');
+  putchar(b1 + '0');
+  putchar(b2 + '0');
+  putchar(b3 + '0');
+  putchar(b4 + '0');
+  putchar(b5 + '0');
+  putchar(b6 + '0');
+  putchar(b7 + '0');
   putchar('\n');
 }
 
@@ -59,7 +85,7 @@ int dobro_quadrado(){
 }
 
 //05. 
-int binario(){
+int binario_lacos(){
   int numero;
   int binario[8];
   int i = 7;
@@ -81,7 +107,10 @@ int binario(){
     putchar('\n');
 }
 
-
 int main(){
-  binario();
+  int valor;
+  
+  valor = le_valor3();
+  imp_valor(valor);
+  imp_binario(valor);
 }
