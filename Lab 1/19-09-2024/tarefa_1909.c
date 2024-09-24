@@ -60,14 +60,25 @@ int dobro_quadrado(){
 
 //05. 
 int binario(){
-  int resto;
-  int decimal, metade; // 8 bits -> 0 - 127
+  int numero;
+  int binario[8];
+  int i = 7;
 
-  decimal = le_valor3();
-  imp_valor(decimal);
+  numero = le_valor3();
 
-  
-
+  while(numero>0 && i>=0){
+    binario[i] = numero%2;
+    numero/=2;
+    i--;
+  }
+  while(i>=0){
+    binario[i] = 0;
+    i--;
+  }
+  for (i = 0; i < 8; i++){
+        putchar(binario[i] + '0');
+    }
+    putchar('\n');
 }
 
 
