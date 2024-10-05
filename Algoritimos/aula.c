@@ -15,14 +15,6 @@ void operacoes(){
     printf("Divisao: %.2f\n\n", num1/num2);
 }
 
-// //Exercicio 4
-// void dobro(){
-//     float num;
-//     printf("Digite um numero: ");
-//     scanf("%f", &num);
-//     printf("Dobro: %.2f\n", num*2);
-// }
-
 int main(){
     operacoes();
 }
