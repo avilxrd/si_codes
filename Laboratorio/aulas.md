@@ -71,3 +71,69 @@ Faça um programa que:
    retorna a parcela a deduzir. A impressão deve ser feita pela função
    principal.
 3. Altere o programa anterior para calcular e imprimir o imposto de renda devido.
+
+# 08/10
+### Revisão do que vimos na outra aula: laços de repetição e tipo booleano
+_Ao utilizar laços de repetição, é uma boa prática tentar testar primeiro os casos que já retornam o valor sem fazer muitos testes_<br>
+
+
+### Exercicios de Aula
+1. Fazer uma funcao que diz se 3 lados sao iguais ou 2 lados sao iguais.<br>
+```C
+//Resolução do professor:
+
+//3 iguais
+{
+   if(a != b) return false;
+   if(a != c) return false;
+   return true;
+}
+// 2 iguais
+{
+   if (a == b) return true;
+   if (a == c) return true;
+   if (b == c) return true;
+   return false;
+}
+```
+Observa-se que ele faz com uma lógica bem mais simples, exluindo as possibilidades com poucas linhas de código.<br>
+
+### Operadores Lógicos
+Existem 3 operadores lógicos em C, são eles: _AND (&&), OR (||) e NOT (!=)_<br>
+Voltando ao exemplo anterior de dois e três numeros iguais, utilizando esses operadores lógicos poderíamos reescrever a função com apenas uma linha: 
+
+```C
+bool tres_iguais(float l1, float l2, float l3){
+   return (a==b) && (a==c);
+}
+bool dois_iguais(float l1, float l2, float l3){
+   return a == b || b == c || c == a;
+}
+//Retorna true se o valor de a for igual ao de b e de c
+```
+**Obs**:_os operadores & e | (apenas 1 caractere) existem e servem para outro propósito, eles fazem as operações AND e OR, porém bit-a-bit, ou seja, é uma operação diferente. É importante tomar cuidado para não errar os operadores ==, && e ||, colocando apenas um caractere._<br>
+
+### Seleção Múltipla
+Podemos utilizar os comandos de repetição para fazer uma seleção múltipla, por exemplo:
+```C
+if (opcao == 1){
+   //Faça Algo
+}else if(opcao == 2){
+   //Faça algo
+}//Assim por diante...
+```
+Como esta prática é muito comum na programação, o C tem um comando específico para seleções múltiplas, que facilita o processo:
+```C
+switch(opcao){
+   case 'a': 
+   case 'A': //Faça algo
+   break;
+   case 2: //Faça algo
+   break;
+   //...
+   default: //É o caso padrão para caso nenhum dos casos foi executado. Tipo o else
+   break;
+}
+```
+O _break_ é um comando não lógico, pois ele dá saltos na lógica do programas, porém o _switch case_ em C foi feito de uma forma em que se o codigo entra em um caso ele vai executar todos os casos abaixo dele. <br>
+Obs: após o _case_ só aceita inteiros e constantes, não aceita contas e variáveis.<br>
