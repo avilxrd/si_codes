@@ -42,7 +42,7 @@ int exercicio_04(){
     int id, horas;
     float valor_hora;
     scanf("%d%d%f", &id, &horas, &valor_hora);
-    printf("id: %d, salario: ", id, horas*valor_hora);
+    printf("id: %d, salario: %f ", id, horas*valor_hora);
 }
 int exercicio_05(){
     int num, maior=0;
@@ -94,10 +94,7 @@ int exercicio_07(){
     }
     printf("%d notas de 100, %d notas de 50, %d notas de 20, %d notas de 10, %d notas de 5, %d notas de 2.", cont_100, cont_50, cont_20, cont_10, cont_5, cont_2);
 }
-exercicio_08(){
-    int segundos, horas, minutos;
-    
-}
+
 
 int main(){
     exercicio_07();
