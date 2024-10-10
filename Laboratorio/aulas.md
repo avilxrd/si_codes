@@ -135,5 +135,37 @@ switch(opcao){
    break;
 }
 ```
-O _break_ é um comando não lógico, pois ele dá saltos na lógica do programas, porém o _switch case_ em C foi feito de uma forma em que se o codigo entra em um caso ele vai executar todos os casos abaixo dele. <br>
-Obs: após o _case_ só aceita inteiros e constantes, não aceita contas e variáveis.<br>
+O `break` é um comando não lógico, pois ele dá saltos na lógica do programas, porém o `switch case` em C foi feito de uma forma em que se o codigo entra em um caso ele vai executar todos os casos abaixo dele. <br>
+Obs: após o `case` só aceita inteiros e constantes, não aceita contas e variáveis. O case sempre deve ser dado entre ' ' (aspas simples).<br>
+
+# 10/10
+Começamos a aula sendo apresentados ao "tipo de dado" NaN (not a number). Se alguma operação resultar em NaN, todas as operações conseguintes também serão. O mesmo acontece com o inf (infinito).<br>
+### Laços de Repetição
+A repetição é fundamental para os programas em geral. Em C, há 3 tipos de comandos de repetição. São eles: 
+- While: sempre vai conferir se a condição é satisfeita antes de executar os comandos. Muito similar ao `do while`, porém com algumas diferenças.
+
+```c
+while(){//COndição
+   //Instrução
+}
+```
+
+- Do While: sempre vai executar uma vez antes de verificar se acondição é satisfeita. Se continuar verdadeira, o laço seguirá sendo executado.
+
+```c
+do{
+   //Instrução
+}
+while();//Condição
+```
+
+- For: 
+
+```c
+for(;;){
+
+}
+```
+### Exercicios
+1. Faça um programa que lê um char e mais dois float. O programa deve então realizar uma operação sobre os dois números e imprimir o resultado dessa operação. A operação a ser realizada depende do char, se for `+`, `-`, `*` ou `/`. Se não for nenhum desses, o programa deve informar o problema e não realizar operação alguma. Use switch.  
+2. Refaça o nosso primeiro programa lenum() para que ele aceite numeros sem precisar completar com zeros
