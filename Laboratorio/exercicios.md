@@ -35,10 +35,40 @@ Faça um programa que:
    houver previsão de chuva. Também deve levar guarda-chuva se a temperatura for
    superior a 35 graus.
 
+# 08/10
+
+### Exercicios de Aula
+1. Fazer uma funcao que diz se 3 lados sao iguais ou 2 lados sao iguais.<br>
+
+```C
+//Resolução do professor:
+
+//3 iguais
+{
+   if(a != b) return false;
+   if(a != c) return false;
+   return true;
+}
+// 2 iguais
+{
+   if (a == b) return true;
+   if (a == c) return true;
+   if (b == c) return true;
+   return false;
+}
+```
+Observa-se que ele faz com uma lógica bem mais simples, exluindo as possibilidades com poucas linhas de código.<br>
+
+
 # 10/10
 
 1. Faça um programa que lê um char e mais dois float. O programa deve então realizar uma operação sobre os dois números e imprimir o resultado dessa operação. A operação a ser realizada depende do char, se for `+`, `-`, `*` ou `/`. Se não for nenhum desses, o programa deve informar o problema e não realizar operação alguma. Use switch.  
 2. Refaça o nosso primeiro programa lenum() para que ele aceite numeros sem precisar completar com zeros
-1. Altere o programa das médias, para que calcule duas médias, a dos valores pares e a dos ímpares.
-4. Um laboratório tem duas colônias de bactérias. A primeira tem 5000 indivíduos, e a população dobra a cada hora. A segunda tem 100000 indivíduos, que têm sua população multiplicada por 1,8 a cada hora. Faça um programa, usando repetição, para calcular quantas horas serão necessárias para que a população da primeira colônia seja maior que da segunda.
-8. Um dos programas acima pede para o usuário adivinhar um número secreto. Faça um programa que faz o contrário: pede para o usuário pensar em um número e depois chuta valores até acertar. Para cada chute do programa, ele imprime o chute e pede para o usuário responder se acertou ou se está acima ou abaixo do valor secreto (digitando 0, 1 ou 2). O chute do programa deve ser um valor aleatório entre os valores que ainda são possíveis a cada chute. A função abaixo pode ser de ajuda, ela retorna um valor aleatório que está entre os limites fornecidos:
+3. Altere o programa das médias, para que calcule duas médias, a dos valores pares e a dos ímpares.
+4. Um laboratório tem duas colônias de bactérias. A primeira tem 5000 indivíduos, e a população dobra a cada hora. A segunda tem 100000 indivíduos, que têm sua população multiplicada por 1,8 a cada hora. Faça um programa, usando repetição, p'ara calcular quantas horas serão necessárias para que a população da primeira colônia seja maior que da segunda.
+5. Um dos programas acima pede para o usuário adivinhar um número secreto. Faça um programa que faz o contrário: pede para o usuário pensar em um número e depois chuta valores até acertar. Para cada chute do programa, ele imprime o chute e pede para o usuário responder se acertou ou se está acima ou abaixo do valor secreto (digitando 0, 1 ou 2). O chute do programa deve ser um valor aleatório entre os valores que ainda são possíveis a cada chute. A função abaixo pode ser de ajuda, ela retorna um valor aleatório que está entre os limites fornecidos:
+
+# 15/10
+1. Faça uma função que recebe um int e um char, e imprima n vezes o char.
+2. Altere a função main para repetir com for
+3. Altere a main de novo, para perguntar a altura dp triangulo.
