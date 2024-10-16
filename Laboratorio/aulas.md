@@ -1,4 +1,5 @@
 # Primeira Aula [10/09]
+
 ### Introdução
 Aula introdutória, explicando sobre como será o decorrer da disciplina.
 * _Foi interrompida para o trote com os veteranos_
@@ -31,30 +32,9 @@ int main(){
 }
 ```
 
-# 08/10
+# Seleção Múltipla [08/10]
 ### Revisão do que vimos na outra aula: laços de repetição e tipo booleano
 _Ao utilizar laços de repetição, é uma boa prática tentar testar primeiro os casos que já retornam o valor sem fazer muitos testes_<br>
-
-### Exercicios de Aula
-1. Fazer uma funcao que diz se 3 lados sao iguais ou 2 lados sao iguais.<br>
-```C
-//Resolução do professor:
-
-//3 iguais
-{
-   if(a != b) return false;
-   if(a != c) return false;
-   return true;
-}
-// 2 iguais
-{
-   if (a == b) return true;
-   if (a == c) return true;
-   if (b == c) return true;
-   return false;
-}
-```
-Observa-se que ele faz com uma lógica bem mais simples, exluindo as possibilidades com poucas linhas de código.<br>
 
 ### Operadores Lógicos
 Existem 3 operadores lógicos em C, são eles: _AND (&&), OR (||) e NOT (!=)_<br>
@@ -96,10 +76,9 @@ switch(opcao){
 O `break` é um comando não lógico, pois ele dá saltos na lógica do programas, porém o `switch case` em C foi feito de uma forma em que se o codigo entra em um caso ele vai executar todos os casos abaixo dele. <br>
 Obs: após o `case` só aceita inteiros e constantes, não aceita contas e variáveis. O case sempre deve ser dado entre ' ' (aspas simples).<br>
 
-# 10/10
+# Laços de Repetição [10/10]
 Começamos a aula sendo apresentados ao "tipo de dado" NaN (not a number). Se alguma operação resultar em NaN, todas as operações conseguintes também serão. O mesmo acontece com o inf (infinito).<br>
 
-### Laços de Repetição
 A repetição é fundamental para os programas em geral. Em C, há 3 tipos de comandos de repetição. São eles: 
 - While: sempre vai conferir se a condição é satisfeita antes de executar os comandos. Muito similar ao `do while`, porém com algumas diferenças.
 
@@ -118,10 +97,46 @@ do{
 while();//Condição
 ```
 
-- For: 
+# Comando For [15/10]
+
+### Gerando numeros "aleatórios"
+O C não consegue gerar numeros aleatórios do nada, todo número gerado é fruto de uma conta feita pela função `rand`. Para contornar isso, temos a função `srand()`, que, da mesma forma, gera um número baseada em um cálculo, porém esta função admite um parâmetro para começar a gerar números a partir de um certo ponto de partida. Com isso podemos usar a seguinte função e gerar números aleatórios com mais variedade.
 
 ```c
-for(;;){
+#include <time.h>
+srand(time(0))
+```
+Utilizando o `time()`, podemos gerar um número aleatório com base no segundo em que o programa foi rodado, tornando muito difícil de gerar números repetidos, pois o programa teria que ser executado no mesmo segundo.
 
+### Repetindo `n` vezes um laço
+É comum querer repetir um trecho de código um determinado número de vezes. Com o `while` e `do while` não há meneiras de fazer um laço controlado por uma variável, por isso foi criado o comando `for`, cuja principal função é criar laços controlados por uma variável.
+```c
+for(int i=0; i<300; i++){ //(var_controle; crit_de_parada; incremento)
+   //Comando a ser repetido
 }
+```
+O comando `while` consegue fazer isso, porém com mais código e menos claro. Outra vantagem de utilizar o `for`, é executar o `incremento` ao utilizar o `continue`.<br>
+_Exemplo_:
+```c
+ct = 0;
+while(ct<300){
+   if(i%2==1) continue;
+   printf("*");
+   ct = ct + 1;
+}
+
+for(int i=0; i<300; i++){
+   if(i%2 ==1) continue;
+   printf("*");
+}
+```
+### Operadores de incremento
+Junto com o laço `for`, é sempre muito utilizado o operador `++`(também o `--`, `+=`, `-=`, entre outras variações). Ele pode ser utilizado de 2 formas:
+- b = a++: b será o valor antigo de a, e depois o a é incrementado;
+- b = ++a: incrementa no a, e seu novo valor soma com o b;
+Outro operador é o `+=`. É uma atribuição e depois incremento;
+```c
+int a = 5;
+b = a++; //b=5, a=6
+b = ++a; //b=6, a=6
 ```
