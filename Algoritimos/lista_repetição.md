@@ -22,8 +22,7 @@ números X e Y e que imprima a soma de todos os números de X até Y. Exemplo 1:
 números informados foram 3 e 5, o programa deve somar 3+4+5 e escrever o resultado 12.
 5. Divisores de um número. Construa um programa que leia um número inteiro e que
 apresente todos os seus divisores a partir do número 1. Exemplo: se o número fornecido
-for 10, o programa deverá imprimir, um abaixo do outro (um por linha), os números: 1, 2 e
-5.
+for 10, o programa deverá imprimir, um abaixo do outro (um por linha), os números: 1, 2 e 5;
 6. Caça aos primos. Construa um programa que receba um número e que verifique se ele é
 primo. Relembrando: números primos são divisíveis apenas por 1 e por ele mesmo. Se o
 número recebido pelo programa for primo, o algoritmo deve escrever “O número é
