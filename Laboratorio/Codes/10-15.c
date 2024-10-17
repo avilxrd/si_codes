@@ -57,12 +57,13 @@ void linha(int n, char c){
     printf("\n");
 } 
 
-int main(){
-    int h;
-    printf("Altura: ");
-    scanf("%d", &h);
-    
-    for(int i=h; i>0; i--){
-        linha(i, '*');
+int altura(int num){
+    int i;
+    for (i=0; i<num; i++){
+        linha(i, "*");
     }
+}
+
+int main(){
+    altura(4);
 }
