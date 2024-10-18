@@ -22,48 +22,132 @@ bool verifica_char(char char_desenhado){
     }
 }
 
-bool verifica_inteiro(int tamanho_desenho){
-    if (tamanho_desenho >=0){
+bool verifica_inteiro(int tamanho_figura){
+    if (tamanho_figura >=0){
         return true;
     } else {
         return false;
     }
 }
 
-//desenhos
-void linha(int n, char c){    
-    for(int i=0; i<n; i++){
-        printf("%c", c);
+void linha(int tamanho, char caractere){    
+    int i;
+    for(i=0; i<tamanho; i++){
+        printf("%c", caractere);
     }
-    printf("\n");
 } 
 
-void figura_a(char char_desenhado, int tamanho_desenho){
+void figura_a(int tamanho, char caractere){
     int i;
-    for (i=1; i<tamanho_desenho+1; i++){
-        linha(i, char_desenhado);
+    for (i=1; i<=tamanho; i++){
+        linha(i, caractere);
+        printf("\n");
     }
 }
 
-void imprime_desenho(char opcao_desenho, char char_desenhado, int tamanho_desenho){
-    switch (opcao_desenho){
-        case 'a': figura_a(char_desenhado, tamanho_desenho);
+void figura_b(int tamanho, char caractere){
+    int i;
+    for (i=tamanho; i>0; i--){
+        linha(i, caractere);
+        printf("\n");
+    }
+}
+
+void figura_c(int tamanho, char caractere){
+    int espacos;
+    int i;
+    for (i=1; i<=tamanho; i++) {
+        espacos = tamanho - i;
+        linha(espacos, ' ');
+        linha(i, caractere);
+        printf("\n");
+    }
+}
+
+void figura_d(int tamanho, char caractere){
+    int espacos;
+    int i;
+    for (i=tamanho; i>=0; i--) {
+        espacos = tamanho - i;
+        linha(espacos, ' ');
+        linha(i, caractere);
+        printf("\n");
+    }
+}
+
+void figura_e(int tamanho, char caractere){
+    int espacos;
+    int i, j=1;
+    for (i=1; i<=tamanho; i++){
+        espacos = tamanho - i; //espaços em cada lado da figura (total = espacos * 2)
+        
+        // linhas de teste de valor das variaveis
+        // printf("%d\t", espacos);
+        // printf("%d\t", j); 
+
+        linha(espacos, ' ');
+        linha(j, caractere);
+        linha(espacos, ' ');
+        printf("\n");
+        j = j + 2;
+    }
+}
+
+void figura_f(int tamanho, char caractere){
+    int espacos, metade;
+    int i, j=1;
+    for (i=0; i<tamanho+2; i++){
+        if (tamanho==0){
+            break;
+        } else if (tamanho == 1){
+            printf("*\n");
+            break;
+        }
+        if (i <= tamanho-1){
+            espacos = tamanho - (i+1);
+        } else {
+            espacos = espacos + 1;
+        }
+        // printf("esp: %d\t", espacos);
+        // printf("j: %d\t", j);         
+        // printf("i: %d\t", i);         
+
+        linha(espacos, ' ');
+        linha(j, caractere);
+        linha(espacos, ' ');
+        printf("\n");
+        if (i < tamanho-1){
+            j = j + 2;
+        } else {
+            j = j - 2;
+        }
+    }
+}
+
+
+//chama a funcao do figura correspondente
+void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
+    printf("Imprimindo o figura %c, com o caractere %c e altura %d.\n", opcao_figura, char_desenhado, tamanho_figura);
+    switch (opcao_figura){
+        case 'a': figura_a(char_desenhado, tamanho_figura);
         break;
         default: printf("kkkk");
     }
+    printf("Que legal! Vamos fazer outro. \n");
+
 }
 
 
 void desenha_figura(){
-    printf("Olá usuário, qual desenho você gostaria de fazer? [a-h] \n");
+    printf("Olá usuário, me dê as instruções para o figura! \n");
     //declaração de variáveis
-    int tamanho_desenho;
+    int tamanho_figura;
     char opcao_figura, char_desenhado;
     //entrada de dados 
     do{
         //pede uma opção até que ela seja [a - h] ou z
         do{
-            printf("Digite opcao_figura: ");
+            printf("Qual a figura? [a-h]: ");
             scanf(" %c", &opcao_figura);
         }while(verifica_opcao(opcao_figura)==false);
 
@@ -74,16 +158,16 @@ void desenha_figura(){
         
         //pede um char até que ele seja [! - ~] na tabela ascii
         do{
-            printf("Digite char_desenhado: ");
+            printf("Qual o caractere base? [tabela ASCII] ");
             scanf(" %c", &char_desenhado);
         }while(verifica_char(char_desenhado)==false);
         //pede um int até ele ser maior que 0
         do{
-            printf("Digite tamanho_desenho:  ");
-            scanf("%d", &tamanho_desenho);
-        }while(verifica_inteiro(tamanho_desenho)==false);
+            printf("Qual o tamanho da figura? ");
+            scanf(" %d", &tamanho_figura);
+        }while(verifica_inteiro(tamanho_figura)==false);
 
-        imprime_desenho(opcao_figura, char_desenhado, tamanho_desenho);
+        imprime_figura(opcao_figura, char_desenhado, tamanho_figura);
     }while(true);
     printf("Fim do programa...\n");
 }
