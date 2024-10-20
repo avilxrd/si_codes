@@ -110,6 +110,35 @@ void figura_f(int tamanho, char caractere){
     }
 }
 
+void figura_g(int tamanho, char caractere){
+    int i, j=0, a=0;
+
+    for (i=1; i<=tamanho; i++){
+        linha(tamanho-i, ' ');
+        printf("%c", caractere);
+        linha(a, ' ');
+        if (i != 1){
+            printf("%c", caractere);
+        }
+        a = j*2 + 1;
+        j = j + 1;
+        printf("\n");
+    }
+    
+    j = j - 2;
+    for (i=tamanho-1; i>=1; i--){
+        j = j - 1;
+        a = j*2 + 1;
+        linha(tamanho-i, ' ');
+        printf("%c", caractere);
+        linha(a, ' ');
+        if (i != 1){
+            printf("%c", caractere);
+        }
+        printf("\n");
+    }
+}
+
 
 //chama a funcao do figura correspondente
 void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
