@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <signal.h>
+// #include <signal.h>
 
 
 //funções auxiliares
@@ -14,7 +14,6 @@ void limpar_buffer(){
 //verifica se a entrada digitada é aceita ou não (a-h ou z)
 bool verifica_opcao(char opcao_figura){
     if (opcao_figura >= 97 && opcao_figura <= 104 || opcao_figura == 122){
-        limpar_buffer();
         return true;
     } else {
         printf("(z para sair) Digite um caractere entre [a - h]. ");
@@ -26,7 +25,6 @@ bool verifica_opcao(char opcao_figura){
 //verifica se a entrada digitada é aceita ou não (char ascii)
 bool verifica_char(char char_desenhado){
     if (char_desenhado >= 33 && char_desenhado <= 126){
-        limpar_buffer();
         return true;
     } else {
         printf("Digite um caractere ASCII. \n");
@@ -124,12 +122,8 @@ void figura_g(int tamanho, char caractere){
         printf("\n");
     }
 }
-void figura_h(int tamanho, char caractere) {
+void figura_h(int tamanho, char caractere){
     int i, j=1, k=0;
-    // int centro;
-    // int change=0;
-    // char util_char, util_char2;
-    // centro = tamanho + 1;
     int quant_chars = 2*tamanho + 1;
     int aux;
     linha(quant_chars, caractere);
@@ -138,8 +132,6 @@ void figura_h(int tamanho, char caractere) {
         if(i==0) j = 0;
         else if(i==1) j = 1;
         else j = j + 2;
-        // printf("i: %d, j: %d. k: %d \n", i, j, k);
-        // printf("k %d", k);
         imprimir_melhorado(tamanho-i, caractere, 1, ' ', j, caractere, k, ' ', tamanho-i, caractere);
         printf("\n");
         if(k!=1) k=k+1;
@@ -150,13 +142,11 @@ void figura_h(int tamanho, char caractere) {
         j = j-2;
         if(i==tamanho-2) k=k-1;
         imprimir_melhorado(aux+i, caractere, 1, ' ', j, caractere, k, ' ', aux+i, caractere);
-        // printf("i: %d, j: %d. k: %d \n", i, j, k);
         printf("\n");
     }
     linha(quant_chars, caractere);
     printf("\n");
 }
-
 
 //chama a funcao do figura correspondente
 void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
@@ -180,9 +170,8 @@ void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
         break;
         default: printf("Nao deveria chegar aqui...");
     }
-    printf("Que legal! Vamos fazer outro. \n");
+    printf("Vamos fazer outro:  \n");
 }
-
 //lógica principal do programa
 int main(){
     int tamanho_figura;
