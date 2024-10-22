@@ -1,4 +1,8 @@
 {
     "C_Cpp.default.compilerPath": "c:\\MinGW\\bin\\gcc.exe",
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "stdio.h": "c",
+        "stdbool.h": "c"
+    }
 }

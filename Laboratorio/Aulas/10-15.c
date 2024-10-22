@@ -57,13 +57,45 @@ void linha(int n, char c){
     printf("\n");
 }
 
-int altura(int num){
+int triangulo(){
     int i;
-    for (i=0; i<num; i++){
-        linha(i, "*");
+    int num;
+    scanf("%d", &num);
+    for (i=1; i<num+1; i++){
+        linha(i, '*');
     }
 }
 
+int triangulo_contrario(){
+    int i;
+    int num;
+    scanf("%d", &num);
+    for (i=num; i>0; i--){
+        linha(i, '*');
+    }
+}
+//Funcoes para figuras
+
+//9
+void calendario(int dias, int primeiro_dia){
+    int i;
+    int dia=1, posicao = primeiro_dia;
+    printf(" D  S  T  Q  Q  S  S\n");
+    while(dia <= dias){
+        for (i=0; i<posicao; i++){
+            printf("   ");
+        }
+        while (posicao<7 && dia<=dias) {
+            printf("%2d ", dia);
+            dia++;
+            posicao++;
+        }
+        printf("\n");
+        posicao = 0;
+    }
+
+}
+
 int main(){
-    altura(4);
+    calendario(31, 5);
 }

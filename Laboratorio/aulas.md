@@ -140,3 +140,6 @@ int a = 5;
 b = a++; //b=5, a=6
 b = ++a; //b=6, a=6
 ```
+# Trabalho e Revisão do Laço For [17/10]
+# Vetores [22/10]
+Um vetor é uma sequência de variáveis de um mesmo tipo e referenciados por um nome único. OS valores podem ser acessados pelo seu índice, tem tamanho predefinido e fixo.
