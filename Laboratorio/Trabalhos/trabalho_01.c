@@ -125,26 +125,36 @@ void figura_g(int tamanho, char caractere){
     }
 }
 void figura_h(int tamanho, char caractere) {
-    int i, j=0, k=0, aux=1;
-    int centro;
-    int change=0;
-    char util_char, util_char2;
-    centro = tamanho + 1;
-
+    int i, j=1, k=0;
+    // int centro;
+    // int change=0;
+    // char util_char, util_char2;
+    // centro = tamanho + 1;
+    int quant_chars = 2*tamanho + 1;
+    int aux;
+    linha(quant_chars, caractere);
+    printf("\n");
     for (i=0; i<tamanho; i++){
-        j = i + j;
-        if (change%2==0){
-            util_char = ' ';
-            util_char2 = caractere;
-        } else {
-            util_char = caractere;
-            util_char2 = ' ';
-        } 
-        
+        if(i==0) j = 0;
+        else if(i==1) j = 1;
+        else j = j + 2;
+        // printf("i: %d, j: %d. k: %d \n", i, j, k);
+        // printf("k %d", k);
         imprimir_melhorado(tamanho-i, caractere, 1, ' ', j, caractere, k, ' ', tamanho-i, caractere);
         printf("\n");
         if(k!=1) k=k+1;
+        aux = tamanho - i;
     }
+    aux = aux + 1;
+    for (i=0; i<tamanho-1; i++){
+        j = j-2;
+        if(i==tamanho-2) k=k-1;
+        imprimir_melhorado(aux+i, caractere, 1, ' ', j, caractere, k, ' ', aux+i, caractere);
+        // printf("i: %d, j: %d. k: %d \n", i, j, k);
+        printf("\n");
+    }
+    linha(quant_chars, caractere);
+    printf("\n");
 }
 
 
@@ -175,50 +185,49 @@ void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
 
 //lógica principal do programa
 int main(){
-    figura_h(4, '*');
-    // int tamanho_figura;
-    // char opcao_figura, char_desenhado;
+    int tamanho_figura;
+    char opcao_figura, char_desenhado;
 
-    // printf("Olá usuário, me dê as instruções para a figura! \n");
+    printf("Olá usuário, me dê as instruções para a figura! \n");
 
-    // //entrada de dados 
-    // do{
-    //     //pede uma opção até que ela seja [a - h] ou z
-    //     do{
-    //         printf("(z para sair) Qual a figura? [a-h]: ");
-    //         scanf(" %c", &opcao_figura);
-    //     }while(verifica_opcao(opcao_figura)==false);
+    //entrada de dados 
+    do{
+        //pede uma opção até que ela seja [a - h] ou z
+        do{
+            printf("(z para sair) Qual a figura? [a-h]: ");
+            scanf(" %c", &opcao_figura);
+        }while(verifica_opcao(opcao_figura)==false);
 
-    //     //se opcao == z -> para o programa
-    //     if (opcao_figura == 'z'){
-    //         break;
-    //     }
+        //se opcao == z -> para o programa
+        if (opcao_figura == 'z'){
+            break;
+        }
         
-    //     //pede um char até que ele seja [! - ~] na tabela ASCII
-    //     do{
-    //         printf("Qual o caractere base? [tabela ASCII] ");
-    //         scanf(" %c", &char_desenhado);
-    //     }while(verifica_char(char_desenhado)==false);
+        //pede um char até que ele seja [! - ~] na tabela ASCII
+        do{
+            printf("Qual o caractere base? [tabela ASCII] ");
+            scanf(" %c", &char_desenhado);
+        }while(verifica_char(char_desenhado)==false);
 
-    //     //pede um int até ele ser um inteiro maior que 0
-    //     do{
-    //         printf("Qual o tamanho da figura? ");
-    //         if (scanf("%d", &tamanho_figura)!=1){
-    //             printf("Tamanho inválido...");
-    //             limpar_buffer();
-    //             continue; //só usei para corrigir o bug
-    //         } else if (tamanho_figura < 0){
-    //             printf("Tamanho negativo...");
-    //         } else {
-    //             limpar_buffer();
-    //             break;
-    //         }
-    //     }while(true);
+        //pede um int até ele ser um inteiro maior que 0
+        do{
+            printf("Qual o tamanho da figura? ");
+            if (scanf("%d", &tamanho_figura)!=1){
+                printf("Tamanho inválido...");
+                limpar_buffer();
+                continue; //só usei para corrigir o bug
+            } else if (tamanho_figura < 0){
+                printf("Tamanho negativo...");
+            } else {
+                limpar_buffer();
+                break;
+            }
+        }while(true);
 
-    //     //chama a função da figura escolhida
-    //     imprime_figura(opcao_figura, char_desenhado, tamanho_figura);
+        //chama a função da figura escolhida
+        imprime_figura(opcao_figura, char_desenhado, tamanho_figura);
 
-    // }while(true);
+    }while(true);
 
-    // printf("\nFim do programa...\n");
+    printf("\nFim do programa...\n");
 }
