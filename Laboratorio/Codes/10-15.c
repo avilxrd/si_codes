@@ -12,9 +12,9 @@ char le_resposta(){
 
     do{
         printf("0: Sim | 1: Menor | 2: Maior \n");
-        scanf(" %c", &resposta);    
+        scanf(" %c", &resposta);
     }while(resposta < '0' || resposta > '2');
-    
+
     return resposta;
 }
 
@@ -31,7 +31,7 @@ int advinha(){
 
         printf("O numero é %d?\n", chute);
         char resposta = le_resposta();
-        
+
         if(resposta == '1'){
             maior = chute - 1;
         }else if (resposta == '2'){
@@ -50,12 +50,12 @@ int advinha(){
     printf("Resposta certa!");
 }
 
-void linha(int n, char c){    
+void linha(int n, char c){
     for(int i=0; i<n; i++){
         printf("%c", c);
     }
     printf("\n");
-} 
+}
 
 int altura(int num){
     int i;
