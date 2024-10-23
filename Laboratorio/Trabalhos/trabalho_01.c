@@ -14,9 +14,11 @@ void limpar_buffer(){
 //verifica se a entrada digitada é aceita ou não (a-h ou z)
 bool verifica_opcao(char opcao_figura){
     if (opcao_figura >= 97 && opcao_figura <= 104 || opcao_figura == 122){
+        limpar_buffer();
         return true;
     } else {
-        printf("(z para sair) Digite um caractere entre [a - h]. ");
+        limpar_buffer();
+        printf("Por favor, digite um caractere entre 'a' e 'h'. (z para sair) ");
         printf("\n");
         return false;
     }
@@ -25,8 +27,10 @@ bool verifica_opcao(char opcao_figura){
 //verifica se a entrada digitada é aceita ou não (char ascii)
 bool verifica_char(char char_desenhado){
     if (char_desenhado >= 33 && char_desenhado <= 126){
+        limpar_buffer();
         return true;
     } else {
+        limpar_buffer();
         printf("Digite um caractere ASCII. \n");
         return false;
     }
@@ -150,7 +154,7 @@ void figura_h(int tamanho, char caractere){
 
 //chama a funcao do figura correspondente
 void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
-    printf("Imprimindo o figura %c, com o caractere %c e altura %d.\n", opcao_figura, char_desenhado, tamanho_figura);
+    printf("\nImprimindo o figura %c, com o caractere %c e altura %d.\n\n", opcao_figura, char_desenhado, tamanho_figura);
     switch (opcao_figura){
         case 'a': figura_a(tamanho_figura, char_desenhado);
         break;
@@ -170,20 +174,20 @@ void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
         break;
         default: printf("Nao deveria chegar aqui...");
     }
-    printf("Vamos fazer outro:  \n");
+    printf("\nVamos fazer outro:  \n\n");
 }
 //lógica principal do programa
 int main(){
     int tamanho_figura;
     char opcao_figura, char_desenhado;
 
-    printf("Olá usuário, me dê as instruções para a figura! \n");
+    printf("Olá usuário, me dê as instruções para a figura! \n\n");
 
     //entrada de dados 
     do{
         //pede uma opção até que ela seja [a - h] ou z
         do{
-            printf("(z para sair) Qual a figura? [a-h]: ");
+            printf("Qual a figura? [a-h, ou z]: ");
             scanf(" %c", &opcao_figura);
         }while(verifica_opcao(opcao_figura)==false);
 
