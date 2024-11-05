@@ -176,6 +176,7 @@ void imprime_figura(char opcao_figura, char char_desenhado, int tamanho_figura){
     }
     printf("\nVamos fazer outro:  \n\n");
 }
+
 //lógica principal do programa
 int main(){
     int tamanho_figura;
