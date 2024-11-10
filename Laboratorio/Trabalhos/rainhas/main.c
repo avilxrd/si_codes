@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define RAINHA 'Q'
 
@@ -22,7 +23,7 @@ int floorSqrt(int x){
     return i - 1;
 }
 
-bool verifica_linha(int tamanho, char str[16]){
+bool verifica_linha(int tamanho, char str[tamanho]){
     int i, aux=0, cont=0;
     
     for (i=0; i<tamanho; i++){
@@ -49,7 +50,7 @@ bool verifica_linha(int tamanho, char str[16]){
     return true;
 }
 
-bool verifica_coluna(int tamanho, char str[16]){
+bool verifica_coluna(int tamanho, char str[tamanho]){
     int i, j, aux=0, cont=0, quant=0;
 
     // percorre o array em colunas
@@ -79,40 +80,56 @@ bool verifica_coluna(int tamanho, char str[16]){
     }
 }
 
-void checa_rainhas(int quant_rainhas){
-    if (quant_rainhas == 0){
-            printf("Nenhuma Rainha!");
-            return false;
-        } else if (quant_rainhas > 1){
-            printf("Mais de uma Rainha!");
-            return false;
-        }  else if (quant_rainhas == 1){
-            printf("Ok!");
-            quant_rainhas = 0;
-        }
-}
 // Basicamente separei em quatro partes:
-// Coluna 1 ↘   Linha 1 ↘   Linha 1 ↙   Coluna última ↙
+// Coluna 1 ↘   última coluna ↙
 // Assim todas as diagonais são verificadas.
-bool verifica_diagonal(int tamanho, char str[16]){
-    int i, j, quant_rainhas=0;
-    int skip = floorSqrt(tamanho) + 1; //quantas linhas pular para checar a diagonal
+int verifica_diagonal(int tamanho, char str[tamanho]){
+    int i, j;
+    int quant_rainhas=0;
+    int lado=floorSqrt(tamanho);
 
-    // Coluna 1 ↘
-    // Primeiro laço muda a o item inicial da coluna
-    for (i=0; i<tamanho; i=i+4){
-        // Segundo laço percorre a diagonal (direita baixo) do item inicial
-        for (j=i; j<tamanho; j=j+skip){
+    int skip_baixo = floorSqrt(tamanho) + 1; //quantas linhas pular para checar a diagonal
+    int skip_cima = floorSqrt(tamanho) - 1; //quantas linhas voltar para checar a diagonal
+    
+    // Coluna 1 -> 
+    for (i=0; i<tamanho; i=i+4){ // muda a o item inicial da coluna
+        quant_rainhas = 0;
+        for (j=i; j<tamanho; j=j+skip_baixo){ // percorre a diagonal (direita baixo) do item inicial
             if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
-        }   
-    }
-    // Linha 1 ↘
-    for (i=0; i<tamanho; i++){
-        for (j=i; j<tamanho; j=j+skip){
+        } 
+        // printf("\n ⬊ [%d] quant_rainhas", quant_rainhas);
+        // if (quant_rainhas <= 0) return 0;
+        // else if (quant_rainhas>1) return 2;
+
+        quant_rainhas = 0;
+        for (j=i; j>=0; j=j-skip_cima){ // percorre a diagonal (direita cima) do item inicial
             if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
         }
+        printf("\n ⬈ [%d] quant_rainhas", quant_rainhas);
+        // if (quant_rainhas <= 0) return 0;
+        // else return 2;
     }
+    
+    // Última Coluna
+    int pos_inicial = floorSqrt(tamanho) - 1; // deixei com nomes diferentes apesar de ter o mesmo valor para facilitar a leitura
+    skip_baixo = floorSqrt(tamanho) - 1;
+    skip_cima = floorSqrt(tamanho) + 1;
+    for (i=pos_inicial; i<tamanho; i++){ // muda o item da coluna
+        for (j=i; j<tamanho; j=j+skip_baixo){
+            if (str[j] == RAINHA) quant_rainhas = quant_rainhas + 1;
+        }
+        if (quant_rainhas <= 0) return 0;
+        else if (quant_rainhas == 1) return 1;
+        else return 2;
 
+        quant_rainhas = 0;
+        for (j=pos_inicial; j>=0; j=j-skip_cima){
+            if (str[i] == RAINHA) quant_rainhas = quant_rainhas + 1;
+        }
+        if (quant_rainhas <= 0) return 0;
+        else if (quant_rainhas == 1) return 1;
+        else return 2;
+    }
 }
 
 bool par(int tamanho){
@@ -120,7 +137,7 @@ bool par(int tamanho){
     else return false ;
 }
 
-void desenha_tabuleiro(int tamanho, char str[16]){
+void desenha_tabuleiro(int tamanho, char str[tamanho]){
     int i, cont=0, aux=0;
 
     for (i=0; i<tamanho; i++){
@@ -154,21 +171,48 @@ void n_rainhas(int tamanho, char str[]){
 
 }
 
+void limpar_buffer(){
+    while (getchar() != '\n');
+}
 int main(){
-    char str[16] = "...Q.Q..Q.....Q.";
+    int lado;
+    printf("Digite o tamanho do tabuleiro (exemplo: 4 => tabuleiro 4x4): ");
+    scanf("%d", &lado);
 
-    // GERA UMA STRING ALEATORIA COM ('.' OU 'Q')
-    // for (i=0; i<100; i++){
-    //     if (rand()%2==0) str[i] = '.';
-    //     else str[i] = RAINHA;
-    // }
+    int tamanho=lado*lado; 
+    char str[tamanho];
 
-    // CHAMA 5 TABULEIROS COM TAMANHOS 1 - 5
-    // for (i=0; i<5; i++){
-    //     printf("tamanho: %dx%d\n", i, i);
-    //     desenha_tabuleiro(i*i, str);
-    // }
-
-    verifica_diagonal(16, str);
-
+    printf("Como iniciar o tabuleiro?\n0: Tabuleiro Vazio\t1: Inserir Tabuleiro Inicial\t2: Tabuleiro Aleatório\nResposta: ");
+    int option;
+    scanf("%d", &option);
+    limpar_buffer();
+    if (option == 0){
+        int i;
+        for (i=0; i<tamanho; i++) {
+            str[i] = ' ';
+        }
+    } else if (option == 1){
+        int i;
+        printf("Qualquer caractere diferente de %c e ' ' será ignorado...\n", RAINHA);
+        for (i=0; i<tamanho; i++){
+            do{
+                scanf("%c", &str[i]);
+            }while(str[i]!=' ' && str[i]!=RAINHA);
+        }
+    } else if (option == 2){
+        srand(time(0));
+        int i;
+        for (i=0; i<tamanho; i++){
+            if (rand()%2 == 0) str[i] = ' ';
+            else str[i] = RAINHA;            
+        }
+    }
+    
+    printf("\nTabuleiro:");
+    int i;
+    for (i=0; i<tamanho; i++){
+        if (i%floorSqrt(tamanho)==0) printf("\n");
+        printf("%c", str[i]);
+    }
+    printf("\n");
 }
