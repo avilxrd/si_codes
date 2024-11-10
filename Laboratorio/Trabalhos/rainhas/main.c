@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define RAINHA 'Q'
+
 // peguei esse codigo aqui -> https://www.geeksforgeeks.org/square-root-of-an-integer/
 int floorSqrt(int x){
     // Base cases
@@ -25,7 +27,7 @@ bool verifica_linha(int tamanho, char str[16]){
     
     for (i=0; i<tamanho; i++){
         // conta as rainhas por linha
-        if (str[i] == 'X') cont = cont + 1;
+        if (str[i] == RAINHA) cont = cont + 1;
         
         // conta quantos quadrados foram verificados
         aux = aux + 1;
@@ -57,7 +59,7 @@ bool verifica_coluna(int tamanho, char str[16]){
             // printf("i:[%d], j:[%d], aux:[%d]\n", i, j, aux);
 
             // conta as rainhas por coluna
-            if (str[aux] == 'X') cont = cont + 1;
+            if (str[aux] == RAINHA) cont = cont + 1;
             quant = quant + 1;
 
             // verifica os dados
@@ -77,7 +79,39 @@ bool verifica_coluna(int tamanho, char str[16]){
     }
 }
 
+void checa_rainhas(int quant_rainhas){
+    if (quant_rainhas == 0){
+            printf("Nenhuma Rainha!");
+            return false;
+        } else if (quant_rainhas > 1){
+            printf("Mais de uma Rainha!");
+            return false;
+        }  else if (quant_rainhas == 1){
+            printf("Ok!");
+            quant_rainhas = 0;
+        }
+}
+// Basicamente separei em quatro partes:
+// Coluna 1 ↘   Linha 1 ↘   Linha 1 ↙   Coluna última ↙
+// Assim todas as diagonais são verificadas.
 bool verifica_diagonal(int tamanho, char str[16]){
+    int i, j, quant_rainhas=0;
+    int skip = floorSqrt(tamanho) + 1; //quantas linhas pular para checar a diagonal
+
+    // Coluna 1 ↘
+    // Primeiro laço muda a o item inicial da coluna
+    for (i=0; i<tamanho; i=i+4){
+        // Segundo laço percorre a diagonal (direita baixo) do item inicial
+        for (j=i; j<tamanho; j=j+skip){
+            if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
+        }   
+    }
+    // Linha 1 ↘
+    for (i=0; i<tamanho; i++){
+        for (j=i; j<tamanho; j=j+skip){
+            if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
+        }
+    }
 
 }
 
@@ -114,26 +148,27 @@ void n_rainhas(int tamanho, char str[]){
 
     if(verifica_linha(tamanho, str) && verifica_coluna(tamanho, str)){ // && verifica_diagonal(tamanho, str)
         printf("Tabuleiro aceito! \n");
-        desenha_tabuleiro(tamanho, str);
     } else {
         printf("Tabuleiro não aceito! \n");
-        desenha_tabuleiro(tamanho, str);
     }
 
 }
 
 int main(){
-    int i;
-    char str[i];
+    char str[16] = "...Q.Q..Q.....Q.";
 
-    for (i=0; i<100; i++){
-        if (rand()%2==0) str[i] = '.';
-        else str[i] = 'Q';
-    }
+    // GERA UMA STRING ALEATORIA COM ('.' OU 'Q')
+    // for (i=0; i<100; i++){
+    //     if (rand()%2==0) str[i] = '.';
+    //     else str[i] = RAINHA;
+    // }
 
-    for (i=0; i<5; i++){
-        printf("tamanho: %dx%d\n", i, i);
-        desenha_tabuleiro(i*i, str);
-    }
+    // CHAMA 5 TABULEIROS COM TAMANHOS 1 - 5
+    // for (i=0; i<5; i++){
+    //     printf("tamanho: %dx%d\n", i, i);
+    //     desenha_tabuleiro(i*i, str);
+    // }
+
+    verifica_diagonal(16, str);
 
 }
