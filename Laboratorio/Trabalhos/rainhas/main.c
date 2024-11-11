@@ -6,7 +6,12 @@
 #include <time.h>
 
 #define RAINHA 'Q'
+#define ESPACO_BRANCO ' '
 
+// reutilizei do outro trabalho
+void limpar_buffer(){
+    while (getchar() != '\n');
+}
 // peguei esse codigo aqui -> https://www.geeksforgeeks.org/square-root-of-an-integer/
 int floorSqrt(int x){
     // Base cases
@@ -171,9 +176,51 @@ void n_rainhas(int tamanho, char str[]){
 
 }
 
-void limpar_buffer(){
-    while (getchar() != '\n');
+bool processa_entrada(int tamanho, char *str[tamanho], int *ref_lin, int *ref_col){
+    char tecla;
+    if (!t_tem_tecla()) return false;
+    else {
+        tecla = t_tecla();
+    }
+
+    switch(tecla){
+        case 'x': return true;
+
+        // ao movimentar o cursor, fiz com que ao 'exceder' o numero da linha/coluna o cursor vá para
+        // o início/fim da mesma.
+        case 'w': 
+        if (*ref_lin>1) *ref_lin -= 1;
+        else *ref_lin += tamanho-1; 
+        break;
+
+        case 's': 
+        if (*ref_lin<tamanho) *ref_lin += 1;
+        else *ref_lin -= tamanho-1; 
+        break;
+        
+        case 'a':
+        if (*ref_col>1) *ref_col -= 1;
+        else *ref_col += tamanho-1; 
+        break;
+
+        case 'd': 
+        if (*ref_col<tamanho) *ref_col += 1;
+        else *ref_col -= tamanho-1;
+        break;
+
+        //altera na posição (rainha -> ESPACO_BRANCO -> rainha)
+        case '\n':
+        case ESPACO_BRANCO:
+        // indice relaciona linha e coluna com o indice da string do tabuleiro
+        int indice = (*ref_lin-1)*floorSqrt(tamanho) + (*ref_col-1); 
+        if (str[indice] == RAINHA) str[indice] = ESPACO_BRANCO;
+        else if (str[indice] == ESPACO_BRANCO) str[indice] = RAINHA; 
+
+        // caso não entre em nenhum anterior.
+        default: return false;
+    }
 }
+
 int main(){
     int lado;
     printf("Digite o tamanho do tabuleiro (exemplo: 4 => tabuleiro 4x4): ");
@@ -182,6 +229,7 @@ int main(){
     int tamanho=lado*lado; 
     char str[tamanho];
 
+    // inicialização do tabuleiro (nao pedia no trabalho, mas me facilitou para testar)
     printf("Como iniciar o tabuleiro?\n0: Tabuleiro Vazio\t1: Inserir Tabuleiro Inicial\t2: Tabuleiro Aleatório\nResposta: ");
     int option;
     scanf("%d", &option);
@@ -189,7 +237,7 @@ int main(){
     if (option == 0){
         int i;
         for (i=0; i<tamanho; i++) {
-            str[i] = ' ';
+            str[i] = ESPACO_BRANCO;
         }
     } else if (option == 1){
         int i;
@@ -197,22 +245,16 @@ int main(){
         for (i=0; i<tamanho; i++){
             do{
                 scanf("%c", &str[i]);
-            }while(str[i]!=' ' && str[i]!=RAINHA);
+            }while(str[i]!=ESPACO_BRANCO && str[i]!=RAINHA);
         }
     } else if (option == 2){
         srand(time(0));
         int i;
         for (i=0; i<tamanho; i++){
-            if (rand()%2 == 0) str[i] = ' ';
+            if (rand()%2 == 0) str[i] = ESPACO_BRANCO;
             else str[i] = RAINHA;            
         }
     }
-    
-    printf("\nTabuleiro:");
-    int i;
-    for (i=0; i<tamanho; i++){
-        if (i%floorSqrt(tamanho)==0) printf("\n");
-        printf("%c", str[i]);
-    }
-    printf("\n");
+    desenha_tabuleiro(tamanho, str);    
+
 }
