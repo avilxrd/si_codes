@@ -52,10 +52,9 @@ bool verifica_linha(int tamanho, char str[tamanho]){
         aux = aux + 1;
         // analisa as informações acima
         if (aux == 4){
-            if (cont == 1) printf("Linha Ok\n");
-            else if (cont == 0){
-                printf("Nenhuma Rainha na Linha\n");
-                return false;
+            if (cont == 0){
+                // printf("Nenhuma Rainha na Linha\n");
+                // return false;
             }
             else if (cont > 1){
                 printf("Mais de uma Rainha na Linha\n");
@@ -83,10 +82,9 @@ bool verifica_coluna(int tamanho, char str[tamanho]){
 
             // verifica os dados
             if (quant == 4){
-                if (cont == 1) printf("Coluna Ok\n");
-                else if (cont == 0){
-                    printf("Nenhuma rainha na coluna\n");
-                    return false;
+                if (cont == 0){
+                    // printf("Nenhuma rainha na coluna\n");
+                    // return false;
                 } else if (cont > 1){
                     printf("Mais de uma rainha na coluna\n");
                     return false;
@@ -117,33 +115,49 @@ bool verifica_diagonal(int tamanho, char str[tamanho]){
         for (j=i; j<tamanho; j=j+skip_baixo){ // percorre a diagonal (direita baixo) do item inicial
             if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
         } 
-        printf("\n ⬊ [%d] quant_rainhas", quant_rainhas);
-        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
+        if (quant_rainhas > 1){
+            printf("\n ⬊ [%d] quant_rainhas", quant_rainhas);
+            return false;
+        } 
 
         quant_rainhas = 0;
         for (j=i; j>=0; j=j-skip_cima){ // percorre a diagonal (direita cima) do item inicial
             if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
         }
-        printf("\n ⬈ [%d] quant_rainhas", quant_rainhas);
-        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
+        if (quant_rainhas > 1) {
+            printf("\n ⬈ [%d] quant_rainhas", quant_rainhas);
+            return false;
+        }
     }
     
     // Última Coluna
     int pos_inicial = floorSqrt(tamanho) - 1; // deixei com nomes diferentes apesar de ter o mesmo valor para facilitar a leitura
     skip_baixo = floorSqrt(tamanho) - 1;
     skip_cima = floorSqrt(tamanho) + 1;
-    for (i=pos_inicial; i<tamanho; i++){ // muda o item da coluna
+
+    for (i=pos_inicial; i<tamanho; i+=floorSqrt(tamanho)){ // muda o item da coluna
+        
+        TODO: // preciso garantir que não está passando do limite do laço
+
+
         for (j=i; j<tamanho; j=j+skip_baixo){
-            if (str[j] == RAINHA) quant_rainhas = quant_rainhas + 1;
+            if (str[j] == RAINHA) quant_rainhas++;
         }
-        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
+        if (quant_rainhas > 1){
+            printf("\n ↖ [%d] quant_rainhas", quant_rainhas);
+            return false;
+        } 
 
         quant_rainhas = 0;
         for (j=pos_inicial; j>=0; j=j-skip_cima){
-            if (str[i] == RAINHA) quant_rainhas = quant_rainhas + 1;
+            if (str[i] == RAINHA) quant_rainhas++;
         }
-        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
+        if (quant_rainhas > 1){
+            printf("\n ↙ [%d] quant_rainhas", quant_rainhas);
+            return false;
+        }
     }
+
     return true;
 }
 
@@ -224,7 +238,7 @@ bool processa_entrada(int tamanho, char str[tamanho], int *ref_lin, int *ref_col
         // ao movimentar o cursor, fiz com que ao 'exceder' o numero da linha/coluna o cursor vá para
         // o início/fim da mesma.
         
-        // obs: eu teria usado [*ref_lin = (*ref_lin>0) ? *ref_lin-1 : lado-1;], porem como nao vimos ? em aula fiz desse outro jeito
+        // *ref_lin = (*ref_lin>0) ? *ref_lin-1 : lado-1;
         case 'w': 
             if (*ref_lin>1) *ref_lin -= 1;
             else *ref_lin += lado-1;
@@ -296,14 +310,17 @@ int main(){
         }
     }
 
+
     // 
     // PARTE DO PROGRAMA QUE REPETE
     // 
 
+    time_t start = time(NULL); 
     int lin=1, col=1;
 
     t_inicializa();
     while(true){
+        if(n_rainhas(tamanho, str)==2) break;
         t_limpa();
         if (processa_entrada(tamanho, str, &lin, &col)){
             printf("Programa Encerrado.");
@@ -316,4 +333,17 @@ int main(){
         }
     }
     t_finaliza();
+
+    // 
+    // FINALIZAÇÃO
+    time_t diff = time(NULL) - start;
+    t_limpa();
+    if (n_rainhas(tamanho, str) == 2){
+        printf("\nParabéns, você conseguiu em %d segundos!!\nVeja seu tabuleiro vencedor: \n", diff);
+        desenha_tabuleiro(tamanho, str, lin, col);
+    } 
+    else{
+        printf ("\nO jogador desistiu com %.2f segundos passados...\nEste era seu tabuleiro:\n\n");
+        desenha_tabuleiro(tamanho, str, lin, col);
+    } 
 }
