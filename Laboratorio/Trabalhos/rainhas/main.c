@@ -52,8 +52,15 @@ bool verifica_linha(int tamanho, char str[tamanho]){
         aux = aux + 1;
         // analisa as informações acima
         if (aux == 4){
-            if (cont == 0) return false;
-            else if (cont > 1) return false;
+            if (cont == 1) printf("Linha Ok\n");
+            else if (cont == 0){
+                printf("Nenhuma Rainha na Linha\n");
+                return false;
+            }
+            else if (cont > 1){
+                printf("Mais de uma Rainha na Linha\n");
+                return false;
+            }
             aux = 0;
             cont = 0;
         }
@@ -110,17 +117,15 @@ bool verifica_diagonal(int tamanho, char str[tamanho]){
         for (j=i; j<tamanho; j=j+skip_baixo){ // percorre a diagonal (direita baixo) do item inicial
             if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
         } 
-        // printf("\n ⬊ [%d] quant_rainhas", quant_rainhas);
-        // if (quant_rainhas <= 0) return 0;
-        // else if (quant_rainhas>1) return 2;
+        printf("\n ⬊ [%d] quant_rainhas", quant_rainhas);
+        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
 
         quant_rainhas = 0;
         for (j=i; j>=0; j=j-skip_cima){ // percorre a diagonal (direita cima) do item inicial
             if (str[j]==RAINHA) quant_rainhas = quant_rainhas + 1;
         }
         printf("\n ⬈ [%d] quant_rainhas", quant_rainhas);
-        // if (quant_rainhas <= 0) return 0;
-        // else return 2;
+        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
     }
     
     // Última Coluna
@@ -131,39 +136,38 @@ bool verifica_diagonal(int tamanho, char str[tamanho]){
         for (j=i; j<tamanho; j=j+skip_baixo){
             if (str[j] == RAINHA) quant_rainhas = quant_rainhas + 1;
         }
-        if (quant_rainhas <= 0) return 0;
-        else if (quant_rainhas == 1) return 1;
-        else return 2;
+        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
 
         quant_rainhas = 0;
         for (j=pos_inicial; j>=0; j=j-skip_cima){
             if (str[i] == RAINHA) quant_rainhas = quant_rainhas + 1;
         }
-        if (quant_rainhas <= 0) return 0;
-        else if (quant_rainhas == 1) return 1;
-        else return 2;
+        if (quant_rainhas <= 0 || quant_rainhas > 1) return false;
     }
+    return true;
 }
 
 int n_rainhas(int tamanho, char str[]){
     int i, rainhas=0, lado = floorSqrt(tamanho);
+
     // conta as rainhas na string
     for (i=0; i<tamanho; i++){
         if (str[i]==RAINHA) rainhas++; 
     }
 
-    if(rainhas==lado && verifica_linha(tamanho, str) && verifica_coluna(tamanho, str)){ 
-        printf("Tabuleiro Correto e Completo! \n");
-        return 2;
-    } else if (verifica_linha(tamanho, str) && verifica_coluna(tamanho, str)){
-        printf("Tabuleiro Correto mas Incompleto! \n");
-        return 0;
-    } else if (!verifica_linha(tamanho, str) || !verifica_coluna(tamanho, str)){
-        printf("Tabuleiro Incorreto! \n");
+    if(verifica_linha(tamanho, str) && verifica_coluna(tamanho, str) && verifica_diagonal(tamanho, str)){ 
+        if (rainhas == lado){
+            printf("Tabuleiro Correto e Completo\n");
+            return 2;
+        } else {
+            printf("Tabuleiro Correto mas Incompleto\n");
+            return 0;
+        }
+    } else {
+        printf("Tabuleiro Incorreto!\n");
         return 1;
     }
 }
-
 // 
 // PARTE 2 DO TRABALHO -> DESENHO DO TABULEIRO
 // 
@@ -181,12 +185,20 @@ void desenha_tabuleiro(int tamanho, char str[tamanho], int lin, int col){
             if (cor == 0) t_cor_fundo(255, 255, 0);
             else if (cor == 1) t_cor_fundo(255, 0, 0);
             else if (cor == 2) t_cor_fundo(0, 255, 0);
-            printf("\n\t");
+            printf("\n");
+            printf("\t");
         }
 
-        if (i==indice) t_cor_fundo(255, 0, 0);
-        else if ((i/lado+i)%2 == 0) t_cor_fundo(255, 255, 255);
-        else t_cor_fundo(0, 0, 0); 
+        if (i==indice){
+            t_cor_fundo(157, 78, 221);
+            t_cor_letra(255, 255, 255);
+        } else if ((i/lado+i)%2 == 0){
+            t_cor_fundo(255, 255, 255);
+            t_cor_letra(0, 0, 0);
+        } else {
+            t_cor_fundo(0, 0, 0);
+            t_cor_letra(255, 255, 255);
+        }  
 
         printf("%c", str[i]);
     }
@@ -250,39 +262,39 @@ int main(){
     // ENTRADA DE DADOS DO PROGRAMA
 
     // pede pro usuario o tamanho do tabuleiro
-    // int lado;
-    // printf("Digite o tamanho do tabuleiro (exemplo: 4 => tabuleiro 4x4): ");
-    // scanf("%d", &lado);
+    int lado;
+    printf("Digite o tamanho do tabuleiro (exemplo: 4 => tabuleiro 4x4): ");
+    scanf("%d", &lado);
 
-    // int tamanho=lado*lado; 
-    // char str[tamanho];
+    int tamanho=lado*lado; 
+    char str[tamanho];
 
-    // // inicialização do tabuleiro (nao pedia no trabalho, mas me facilitou para testar)
-    // printf("Como iniciar o tabuleiro?\n0: Tabuleiro Vazio\t1: Inserir Tabuleiro Inicial\t2: Tabuleiro Aleatório\nResposta: ");
-    // int option;
-    // scanf("%d", &option);
-    // limpar_buffer();
-    // if (option == 0){
-    //     int i;
-    //     for (i=0; i<tamanho; i++) {
-    //         str[i] = ESPACO_BRANCO;
-    //     }
-    // } else if (option == 1){
-    //     int i;
-    //     printf("Qualquer caractere diferente de %c e ' ' será ignorado...\n", RAINHA);
-    //     for (i=0; i<tamanho; i++){
-    //         do{
-    //             scanf("%c", &str[i]);
-    //         }while(str[i]!=ESPACO_BRANCO && str[i]!=RAINHA);
-    //     }
-    // } else if (option == 2){
-    //     srand(time(0));
-    //     int i;
-    //     for (i=0; i<tamanho; i++){
-    //         if (rand()%2 == 0) str[i] = ESPACO_BRANCO;
-    //         else str[i] = RAINHA;            
-    //     }
-    // }
+    // inicialização do tabuleiro (nao pedia no trabalho, mas me facilitou para testar)
+    printf("Como iniciar o tabuleiro?\n0: Tabuleiro Vazio\t1: Inserir Tabuleiro Inicial\t2: Tabuleiro Aleatório\nResposta: ");
+    int option;
+    scanf("%d", &option);
+    limpar_buffer();
+    if (option == 0){
+        int i;
+        for (i=0; i<tamanho; i++) {
+            str[i] = ESPACO_BRANCO;
+        }
+    } else if (option == 1){
+        int i;
+        printf("Qualquer caractere diferente de %c e ' ' será ignorado...\n", RAINHA);
+        for (i=0; i<tamanho; i++){
+            do{
+                scanf("%c", &str[i]);
+            }while(str[i]!=ESPACO_BRANCO && str[i]!=RAINHA);
+        }
+    } else if (option == 2){
+        srand(time(0));
+        int i;
+        for (i=0; i<tamanho; i++){
+            if (rand()%2 == 0) str[i] = ESPACO_BRANCO;
+            else str[i] = RAINHA;            
+        }
+    }
 
     // 
     // PARTE DO PROGRAMA QUE REPETE
@@ -290,15 +302,18 @@ int main(){
 
     int lin=1, col=1;
 
-    // t_inicializa();
-    // while(true){
-    //     t_limpa();
-    //     processa_entrada(tamanho, str, &lin, &col);
-    //     desenha_tabuleiro(tamanho, str, lin, col);
-    //     t_atualiza();
-    // }
-    // t_finaliza();
-    char str[16]="Q      Q Q      ";
-    desenha_tabuleiro(16, str, lin, col);
-    return 0;
+    t_inicializa();
+    while(true){
+        t_limpa();
+        if (processa_entrada(tamanho, str, &lin, &col)){
+            printf("Programa Encerrado.");
+            t_limpa();
+            break;
+        }
+        else {
+            desenha_tabuleiro(tamanho, str, lin, col);
+            t_atualiza();
+        }
+    }
+    t_finaliza();
 }
