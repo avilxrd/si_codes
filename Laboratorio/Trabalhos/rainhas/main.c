@@ -9,18 +9,14 @@
 #define RAINHA 'Q'
 #define ESPACO_BRANCO ' '
 
-// reutilizei do outro trabalho
 void limpar_buffer(){
     while (getchar() != '\n');
 }
+
 // peguei esse codigo aqui -> https://www.geeksforgeeks.org/square-root-of-an-integer/
 int floorSqrt(int x){
-    // Base cases
     if (x == 0 || x == 1)
         return x;
-
-    // Starting from 1, try all numbers until
-    // i*i is greater than or equal to x.
     int i = 1, result = 1;
     while (result <= x) {
         i++;
@@ -28,306 +24,313 @@ int floorSqrt(int x){
     }
     return i - 1;
 }
-// apenas verifica se um numero é par
-bool par(int tamanho){
-    if (tamanho%2==0) return true;
-    else return false ;
-}
 
-// PARTE 1 DO TRABALHO -> VERIFICAÇÃO DAS N RAINHAS
-bool verifica_linha(int tamanho, char str[tamanho]){
-    int i, aux=0, cont=0;
+bool verifica_linha(int tamanho, char str[]){
+    int lin, col, cont;
     int lado = floorSqrt(tamanho);
 
-    for (i=0; i<tamanho; i++){
-        // conta as rainhas por linha
-        if (str[i] == RAINHA) cont = cont + 1;
-        
-        // conta quantos quadrados foram verificados
-        aux = aux + 1;
-        // analisa as informações acima
-        if (aux == lado){
-            if (cont > 1){
-                printf("Mais de uma Rainha na Linha\n");
-                return false;
-            }
-            aux = 0;
-            cont = 0;
+    for (lin=1; lin<=lado; lin++){
+        cont = 0;
+        for (col=1; col<=lado; col++){
+            int indice = (lin-1)*lado + (col-1);
+            if (str[indice] == RAINHA) cont++; 
         }
+        if (cont > 1) return false;
     }
     return true;
 }
 
-bool verifica_coluna(int tamanho, char str[tamanho]){
-    int i, j, aux=0, cont=0, quant=0;
+bool verifica_coluna(int tamanho, char str[]){
+    int lin, col, cont;
     int lado = floorSqrt(tamanho);
 
-    // percorre o array em colunas
-    for (i=0; i<lado;i++){
-        aux = i;
-        for (j=0; j<lado; j++){
-
-            // conta as rainhas por coluna
-            if (str[aux] == RAINHA) cont = cont + 1;
-            quant++;
-
-            // verifica os dados
-            if (quant == lado){
-                if (cont > 1){
-                    printf("Mais de uma rainha na coluna\n");
-                    return false;
-                }
-                cont = 0;
-                quant = 0;
-            }
-            aux = aux + lado;
+    for (col=1; col<=lado; col++){
+        cont = 0;
+        for (lin=1; lin<=lado; lin++){
+            int indice = (lin-1)*lado + (col-1);
+            if (str[indice] == RAINHA) cont++; 
         }
+        if (cont > 1) return false;
     }
     return true;
 }
 
-    // Basicamente separei em quatro partes:
-    // Coluna 1 ↘   última coluna ↙
-    // Assim todas as diagonais são verificadas.
-bool verifica_diagonal(int tamanho, char str[tamanho]){
-    int i, j;
-    int quant_rainhas;
-    int lado=floorSqrt(tamanho);
-
-    // Coluna 1 -> 
-    for (i=0; i<tamanho; i+=lado){ // muda a o item inicial da coluna
-        // col 1 ⬊
-        quant_rainhas = 0;
-        for (j=i; j<tamanho; j+=lado+1){ // percorre a diagonal (direita baixo) do item inicial
-            if (str[j]==RAINHA) quant_rainhas++;
-        } 
-        if (quant_rainhas > 1){
-            printf("DIREITA BAIXO: %d Rainhas\n", quant_rainhas);
-            return false;
-        } 
-
-        // col 1 ⬈
-        quant_rainhas = 0;
-        for (j=i; j>=0; j-=lado-1){ // percorre a diagonal (direita cima) do item inicial
-            if (str[j]==RAINHA) quant_rainhas++;
-        }
-        if (quant_rainhas > 1){
-            printf("DIREITA CIMA: %d Rainhas\n", quant_rainhas);
-            return false;
-        }
-    }
+// bool verifica_diagonal(int tamanho, char str[]){
+//     int lin, col, i, cont;
+//     int lado = floorSqrt(tamanho);
     
-    // Última Coluna
-    for (i=lado-1; i<tamanho; i+=lado){ // muda o item da coluna
-        
-        quant_rainhas = 0;
-        for (j=i; j+lado<tamanho; j+=lado-1){
-            if (str[j] == RAINHA) quant_rainhas++;
-        }
-        if (quant_rainhas > 1){
-            printf("ESQUERDA BAIXO: %d Rainhas\n", quant_rainhas);
-            return false;
-        } 
+//     for (i=1; i<=lado; i++){
+//         cont = 0;
+//         for (lin=1, col=i; lin<=lado && col<=lado; lin++, col++){
+//             int indice = (lin-1)*lado + (col-1);
+//             if (str[indice] == RAINHA) cont++;
+//         }
+//         if (cont > 1) return false; 
+//     }
 
-        quant_rainhas = 0;
-        for (j=lado-1; j>=0; j-=lado+1){
-            if (str[i] == RAINHA) quant_rainhas++;
+//     for (i=2; i<=lado; i++){
+//         cont = 0;
+//         for (lin=i, col=1; lin<=lado && col<=lado; lin++, col++){
+//             int indice = (lin-1)*lado + (col-1);
+//             if (str[indice] == RAINHA) cont++;
+//         }
+//         if (cont > 1) return false; 
+//     }
+    
+//     // <-
+//     for (i=1; i<=lado; i++){
+//         cont = 0;
+//         for (lin=1, col=i; lin>=1 && col<=lado; lin--, col++){
+//             int indice = (lin-1)*lado + (col-1);
+//             if (str[indice] == RAINHA) cont++;
+//         }
+//         if (cont > 1) return false; 
+//     }
+
+//     for (i=2; i<=lado; i++){
+//         cont = 0;
+//         for (lin=lado, col=i; lin>=1 && col<=lado; lin--, col++){
+//             int indice = (lin-1)*lado + (col-1);
+//             if (str[indice] == RAINHA) cont++;
+//         }
+//         if (cont > 1) return false; 
+//     }
+//     return true;
+// }
+
+bool verifica_diagonal(int tamanho, char str[]) {
+    int lin, col, cont;
+    int lado = floorSqrt(tamanho);
+
+    // Diagonais principais (esquerda para direita, do topo esquerdo ao canto inferior direito)
+    for (int start_col = 1; start_col <= lado; start_col++) { 
+        cont = 0;
+        lin = 1;
+        col = start_col;
+
+        while (lin <= lado && col <= lado) { 
+            int indice = (lin - 1) * lado + (col - 1);
+            if (str[indice] == RAINHA) cont++;
+            lin++;
+            col++;
         }
-        if (quant_rainhas > 1){
-            printf("ESQUERDA CIMA: %d Rainhas\n", quant_rainhas);
-            return false;
+
+        if (cont > 1) return false; 
+    }
+
+    for (int start_row = 2; start_row <= lado; start_row++) { 
+        cont = 0;
+        lin = start_row;
+        col = 1;
+
+        while (lin <= lado && col <= lado) { 
+            int indice = (lin - 1) * lado + (col - 1);
+            if (str[indice] == RAINHA) cont++;
+            lin++;
+            col++;
         }
+
+        if (cont > 1) return false; 
+    }
+
+    // Diagonais secundárias (direita para esquerda, do topo direito ao canto inferior esquerdo)
+    for (int start_col = 1; start_col <= lado; start_col++) {
+        cont = 0;
+        lin = 1;
+        col = start_col;
+
+        while (lin <= lado && col >= 1) { 
+            int indice = (lin - 1) * lado + (col - 1);
+            if (str[indice] == RAINHA) cont++;
+            lin++;
+            col--;
+        }
+
+        if (cont > 1) return false; 
+    }
+
+    for (int start_row = 2; start_row <= lado; start_row++) {
+        cont = 0;
+        lin = start_row;
+        col = lado;
+
+        while (lin <= lado && col >= 1) { 
+            int indice = (lin - 1) * lado + (col - 1);
+            if (str[indice] == RAINHA) cont++;
+            lin++;
+            col--;
+        }
+
+        if (cont > 1) return false; 
     }
 
     return true;
 }
 
-int n_rainhas(int tamanho, char str[]){
-    int i, rainhas=0, lado = floorSqrt(tamanho);
+int jogo_rainhas(int tamanho, char str[]){
+    int i, rainhas=0;
+    int lado = floorSqrt(tamanho);
 
-    // conta as rainhas na string
     for (i=0; i<tamanho; i++){
-        if (str[i]==RAINHA) rainhas++; 
+        if (str[i]==RAINHA) rainhas++;
     }
 
-    if(verifica_linha(tamanho, str) && verifica_coluna(tamanho, str) && verifica_diagonal(tamanho, str)){ 
-        if (rainhas == lado){
-            // printf("Tabuleiro Correto e Completo\n");
-            return 2;
-        } else {
-            // printf("Tabuleiro Correto mas Incompleto\n");
-            return 0;
-        }
-    } else {
-        // printf("Tabuleiro Incorreto!\n");
-        return 1;
+    if (!verifica_linha(tamanho, str) || !verifica_coluna(tamanho, str) || !verifica_diagonal(tamanho, str)) return 2; // 2 -> incorreto
+    else {
+        if (rainhas<lado) return 0; // 0 -> incompleto
+        else return 1; // 1 -> completo
     }
 }
-// 
-// PARTE 2 DO TRABALHO -> DESENHO DO TABULEIRO
-// 
 
-void desenha_tabuleiro(int tamanho, char str[tamanho], int lin, int col){
+void cor_borda(int cor){
+    if (cor == 0) t_cor_fundo(255, 255, 0); // incompleto -> amarelo
+    else if (cor == 1) t_cor_fundo(0, 255, 0); // correto -> verde
+    else t_cor_fundo(255, 0, 0); // incorreto -> vermelho
+}
+
+void borda(int lado, int cor){
     int i;
-    int lado = floorSqrt(tamanho);
-    int indice = (lin-1)*lado + (col-1); // relaciona linha e coluna com o indice da posição (ex. linha 1, coluna 2 = indice 1 da string).
-
-    int cor = n_rainhas(tamanho, str);
-    
-    for (i=0; i<tamanho; i++){
-        
-        if (i%lado == 0){
-            if (cor == 0) t_cor_fundo(255, 255, 0);
-            else if (cor == 1) t_cor_fundo(255, 0, 0);
-            else if (cor == 2) t_cor_fundo(0, 255, 0);
-            printf("\n");
-            printf("\t");
-        }
-
-        if (i==indice){
-            t_cor_fundo(157, 78, 221);
-            t_cor_letra(255, 255, 255);
-        } else if (((i/lado)+(i/lado+i))%2 == 0){
-            t_cor_fundo(255, 255, 255);
-            t_cor_letra(0, 0, 0);
-        } else {
-            t_cor_fundo(0, 0, 0);
-            t_cor_letra(255, 255, 255);
-        }  
-        printf("%c", str[i]);
-
+    cor_borda(cor);
+    for (i=0; i<lado+4; i++){
+        printf("%c", ESPACO_BRANCO);
     }
-    t_cor_normal();
 }
 
-// 
-// PARTE 3 DO TRABALHO -> PROCESSAMENTO DA ENTRADA
-// 
-
-bool processa_entrada(int tamanho, char str[tamanho], int *ref_lin, int *ref_col){
+void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bool inicio){
+    int i, j;
     int lado = floorSqrt(tamanho);
-    char tecla;
-
-    if (!t_tem_tecla()) return false;
-    else tecla = t_tecla();
+    int posicao_destacada = (lin-1)*lado + (col-1);
+    int cor = jogo_rainhas(tamanho, str);
     
-    switch(tecla){
+    if (inicio == 1) t_lincol(1,1);
+    if (start!=0) printf("Tempo %ld \n", time(NULL)-start);
+    // borda superior
+    borda(lado, cor);
+
+    for (i=0; i<lado; i++){
+        t_cor_normal();
+        printf("\n");
+        for(j=0; j<lado; j++){
+            // borda lateral
+            if(j==0){
+                cor_borda(cor);
+                printf("%c%c", ESPACO_BRANCO, ESPACO_BRANCO);
+            }
+
+            int indice = i*lado + j;  
+            if (indice == posicao_destacada){
+                t_cor_letra(255, 255, 255);
+                t_cor_fundo(190, 149, 196);
+            } else if ((i+j)%2==0){
+                t_cor_letra(255, 255, 255);
+                t_cor_fundo(0, 0, 0);
+            } else {
+                t_cor_letra(0, 0, 0);
+                t_cor_fundo(255, 255, 255);
+            }
+            printf("%c", str[indice]);
+            // borda lateral
+            if(j==lado-1){
+                cor_borda(cor);
+                printf("%c%c", ESPACO_BRANCO, ESPACO_BRANCO);
+            }
+        }
+    }
+    // borda inferior
+    t_cor_normal();
+    printf("\n");
+    borda(lado, cor);
+    t_cor_normal();
+    printf("\n");
+
+}
+
+bool processa_entrada(int tamanho, char str[], int *ref_lin, int *ref_col){
+    int lado = floorSqrt(tamanho);
+    if (!t_tem_tecla()) return false;
+
+    char option = t_tecla();
+    switch(option){
+        case 'X':
         case 'x': return true;
-
-        // ao movimentar o cursor, fiz com que ao 'exceder' o numero da linha/coluna o cursor vá para
-        // o início/fim da mesma.
         
-        // *ref_lin = (*ref_lin>0) ? *ref_lin-1 : lado-1;
-        case 'w': 
-            if (*ref_lin>1) *ref_lin -= 1;
-            else *ref_lin += lado-1;
+        case 'W':
+        case 'w':
+            //ref_lin igual a (se ref_lin for maior que 1) ref_lin-1 : senao igual a ref_lin+lado-1
+            *ref_lin = (*ref_lin>1) ? *ref_lin-1 : *ref_lin+lado-1;
             return false;
-        case 's': 
-            if (*ref_lin<lado) *ref_lin += 1;
-            else *ref_lin -= lado-1; 
+        case 'S':
+        case 's':
+            *ref_lin = (*ref_lin<lado) ? *ref_lin+1 : *ref_lin-lado+1;
             return false;
-        case 'a':
-            if (*ref_col>1) *ref_col -= 1;
-            else *ref_col += lado-1; 
+        
+        case 'A':
+        case 'a': 
+            *ref_col = (*ref_col>1) ? *ref_col-1 : *ref_col+lado-1;
             return false;
-        case 'd': 
-            if (*ref_col<lado) *ref_col += 1;
-            else *ref_col -= lado-1;
+        case 'D':
+        case 'd':
+            *ref_col = (*ref_col<lado) ? *ref_col+1 : *ref_col-lado+1;
             return false;
-
-        //altera na posição (rainha -> ESPACO_BRANCO -> rainha)
         case '\n':
         case ESPACO_BRANCO:
             int indice = (*ref_lin-1)*lado + (*ref_col-1);  // indice relaciona linha e coluna com o indice da string do tabuleiro
             if (str[indice] == RAINHA) str[indice] = ESPACO_BRANCO;
             else if (str[indice] == ESPACO_BRANCO) str[indice] = RAINHA; 
             return false;
-
         default: return false;
     }
 }
 
-// 
-// PARTE 4 DO TRABALHO -> PROGRAMA PRINCIPAL
-// 
+void end_status(int status, long tempo){
+    switch(status){
+        case 0:
+            printf("\nPrograma encerrado com %ld segundos passados...\nÚltimo tabuleiro:\n\n", tempo);
+            break;
+        case 1:
+            printf("\nParabéns!! Você venceu em %ld segundos...\nTabuleiro final:\n\n", tempo);
+            break;
+        default: printf("\nErro!\n\n");
+    }
+}
 
-int main(){
-    // ENTRADA DE DADOS DO PROGRAMA
-
-    // pede pro usuario o tamanho do tabuleiro
+void main(){
+    int i;
     int lado;
-    printf("Digite o tamanho do tabuleiro (exemplo: 4 => tabuleiro 4x4): ");
+    printf("Qual o tamanho do tabuleiro? (ex. 4 => 4x4): ");
     scanf("%d", &lado);
-
-    int tamanho=lado*lado; 
-    char str[tamanho];
-
-    // inicialização do tabuleiro (nao pedia no trabalho, mas me facilitou para testar)
-    printf("Como iniciar o tabuleiro?\n0: Tabuleiro Vazio\t1: Inserir Tabuleiro Inicial\t2: Tabuleiro Aleatório\nResposta: ");
-    int option;
-    scanf("%d", &option);
     limpar_buffer();
-    if (option == 0){
-        int i;
-        for (i=0; i<tamanho; i++) {
-            str[i] = ESPACO_BRANCO;
-        }
-    } else if (option == 1){
-        int i;
-        printf("Qualquer caractere diferente de %c e ' ' será ignorado...\n", RAINHA);
-        for (i=0; i<tamanho; i++){
-            do{
-                scanf("%c", &str[i]);
-            }while(str[i]!=ESPACO_BRANCO && str[i]!=RAINHA);
-        }
-    } else if (option == 2){
-        srand(time(0));
-        int i;
-        for (i=0; i<tamanho; i++){
-            if (rand()%2 == 0) str[i] = ESPACO_BRANCO;
-            else str[i] = RAINHA;            
-        }
+
+    int tamanho = lado*lado;
+    char str[tamanho];
+    for (i=0; i<tamanho; i++){
+        str[i] = ESPACO_BRANCO;
     }
 
-
-    // 
-    // PARTE DO PROGRAMA QUE REPETE
-    // 
-
-    time_t start = time(NULL); 
+    time_t start = time(NULL);
     int lin=1, col=1;
+    int status;
 
     t_inicializa();
-    t_limpa();
     while(true){
-        t_lincol(1,1);
-        if(n_rainhas(tamanho, str)==2) break;
+        
+        if (jogo_rainhas(tamanho, str)==1){
+            status = 1;
+            break;
+        } 
         
         if (processa_entrada(tamanho, str, &lin, &col)){
-            printf("Programa Encerrado.");
+            status = 0;
             break;
         } else {
             t_limpa();
-            desenha_tabuleiro(tamanho, str, lin, col);
+            desenha_tabuleiro(tamanho, str, lin, col, start, 1);
             t_atualiza();
         }
     }
-    t_limpa();
-    t_cor_normal();
     t_finaliza();
-
-    // 
-    // FINALIZAÇÃO
-    time_t diff = time(NULL) - start;
     t_limpa();
-    if (n_rainhas(tamanho, str) == 2){
-        printf("\nParabéns, você conseguiu em %ld segundos!!\nVeja seu tabuleiro vencedor: \n", diff);
-        desenha_tabuleiro(tamanho, str, lin, col);
-        printf("\n\n");
-    } 
-    else{
-        printf ("\nO jogador desistiu com %ld segundos passados...\nEste era seu tabuleiro:\n", diff);
-        desenha_tabuleiro(tamanho, str, lin, col);
-        printf("\n\n");
-    } 
+    t_lincol(1,1);
+    end_status(status, time(NULL)-start);
+    desenha_tabuleiro(tamanho, str, 0, 0, 0, 0);
 }
