@@ -55,115 +55,64 @@ bool verifica_coluna(int tamanho, char str[]){
     return true;
 }
 
-// bool verifica_diagonal(int tamanho, char str[]){
-//     int lin, col, i, cont;
-//     int lado = floorSqrt(tamanho);
-    
-//     for (i=1; i<=lado; i++){
-//         cont = 0;
-//         for (lin=1, col=i; lin<=lado && col<=lado; lin++, col++){
-//             int indice = (lin-1)*lado + (col-1);
-//             if (str[indice] == RAINHA) cont++;
-//         }
-//         if (cont > 1) return false; 
-//     }
-
-//     for (i=2; i<=lado; i++){
-//         cont = 0;
-//         for (lin=i, col=1; lin<=lado && col<=lado; lin++, col++){
-//             int indice = (lin-1)*lado + (col-1);
-//             if (str[indice] == RAINHA) cont++;
-//         }
-//         if (cont > 1) return false; 
-//     }
-    
-//     // <-
-//     for (i=1; i<=lado; i++){
-//         cont = 0;
-//         for (lin=1, col=i; lin>=1 && col<=lado; lin--, col++){
-//             int indice = (lin-1)*lado + (col-1);
-//             if (str[indice] == RAINHA) cont++;
-//         }
-//         if (cont > 1) return false; 
-//     }
-
-//     for (i=2; i<=lado; i++){
-//         cont = 0;
-//         for (lin=lado, col=i; lin>=1 && col<=lado; lin--, col++){
-//             int indice = (lin-1)*lado + (col-1);
-//             if (str[indice] == RAINHA) cont++;
-//         }
-//         if (cont > 1) return false; 
-//     }
-//     return true;
-// }
-
 bool verifica_diagonal(int tamanho, char str[]) {
     int lin, col, cont;
     int lado = floorSqrt(tamanho);
 
-    // Diagonais principais (esquerda para direita, do topo esquerdo ao canto inferior direito)
-    for (int start_col = 1; start_col <= lado; start_col++) { 
+    // esquerda -> direita
+    int col_inicial;
+    for (col_inicial=1; col_inicial<=lado; col_inicial++){ 
         cont = 0;
         lin = 1;
-        col = start_col;
+        col = col_inicial;
 
         while (lin <= lado && col <= lado) { 
-            int indice = (lin - 1) * lado + (col - 1);
+            int indice = (lin-1)*lado + (col-1);
             if (str[indice] == RAINHA) cont++;
             lin++;
             col++;
         }
-
-        if (cont > 1) return false; 
+        if (cont>1) return false; 
     }
-
-    for (int start_row = 2; start_row <= lado; start_row++) { 
+    int lin_inicial;
+    for (lin_inicial=2; lin_inicial<=lado; lin_inicial++){ 
         cont = 0;
-        lin = start_row;
+        lin = lin_inicial;
         col = 1;
-
-        while (lin <= lado && col <= lado) { 
-            int indice = (lin - 1) * lado + (col - 1);
+        while (lin<=lado && col<=lado){ 
+            int indice = (lin-1)*lado + (col-1);
             if (str[indice] == RAINHA) cont++;
             lin++;
             col++;
         }
-
-        if (cont > 1) return false; 
+        if (cont>1) return false; 
     }
 
-    // Diagonais secundárias (direita para esquerda, do topo direito ao canto inferior esquerdo)
-    for (int start_col = 1; start_col <= lado; start_col++) {
+    // direita -> esquerda
+    for (col_inicial=1; col_inicial<=lado; col_inicial++){
         cont = 0;
         lin = 1;
-        col = start_col;
-
-        while (lin <= lado && col >= 1) { 
-            int indice = (lin - 1) * lado + (col - 1);
+        col = col_inicial;
+        while (lin<=lado && col>=1){ 
+            int indice = (lin-1)*lado + (col-1);
             if (str[indice] == RAINHA) cont++;
             lin++;
             col--;
         }
-
-        if (cont > 1) return false; 
+        if (cont>1) return false; 
     }
-
-    for (int start_row = 2; start_row <= lado; start_row++) {
+    for (lin_inicial=2; lin_inicial<=lado; lin_inicial++){
         cont = 0;
-        lin = start_row;
+        lin = lin_inicial;
         col = lado;
-
-        while (lin <= lado && col >= 1) { 
-            int indice = (lin - 1) * lado + (col - 1);
+        while (lin<=lado && col>=1){ 
+            int indice = (lin-1)*lado + (col-1);
             if (str[indice] == RAINHA) cont++;
             lin++;
             col--;
         }
-
         if (cont > 1) return false; 
     }
-
     return true;
 }
 
@@ -191,8 +140,8 @@ void cor_borda(int cor){
 void borda(int lado, int cor){
     int i;
     cor_borda(cor);
-    for (i=0; i<lado+4; i++){
-        printf("%c", ESPACO_BRANCO);
+    for (i=0; i<lado+2; i++){
+        printf(" %c ", ESPACO_BRANCO);
     }
 }
 
@@ -214,7 +163,7 @@ void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bo
             // borda lateral
             if(j==0){
                 cor_borda(cor);
-                printf("%c%c", ESPACO_BRANCO, ESPACO_BRANCO);
+                printf(" %c ", ESPACO_BRANCO);
             }
 
             int indice = i*lado + j;  
@@ -228,11 +177,13 @@ void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bo
                 t_cor_letra(0, 0, 0);
                 t_cor_fundo(255, 255, 255);
             }
-            printf("%c", str[indice]);
+            if (str[indice] == RAINHA) printf(" # ");
+            else printf(" %c ", ESPACO_BRANCO);
+            
             // borda lateral
             if(j==lado-1){
                 cor_borda(cor);
-                printf("%c%c", ESPACO_BRANCO, ESPACO_BRANCO);
+                printf(" %c ", ESPACO_BRANCO);
             }
         }
     }
@@ -282,7 +233,7 @@ bool processa_entrada(int tamanho, char str[], int *ref_lin, int *ref_col){
     }
 }
 
-void end_status(int status, long tempo){
+void mensagem_final(int status, long tempo){
     switch(status){
         case 0:
             printf("\nPrograma encerrado com %ld segundos passados...\nÚltimo tabuleiro:\n\n", tempo);
@@ -307,7 +258,7 @@ void main(){
         str[i] = ESPACO_BRANCO;
     }
 
-    time_t start = time(NULL);
+    time_t start = time(NULL), end;
     int lin=1, col=1;
     int status;
 
@@ -315,11 +266,13 @@ void main(){
     while(true){
         
         if (jogo_rainhas(tamanho, str)==1){
+            end = time(NULL);
             status = 1;
             break;
         } 
         
         if (processa_entrada(tamanho, str, &lin, &col)){
+            end = time(NULL);
             status = 0;
             break;
         } else {
@@ -331,6 +284,6 @@ void main(){
     t_finaliza();
     t_limpa();
     t_lincol(1,1);
-    end_status(status, time(NULL)-start);
+    mensagem_final(status, end-start);
     desenha_tabuleiro(tamanho, str, 0, 0, 0, 0);
 }
