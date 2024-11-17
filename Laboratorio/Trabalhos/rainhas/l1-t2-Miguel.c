@@ -26,9 +26,8 @@ int floorSqrt(int x){
     return i - 1;
 }
 // verifica se há conflito nas linhas
-bool verifica_linha(int tamanho, char str[]){
+bool verifica_linha(int lado, char str[]){
     int lin, col, cont;
-    int lado = floorSqrt(tamanho);
 
     for (lin=1; lin<=lado; lin++){
         cont = 0;
@@ -41,9 +40,8 @@ bool verifica_linha(int tamanho, char str[]){
     return true;
 }
 // verifica se há conflito nas colunas
-bool verifica_coluna(int tamanho, char str[]){
+bool verifica_coluna(int lado, char str[]){
     int lin, col, cont;
-    int lado = floorSqrt(tamanho);
 
     for (col=1; col<=lado; col++){
         cont = 0;
@@ -56,9 +54,8 @@ bool verifica_coluna(int tamanho, char str[]){
     return true;
 }
 // verifica se há conflito nas diagonais
-bool verifica_diagonal(int tamanho, char str[]) {
+bool verifica_diagonal(int lado, char str[]) {
     int lin, col, cont;
-    int lado = floorSqrt(tamanho);
 
     // esquerda -> direita
     int col_inicial;
@@ -66,7 +63,6 @@ bool verifica_diagonal(int tamanho, char str[]) {
         cont = 0;
         lin = 1;
         col = col_inicial;
-
         while (lin <= lado && col <= lado) { 
             int indice = (lin-1)*lado + (col-1);
             if (str[indice] == RAINHA) cont++;
@@ -117,15 +113,14 @@ bool verifica_diagonal(int tamanho, char str[]) {
     return true;
 }
 // retorna o estado do tabuleiro (0: incompleto, 1: completo, 2: conflito)
-int jogo_rainhas(int tamanho, char str[]){
+int jogo_rainhas(int lado, char str[]){
     int i, rainhas=0;
-    int lado = floorSqrt(tamanho);
 
-    for (i=0; i<tamanho; i++){
+    for (i=0; i<lado*lado; i++){
         if (str[i]==RAINHA) rainhas++;
     }
 
-    if (!verifica_linha(tamanho, str) || !verifica_coluna(tamanho, str) || !verifica_diagonal(tamanho, str)) return 2; // 2 -> incorreto
+    if (!verifica_linha(lado, str) || !verifica_coluna(lado, str) || !verifica_diagonal(lado, str)) return 2; // 2 -> incorreto
     else {
         if (rainhas<lado) return 0; // 0 -> incompleto
         else return 1; // 1 -> completo
@@ -146,17 +141,15 @@ void borda(int lado, int cor){
     }
 }
 // desenha o tabuleiro com a borda
-void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bool inicio){
+void desenha_tabuleiro(int lado, char str[], int lin, int col, long start /*tempo inicial*/, bool inicio /*desenhar no inicio do terminal*/){
     int i, j;
-    int lado = floorSqrt(tamanho);
     int posicao_destacada = (lin-1)*lado + (col-1);
-    int cor = jogo_rainhas(tamanho, str);
+    int cor = jogo_rainhas(lado, str);
     
-    if (inicio == 1) t_lincol(1,1);
-    if (start!=0) printf("Tempo %ld \n", time(NULL)-start);
+    if (inicio == 1) t_lincol(1,1); // se o parametro inicio for true, o desenho será feito no inicio do terminal, caso contrario, onde houver espaço
+    if (start!=0) printf("Tempo %ld \n", time(NULL)-start); // se start for 0, nao printar o tempo, caso contrario, sim
     // borda superior
     borda(lado, cor);
-
     for (i=0; i<lado; i++){
         t_cor_normal();
         printf("\n");
@@ -196,8 +189,7 @@ void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bo
     printf("\n");
 }
 // atribui uma funcionalidade para cada tecla apertada
-bool processa_entrada(int tamanho, char str[], int *ref_lin, int *ref_col){
-    int lado = floorSqrt(tamanho);
+bool processa_entrada(int lado, char str[], int *ref_lin, int *ref_col){
     if (!t_tem_tecla()) return false;
 
     char option = t_tecla();
@@ -265,19 +257,19 @@ void main(){
     t_inicializa();
     while(true){
         
-        if (jogo_rainhas(tamanho, str)==1){
+        if (jogo_rainhas(lado, str)==1){
             end = time(NULL);
             status = 1;
             break;
         } 
         
-        if (processa_entrada(tamanho, str, &lin, &col)){
+        if (processa_entrada(lado, str, &lin, &col)){
             end = time(NULL);
             status = 0;
             break;
         } else {
             t_limpa();
-            desenha_tabuleiro(tamanho, str, lin, col, start, 1);
+            desenha_tabuleiro(lado, str, lin, col, start, 1);
             t_atualiza();
         }
     }
@@ -285,5 +277,5 @@ void main(){
     t_limpa();
     t_lincol(1,1);
     mensagem_final(status, end-start);
-    desenha_tabuleiro(tamanho, str, 0, 0, 0, 0);
+    desenha_tabuleiro(lado, str, 0 /*linha*/, 0 /*coluna*/, 0/*start*/, 0/*inicio*/); //deixei com 0 pois nao precisa neste caso.
 }
