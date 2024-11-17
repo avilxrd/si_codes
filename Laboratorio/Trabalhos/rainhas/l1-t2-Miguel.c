@@ -14,6 +14,7 @@ void limpar_buffer(){
 }
 
 // peguei esse codigo aqui -> https://www.geeksforgeeks.org/square-root-of-an-integer/
+// faz a raiz inteira de um numero
 int floorSqrt(int x){
     if (x == 0 || x == 1)
         return x;
@@ -24,7 +25,7 @@ int floorSqrt(int x){
     }
     return i - 1;
 }
-
+// verifica se há conflito nas linhas
 bool verifica_linha(int tamanho, char str[]){
     int lin, col, cont;
     int lado = floorSqrt(tamanho);
@@ -39,7 +40,7 @@ bool verifica_linha(int tamanho, char str[]){
     }
     return true;
 }
-
+// verifica se há conflito nas colunas
 bool verifica_coluna(int tamanho, char str[]){
     int lin, col, cont;
     int lado = floorSqrt(tamanho);
@@ -54,7 +55,7 @@ bool verifica_coluna(int tamanho, char str[]){
     }
     return true;
 }
-
+// verifica se há conflito nas diagonais
 bool verifica_diagonal(int tamanho, char str[]) {
     int lin, col, cont;
     int lado = floorSqrt(tamanho);
@@ -115,7 +116,7 @@ bool verifica_diagonal(int tamanho, char str[]) {
     }
     return true;
 }
-
+// retorna o estado do tabuleiro (0: incompleto, 1: completo, 2: conflito)
 int jogo_rainhas(int tamanho, char str[]){
     int i, rainhas=0;
     int lado = floorSqrt(tamanho);
@@ -130,13 +131,13 @@ int jogo_rainhas(int tamanho, char str[]){
         else return 1; // 1 -> completo
     }
 }
-
+// seta a cor da borda dependendo do status
 void cor_borda(int cor){
     if (cor == 0) t_cor_fundo(255, 255, 0); // incompleto -> amarelo
     else if (cor == 1) t_cor_fundo(0, 255, 0); // correto -> verde
     else t_cor_fundo(255, 0, 0); // incorreto -> vermelho
 }
-
+// printa uma linha de espaços brancos com fundo da cor do estado do tabuleiro
 void borda(int lado, int cor){
     int i;
     cor_borda(cor);
@@ -144,7 +145,7 @@ void borda(int lado, int cor){
         printf(" %c ", ESPACO_BRANCO);
     }
 }
-
+// desenha o tabuleiro com a borda
 void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bool inicio){
     int i, j;
     int lado = floorSqrt(tamanho);
@@ -193,9 +194,8 @@ void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bo
     borda(lado, cor);
     t_cor_normal();
     printf("\n");
-
 }
-
+// atribui uma funcionalidade para cada tecla apertada
 bool processa_entrada(int tamanho, char str[], int *ref_lin, int *ref_col){
     int lado = floorSqrt(tamanho);
     if (!t_tem_tecla()) return false;
@@ -232,7 +232,7 @@ bool processa_entrada(int tamanho, char str[], int *ref_lin, int *ref_col){
         default: return false;
     }
 }
-
+// mensagem final dependendo de como o programa foi encerrado
 void mensagem_final(int status, long tempo){
     switch(status){
         case 0:
@@ -244,7 +244,7 @@ void mensagem_final(int status, long tempo){
         default: printf("\nErro!\n\n");
     }
 }
-
+// lógica principal do jogo
 void main(){
     int i;
     int lado;
