@@ -22,6 +22,7 @@ cor_t vermelho = {1, 0, 0, 1};
 cor_t amarelo = {1, 1, 0, 1};
 cor_t verde = {0, 1, 0, 1,};
 cor_t cinza = {0.168, 0.176, 0.258, 1};
+cor_t roxo = {0.5, 0.07, 0.388, 1};
 
 void limpar_buffer(){
     while (getchar() != '\n');
@@ -203,8 +204,8 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
     background.inicio.x = 1;
     background.inicio.y = 1;
 
-    cor_t cor = cor_status(lado, str);
     j_retangulo(background, 0, preto, cinza); //fundo
+    cor_t cor = cor_status(lado, str); // cor da borda
     j_retangulo(tabuleiro, 3, preto, cor);
 
     // desenhando as posições no tabuleiro
@@ -212,9 +213,12 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
     posicao.inicio.x = tabuleiro.inicio.x + LARGURA_BORDA/2;
     posicao.inicio.y = tabuleiro.inicio.y + LARGURA_BORDA/2;
 
+    int pos_destacada = (lin-1)*lado + (col-1);
     for (i=0; i<lado; i++){
         for (j=0; j<lado; j++){
-            if ((i+j)%2==0) j_retangulo(posicao, 1, preto, preto);
+            int indice = (i-1)*lado + (j-1);
+            if (indice == pos_destacada) j_retangulo(posicao, 1, preto, roxo);
+            else if ((i+j)%2==0) j_retangulo(posicao, 1, preto, preto);
             else j_retangulo(posicao, 1, preto, branco);
             posicao.inicio.x += largura;
         }
@@ -226,7 +230,7 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
 
 void main(){
     int i;
-    int lado = 50;
+    int lado = 10;
     // scanf("%d", &lado);
     int tamanho = lado*lado;
     char str[tamanho];
