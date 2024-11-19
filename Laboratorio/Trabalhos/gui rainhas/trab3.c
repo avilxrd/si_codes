@@ -6,13 +6,22 @@
 #include <string.h>
 #include <time.h>
 
+// especificações iniciais da janela
+#define ALTURA 600
+#define LARGURA 800
+// constantes usadas no codigo
 #define RAINHA 'Q'
 #define ESPACO_BRANCO ' '
+#define LARGURA_BORDA 15
+#define MARGEM 25
 
 // CORES
 cor_t branco = {1, 1, 1, 1};
 cor_t preto = {0, 0, 0, 1};
 cor_t vermelho = {1, 0, 0, 1};
+cor_t amarelo = {1, 1, 0, 1};
+cor_t verde = {0, 1, 0, 1,};
+cor_t cinza = {0.168, 0.176, 0.258, 1};
 
 void limpar_buffer(){
     while (getchar() != '\n');
@@ -136,12 +145,6 @@ int jogo_rainhas(int tamanho, char str[]){
     }
 }
 
-// void cor_borda(int cor){
-//     if (cor == 0) t_cor_fundo(255, 255, 0); // incompleto -> amarelo
-//     else if (cor == 1) t_cor_fundo(0, 255, 0); // correto -> verde
-//     else t_cor_fundo(255, 0, 0); // incorreto -> vermelho
-// }
-
 void borda(int lado, int cor){
     int i;
     // cor_borda(cor);
@@ -149,7 +152,6 @@ void borda(int lado, int cor){
         printf(" %c ", ESPACO_BRANCO);
     }
 }
-
 
 void mensagem_final(int status, long tempo){
     switch(status){
@@ -163,40 +165,36 @@ void mensagem_final(int status, long tempo){
     }
 }
 
-void desenha_tabuleiro(int lado, char str[], int lin, int col){
-
-}
-
-// especificações iniciais da janela
-tamanho_t janela = {600, 800};
-
-void main(){
-    int i;
-    int lado = 7;
-    // scanf("%d", &lado);
-    int tamanho = lado*lado;
-    char str[tamanho];
-    for (i=0; i<tamanho; i++){
-        str[i] = ESPACO_BRANCO;
+cor_t cor_status(int lado, char str[]){
+    int i, quant_rainhas=0;
+    
+    for (i=0; i<lado*lado; i++){
+        if (str[i] == RAINHA) quant_rainhas++; 
     }
 
+    if (!verifica_linha(lado, str) || !verifica_coluna(lado, str) || !verifica_diagonal(lado, str)) return vermelho;
+    else if (quant_rainhas<lado) return amarelo;
+    else return verde;
+}
+
+tamanho_t janela = {ALTURA, LARGURA};
+
+void desenha_tabuleiro(int lado, char str[], int lin, int col){
+    
     // inicializa o tamanho de uma posição do tabuleiro
     int altura, largura;
-    int margin = 50;
-    altura = (janela.altura - 3*margin) / lado;
-    largura = (janela.largura - 4*margin) / lado;
-
+    altura = (janela.altura - 3*MARGEM) / lado;
+    largura = (janela.largura - 4*MARGEM) / lado;
     retangulo_t posicao;
     posicao.tamanho.altura = altura;
     posicao.tamanho.largura = largura;
 
     // inicializa o tamanho do tabuleiro
     retangulo_t tabuleiro;
-    tabuleiro.tamanho.altura = lado * altura;
-    tabuleiro.tamanho.largura = lado * largura;
+    tabuleiro.tamanho.altura = ((lado * altura)+LARGURA_BORDA);
+    tabuleiro.tamanho.largura = ((lado * largura)+LARGURA_BORDA);
     tabuleiro.inicio.x = janela.largura/2 - tabuleiro.tamanho.largura/2;    
     tabuleiro.inicio.y = janela.altura/2 - tabuleiro.tamanho.altura/2;    
-
 
     // fundo
     retangulo_t background;
@@ -205,25 +203,42 @@ void main(){
     background.inicio.x = 1;
     background.inicio.y = 1;
 
+    cor_t cor = cor_status(lado, str);
+    j_retangulo(background, 0, preto, cinza); //fundo
+    j_retangulo(tabuleiro, 3, preto, cor);
+
+    // desenhando as posições no tabuleiro
+    int i, j;
+    posicao.inicio.x = tabuleiro.inicio.x + LARGURA_BORDA/2;
+    posicao.inicio.y = tabuleiro.inicio.y + LARGURA_BORDA/2;
+
+    for (i=0; i<lado; i++){
+        for (j=0; j<lado; j++){
+            if ((i+j)%2==0) j_retangulo(posicao, 1, preto, preto);
+            else j_retangulo(posicao, 1, preto, branco);
+            posicao.inicio.x += largura;
+        }
+        posicao.inicio.x = tabuleiro.inicio.x + LARGURA_BORDA/2;
+        posicao.inicio.y += altura;
+    }
+
+}
+
+void main(){
+    int i;
+    int lado = 50;
+    // scanf("%d", &lado);
+    int tamanho = lado*lado;
+    char str[tamanho];
+    for (i=0; i<tamanho; i++){
+        str[i] = ESPACO_BRANCO;
+    }
+
+    
     t_inicializa(janela, str);
     while(true){
-        j_retangulo(background, 0, preto, vermelho);
-        j_retangulo(tabuleiro, 3, preto, preto);
-        
-        // desenhando as posições no tabuleiro
-        int i, j;
-        posicao.inicio.x = tabuleiro.inicio.x;
-        posicao.inicio.y = tabuleiro.inicio.y;
 
-        for (i=0; i<lado; i++){
-            for (j=0; j<lado; j++){
-                if ((i+j)%2==0) j_retangulo(posicao, 1, preto, preto);
-                else j_retangulo(posicao, 1, preto, branco);
-                posicao.inicio.x += largura;
-            }
-            posicao.inicio.x = tabuleiro.inicio.x;
-            posicao.inicio.y += altura;
-        }
+        desenha_tabuleiro(lado, str, 0, 0);
         j_atualiza();
 
         // if (jogo_rainhas(tamanho, str)==1){
