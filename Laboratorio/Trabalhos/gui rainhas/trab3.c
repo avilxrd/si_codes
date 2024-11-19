@@ -1,5 +1,5 @@
-// l1-t2 Miguel Avila de Oliveira
-#include "terminal.h"
+// l1-t3 Miguel Avila de Oliveira
+#include "janela.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -8,6 +8,11 @@
 
 #define RAINHA 'Q'
 #define ESPACO_BRANCO ' '
+
+// CORES
+cor_t branco = {1, 1, 1, 1};
+cor_t preto = {0, 0, 0, 1};
+cor_t vermelho = {1, 0, 0, 1};
 
 void limpar_buffer(){
     while (getchar() != '\n');
@@ -131,107 +136,20 @@ int jogo_rainhas(int tamanho, char str[]){
     }
 }
 
-void cor_borda(int cor){
-    if (cor == 0) t_cor_fundo(255, 255, 0); // incompleto -> amarelo
-    else if (cor == 1) t_cor_fundo(0, 255, 0); // correto -> verde
-    else t_cor_fundo(255, 0, 0); // incorreto -> vermelho
-}
+// void cor_borda(int cor){
+//     if (cor == 0) t_cor_fundo(255, 255, 0); // incompleto -> amarelo
+//     else if (cor == 1) t_cor_fundo(0, 255, 0); // correto -> verde
+//     else t_cor_fundo(255, 0, 0); // incorreto -> vermelho
+// }
 
 void borda(int lado, int cor){
     int i;
-    cor_borda(cor);
+    // cor_borda(cor);
     for (i=0; i<lado+2; i++){
         printf(" %c ", ESPACO_BRANCO);
     }
 }
 
-void desenha_tabuleiro(int tamanho, char str[], int lin, int col, long start, bool inicio){
-    int i, j;
-    int lado = floorSqrt(tamanho);
-    int posicao_destacada = (lin-1)*lado + (col-1);
-    int cor = jogo_rainhas(tamanho, str);
-    
-    if (inicio == 1) t_lincol(1,1);
-    if (start!=0) printf("Tempo %ld \n", time(NULL)-start);
-    // borda superior
-    borda(lado, cor);
-
-    for (i=0; i<lado; i++){
-        t_cor_normal();
-        printf("\n");
-        for(j=0; j<lado; j++){
-            // borda lateral
-            if(j==0){
-                cor_borda(cor);
-                printf(" %c ", ESPACO_BRANCO);
-            }
-
-            int indice = i*lado + j;  
-            if (indice == posicao_destacada){
-                t_cor_letra(255, 255, 255);
-                t_cor_fundo(190, 149, 196);
-            } else if ((i+j)%2==0){
-                t_cor_letra(255, 255, 255);
-                t_cor_fundo(0, 0, 0);
-            } else {
-                t_cor_letra(0, 0, 0);
-                t_cor_fundo(255, 255, 255);
-            }
-            if (str[indice] == RAINHA) printf(" # ");
-            else printf(" %c ", ESPACO_BRANCO);
-            
-            // borda lateral
-            if(j==lado-1){
-                cor_borda(cor);
-                printf(" %c ", ESPACO_BRANCO);
-            }
-        }
-    }
-    // borda inferior
-    t_cor_normal();
-    printf("\n");
-    borda(lado, cor);
-    t_cor_normal();
-    printf("\n");
-
-}
-
-bool processa_entrada(int tamanho, char str[], int *ref_lin, int *ref_col){
-    int lado = floorSqrt(tamanho);
-    if (!t_tem_tecla()) return false;
-
-    char option = t_tecla();
-    switch(option){
-        case 'X':
-        case 'x': return true;
-        
-        case 'W':
-        case 'w':
-            //ref_lin igual a (se ref_lin for maior que 1) ref_lin-1 : senao igual a ref_lin+lado-1
-            *ref_lin = (*ref_lin>1) ? *ref_lin-1 : *ref_lin+lado-1;
-            return false;
-        case 'S':
-        case 's':
-            *ref_lin = (*ref_lin<lado) ? *ref_lin+1 : *ref_lin-lado+1;
-            return false;
-        
-        case 'A':
-        case 'a': 
-            *ref_col = (*ref_col>1) ? *ref_col-1 : *ref_col+lado-1;
-            return false;
-        case 'D':
-        case 'd':
-            *ref_col = (*ref_col<lado) ? *ref_col+1 : *ref_col-lado+1;
-            return false;
-        case '\n':
-        case ESPACO_BRANCO:
-            int indice = (*ref_lin-1)*lado + (*ref_col-1);  // indice relaciona linha e coluna com o indice da string do tabuleiro
-            if (str[indice] == RAINHA) str[indice] = ESPACO_BRANCO;
-            else if (str[indice] == ESPACO_BRANCO) str[indice] = RAINHA; 
-            return false;
-        default: return false;
-    }
-}
 
 void mensagem_final(int status, long tempo){
     switch(status){
@@ -245,45 +163,87 @@ void mensagem_final(int status, long tempo){
     }
 }
 
+void desenha_tabuleiro(int lado, char str[], int lin, int col){
+
+}
+
+// especificações iniciais da janela
+tamanho_t janela = {600, 800};
+
 void main(){
     int i;
-    int lado;
-    printf("Qual o tamanho do tabuleiro? (ex. 4 => 4x4): ");
-    scanf("%d", &lado);
-    limpar_buffer();
-
+    int lado = 7;
+    // scanf("%d", &lado);
     int tamanho = lado*lado;
     char str[tamanho];
     for (i=0; i<tamanho; i++){
         str[i] = ESPACO_BRANCO;
     }
 
-    time_t start = time(NULL), end;
-    int lin=1, col=1;
-    int status;
+    // inicializa o tamanho de uma posição do tabuleiro
+    int altura, largura;
+    int margin = 50;
+    altura = (janela.altura - 3*margin) / lado;
+    largura = (janela.largura - 4*margin) / lado;
 
-    t_inicializa();
+    retangulo_t posicao;
+    posicao.tamanho.altura = altura;
+    posicao.tamanho.largura = largura;
+
+    // inicializa o tamanho do tabuleiro
+    retangulo_t tabuleiro;
+    tabuleiro.tamanho.altura = lado * altura;
+    tabuleiro.tamanho.largura = lado * largura;
+    tabuleiro.inicio.x = janela.largura/2 - tabuleiro.tamanho.largura/2;    
+    tabuleiro.inicio.y = janela.altura/2 - tabuleiro.tamanho.altura/2;    
+
+
+    // fundo
+    retangulo_t background;
+    background.tamanho.altura = janela.altura;
+    background.tamanho.largura = janela.largura;
+    background.inicio.x = 1;
+    background.inicio.y = 1;
+
+    t_inicializa(janela, str);
     while(true){
+        j_retangulo(background, 0, preto, vermelho);
+        j_retangulo(tabuleiro, 3, preto, preto);
         
-        if (jogo_rainhas(tamanho, str)==1){
-            end = time(NULL);
-            status = 1;
-            break;
-        } 
-        
-        if (processa_entrada(tamanho, str, &lin, &col)){
-            end = time(NULL);
-            status = 0;
-            break;
-        } else {
-            t_limpa();
-            desenha_tabuleiro(tamanho, str, lin, col, start, 1);
-            t_atualiza();
+        // desenhando as posições no tabuleiro
+        int i, j;
+        posicao.inicio.x = tabuleiro.inicio.x;
+        posicao.inicio.y = tabuleiro.inicio.y;
+
+        for (i=0; i<lado; i++){
+            for (j=0; j<lado; j++){
+                if ((i+j)%2==0) j_retangulo(posicao, 1, preto, preto);
+                else j_retangulo(posicao, 1, preto, branco);
+                posicao.inicio.x += largura;
+            }
+            posicao.inicio.x = tabuleiro.inicio.x;
+            posicao.inicio.y += altura;
         }
+        j_atualiza();
+
+        // if (jogo_rainhas(tamanho, str)==1){
+        //     end = time(NULL);
+        //     status = 1;
+        //     break;
+        // } 
+        
+        // if (processa_entrada(tamanho, str, &lin, &col)){
+        //     end = time(NULL);
+        //     status = 0;
+        //     break;
+        // } else {
+        //     t_limpa();
+        //     desenha_tabuleiro(tamanho, str, lin, col, start, 1);
+        //     t_atualiza();
+        // }
     }
-    t_finaliza();
-    t_limpa();
-    t_lincol(1,1);
-    mensagem_final(status, end-start);
-    desenha_tabuleiro(tamanho, str, 0, 0, 0, 0);
+    j_finaliza();
+    // t_limpa();
+    // mensagem_final(status, end-start);
+    // desenha_tabuleiro(tamanho, str, 0, 0, 0, 0);
 }
