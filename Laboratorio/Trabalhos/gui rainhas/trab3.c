@@ -146,14 +146,6 @@ int jogo_rainhas(int tamanho, char str[]){
     }
 }
 
-void borda(int lado, int cor){
-    int i;
-    // cor_borda(cor);
-    for (i=0; i<lado+2; i++){
-        printf(" %c ", ESPACO_BRANCO);
-    }
-}
-
 void mensagem_final(int status, long tempo){
     switch(status){
         case 0:
@@ -226,6 +218,11 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
         posicao.inicio.y += altura;
     }
 
+}
+
+void processa_entrada(int lado, char str[], int *ref_lin, int *ref_col){
+    
+    
 }
 
 void main(){
