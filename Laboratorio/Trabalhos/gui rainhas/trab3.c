@@ -241,14 +241,12 @@ bool processa_entrada(int lado, char str[], int *ref_lin, int *ref_col){
         
         case 'W':
         case 'w':
-            //ref_lin igual a (se ref_lin for maior que 1) ref_lin-1 : senao igual a ref_lin+lado-1
             *ref_lin = (*ref_lin>1) ? *ref_lin-1 : *ref_lin+lado-1;
             return false;
         case 'S':
         case 's':
             *ref_lin = (*ref_lin<lado) ? *ref_lin+1 : *ref_lin-lado+1;
             return false;
-        
         case 'A':
         case 'a': 
             *ref_col = (*ref_col>1) ? *ref_col-1 : *ref_col+lado-1;
@@ -276,6 +274,8 @@ int main(){
     for (i=0; i<tamanho; i++){
         str[i] = ESPACO_BRANCO;
     }
+    // mouse
+    rato_t mouse;
 
     int lin=1, col=1;
     t_inicializa(janela, str);
