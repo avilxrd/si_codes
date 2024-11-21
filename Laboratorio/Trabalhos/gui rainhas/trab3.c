@@ -171,6 +171,13 @@ cor_t cor_status(int lado, char str[]){
 }
 
 tamanho_t janela = {ALTURA, LARGURA};
+void desenha_rainha(int altura_posicao, int largura_posicao, int y_inicio, int x_inicio){
+    circulo_t rainha;
+    rainha.raio = largura_posicao/3;
+    rainha.centro.y = y_inicio + (altura_posicao/2);
+    rainha.centro.x = x_inicio + (largura_posicao/2);
+    j_circulo(rainha, 0, preto, vermelho);
+}
 
 void desenha_tabuleiro(int lado, char str[], int lin, int col){
     
@@ -209,9 +216,13 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
     for (i=0; i<lado; i++){
         for (j=0; j<lado; j++){
             int indice = (i-1)*lado + (j-1);
+
             if (indice == pos_destacada) j_retangulo(posicao, 1, preto, roxo);
             else if ((i+j)%2==0) j_retangulo(posicao, 1, preto, preto);
             else j_retangulo(posicao, 1, preto, branco);
+            
+            if (str[indice] == RAINHA) desenha_rainha(posicao.tamanho.altura, posicao.tamanho.largura, posicao.inicio.y, posicao.inicio.x);
+            
             posicao.inicio.x += largura;
         }
         posicao.inicio.x = tabuleiro.inicio.x + LARGURA_BORDA/2;
@@ -220,26 +231,57 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
 
 }
 
-void processa_entrada(int lado, char str[], int *ref_lin, int *ref_col){
-    
-    
+bool processa_entrada(int lado, char str[], int *ref_lin, int *ref_col){
+    if (!j_tem_tecla()) return false;
+
+    char option = j_tecla();
+    switch(option){
+        case 'X':
+        case 'x': return true;
+        
+        case 'W':
+        case 'w':
+            //ref_lin igual a (se ref_lin for maior que 1) ref_lin-1 : senao igual a ref_lin+lado-1
+            *ref_lin = (*ref_lin>1) ? *ref_lin-1 : *ref_lin+lado-1;
+            return false;
+        case 'S':
+        case 's':
+            *ref_lin = (*ref_lin<lado) ? *ref_lin+1 : *ref_lin-lado+1;
+            return false;
+        
+        case 'A':
+        case 'a': 
+            *ref_col = (*ref_col>1) ? *ref_col-1 : *ref_col+lado-1;
+            return false;
+        case 'D':
+        case 'd':
+            *ref_col = (*ref_col<lado) ? *ref_col+1 : *ref_col-lado+1;
+            return false;
+        case '\n':
+        case ESPACO_BRANCO:
+            int indice = (*ref_lin-1)*lado + (*ref_col-1);  // indice relaciona linha e coluna com o indice da string do tabuleiro
+            if (str[indice] == RAINHA) str[indice] = ESPACO_BRANCO;
+            else if (str[indice] == ESPACO_BRANCO) str[indice] = RAINHA; 
+            return false;
+        default: return false;
+    }
 }
 
-void main(){
+int main(){
     int i;
-    int lado = 10;
-    // scanf("%d", &lado);
+    int lado = 4;
+    scanf("%d", &lado);
     int tamanho = lado*lado;
     char str[tamanho];
     for (i=0; i<tamanho; i++){
         str[i] = ESPACO_BRANCO;
     }
 
-    
+    int lin=1, col=1;
     t_inicializa(janela, str);
     while(true){
-
-        desenha_tabuleiro(lado, str, 0, 0);
+        processa_entrada(lado, str, &lin, &col);
+        desenha_tabuleiro(lado, str, lin, col);
         j_atualiza();
 
         // if (jogo_rainhas(tamanho, str)==1){
