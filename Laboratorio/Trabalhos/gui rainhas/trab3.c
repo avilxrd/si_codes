@@ -13,7 +13,11 @@
 #define RAINHA 'Q'
 #define ESPACO_BRANCO ' '
 #define LARGURA_BORDA 15
-#define MARGEM 25
+#define MARGEM 50
+
+// typedef struct {
+//     tamanho_t TAMANHO_JANELA;
+// }jogo;
 
 // CORES
 cor_t branco = {1, 1, 1, 1};
@@ -40,9 +44,9 @@ int floorSqrt(int x){
     return i - 1;
 }
 
-bool verifica_linha(int tamanho, char str[]){
+// verifica se há conflito nas linhas
+bool verifica_linha(int lado, char str[]){
     int lin, col, cont;
-    int lado = floorSqrt(tamanho);
 
     for (lin=1; lin<=lado; lin++){
         cont = 0;
@@ -54,10 +58,9 @@ bool verifica_linha(int tamanho, char str[]){
     }
     return true;
 }
-
-bool verifica_coluna(int tamanho, char str[]){
+// verifica se há conflito nas colunas
+bool verifica_coluna(int lado, char str[]){
     int lin, col, cont;
-    int lado = floorSqrt(tamanho);
 
     for (col=1; col<=lado; col++){
         cont = 0;
@@ -69,10 +72,9 @@ bool verifica_coluna(int tamanho, char str[]){
     }
     return true;
 }
-
-bool verifica_diagonal(int tamanho, char str[]) {
+// verifica se há conflito nas diagonais
+bool verifica_diagonal(int lado, char str[]) {
     int lin, col, cont;
-    int lado = floorSqrt(tamanho);
 
     // esquerda -> direita
     int col_inicial;
@@ -80,7 +82,6 @@ bool verifica_diagonal(int tamanho, char str[]) {
         cont = 0;
         lin = 1;
         col = col_inicial;
-
         while (lin <= lado && col <= lado) { 
             int indice = (lin-1)*lado + (col-1);
             if (str[indice] == RAINHA) cont++;
@@ -171,16 +172,40 @@ cor_t cor_status(int lado, char str[]){
 }
 
 tamanho_t janela = {ALTURA, LARGURA};
+
 void desenha_rainha(int altura_posicao, int largura_posicao, int y_inicio, int x_inicio){
     circulo_t rainha;
-    rainha.raio = largura_posicao/3;
+    rainha.raio = largura_posicao/5;
     rainha.centro.y = y_inicio + (altura_posicao/2);
     rainha.centro.x = x_inicio + (largura_posicao/2);
     j_circulo(rainha, 0, preto, vermelho);
 }
 
-void desenha_tabuleiro(int lado, char str[], int lin, int col){
+void desenha_desistir(){
+    int tamanho_txt = 16;
     
+    ponto_t inicio_txt;
+    inicio_txt.y = 10 + tamanho_txt; 
+    inicio_txt.x = 1; 
+    j_texto(inicio_txt, tamanho_txt, branco, "DESISTIR");
+
+}
+
+void desenha_tempo(time_t start){
+    int tamanho_txt = 14;
+    ponto_t inicio_texto;
+    inicio_texto.y = 10 + tamanho_txt; 
+    inicio_texto.x = janela.largura/2 - 30;
+
+    long tempo_atual = time(NULL) - start; 
+    char txt[100];
+    sprintf(txt, "Tempo: %ld s", tempo_atual);
+    j_texto(inicio_texto, tamanho_txt, branco, txt);
+
+}
+
+void desenha_tabuleiro(int lado, char str[], int lin, int col){
+
     // inicializa o tamanho de uma posição do tabuleiro
     int altura, largura;
     altura = (janela.altura - 3*MARGEM) / lado;
@@ -213,8 +238,8 @@ void desenha_tabuleiro(int lado, char str[], int lin, int col){
     posicao.inicio.y = tabuleiro.inicio.y + LARGURA_BORDA/2;
 
     int pos_destacada = (lin-1)*lado + (col-1);
-    for (i=0; i<lado; i++){
-        for (j=0; j<lado; j++){
+    for (i=1; i<=lado; i++){
+        for (j=1; j<=lado; j++){
             int indice = (i-1)*lado + (j-1);
 
             if (indice == pos_destacada) j_retangulo(posicao, 1, preto, roxo);
@@ -267,21 +292,22 @@ bool processa_entrada(int lado, char str[], int *ref_lin, int *ref_col){
 
 int main(){
     int i;
-    int lado = 4;
-    scanf("%d", &lado);
+    int lado = 10;
     int tamanho = lado*lado;
     char str[tamanho];
     for (i=0; i<tamanho; i++){
         str[i] = ESPACO_BRANCO;
     }
-    // mouse
-    rato_t mouse;
 
     int lin=1, col=1;
+
+    time_t start = time(NULL);
     t_inicializa(janela, str);
     while(true){
         processa_entrada(lado, str, &lin, &col);
         desenha_tabuleiro(lado, str, lin, col);
+        desenha_tempo(start);
+        desenha_desistir();
         j_atualiza();
 
         // if (jogo_rainhas(tamanho, str)==1){
