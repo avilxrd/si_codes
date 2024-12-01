@@ -13,13 +13,13 @@
 #define MARGEM 50
 
 // CORES
-cor_t branco = {1, 1, 1, 1};
-cor_t preto = {0, 0, 0, 1};
+cor_t branco   = {1, 1, 1, 1};
+cor_t preto    = {0, 0, 0, 1};
 cor_t vermelho = {1, 0, 0, 1};
-cor_t amarelo = {1, 1, 0, 1};
-cor_t verde = {0, 1, 0, 1,};
-cor_t cinza = {0.168, 0.176, 0.258, 1};
-cor_t roxo = {0.5, 0.07, 0.388, 1};
+cor_t amarelo  = {1, 1, 0, 1};
+cor_t verde    = {0, 1, 0, 1,};
+cor_t cinza    = {0.168, 0.176, 0.258, 1};
+cor_t roxo     = {0.5, 0.07, 0.388, 1};
 
 void limpar_buffer(){
     while (getchar() != '\n');
@@ -56,7 +56,9 @@ typedef struct{
     char *str;
     int tamanho_txt;
     long tempo_inicial;
+    long tempo_final;
     int status;
+    bool encerrado;
 }jogo_t;
 
 void inicializa_jogo(jogo_t *pj){
@@ -64,6 +66,8 @@ void inicializa_jogo(jogo_t *pj){
     pj->tamanho_txt = 48;
     pj->cor_status = amarelo;
     pj->status = 0;
+    pj->encerrado = 0;
+    pj->mouse = j_rato();
 }
 
 void inicia_tabuleiro(jogo_t *pj){
@@ -81,7 +85,142 @@ void inicia_tabuleiro(jogo_t *pj){
     pj->background.inicio = (ponto_t){1,1};
     pj->background.tamanho.altura = pj->tamanho_janela.altura;
     pj->background.tamanho.largura = pj->tamanho_janela.largura;
+
+    pj->rainha.raio = pj->posicao.tamanho.largura/5;
 }
+
+// FUNÇÕES DE PROCESSAMENTO DO JOGO
+// verifica se há conflito nas linhas
+bool verifica_linha(jogo_t *pj){
+    int lin, col, cont;
+
+    for (lin=1; lin<=pj->lado; lin++){
+        cont = 0;
+        for (col=1; col<=pj->lado; col++){
+            int indice = (lin-1)*pj->lado + (col-1);
+            if (pj->str[indice] == RAINHA) cont++; 
+        }
+        if (cont > 1) return false;
+    }
+    return true;
+}
+// verifica se há conflito nas colunas
+bool verifica_coluna(jogo_t *pj){
+    int lin, col, cont;
+
+    for (col=1; col<=pj->lado; col++){
+        cont = 0;
+        for (lin=1; lin<=pj->lado; lin++){
+            int indice = (lin-1)*pj->lado + (col-1);
+            if (pj->str[indice] == RAINHA) cont++; 
+        }
+        if (cont > 1) return false;
+    }
+    return true;
+}
+// verifica se há conflito nas diagonais
+bool verifica_diagonal(jogo_t *pj){
+    int lin, col, cont;
+
+    // esquerda -> direita
+    int col_inicial;
+    for (col_inicial=1; col_inicial<=pj->lado; col_inicial++){ 
+        cont = 0;
+        lin = 1;
+        col = col_inicial;
+        while (lin <= pj->lado && col <= pj->lado) { 
+            int indice = (lin-1)*pj->lado + (col-1);
+            if (pj->str[indice] == RAINHA) cont++;
+            lin++;
+            col++;
+        }
+        if (cont>1) return false; 
+    }
+    int lin_inicial;
+    for (lin_inicial=2; lin_inicial<=pj->lado; lin_inicial++){ 
+        cont = 0;
+        lin = lin_inicial;
+        col = 1;
+        while (lin<=pj->lado && col<=pj->lado){ 
+            int indice = (lin-1)*pj->lado + (col-1);
+            if (pj->str[indice] == RAINHA) cont++;
+            lin++;
+            col++;
+        }
+        if (cont>1) return false; 
+    }
+
+    // direita -> esquerda
+    for (col_inicial=1; col_inicial<=pj->lado; col_inicial++){
+        cont = 0;
+        lin = 1;
+        col = col_inicial;
+        while (lin<=pj->lado && col>=1){ 
+            int indice = (lin-1)*pj->lado + (col-1);
+            if (pj->str[indice] == RAINHA) cont++;
+            lin++;
+            col--;
+        }
+        if (cont>1) return false; 
+    }
+    for (lin_inicial=2; lin_inicial<=pj->lado; lin_inicial++){
+        cont = 0;
+        lin = lin_inicial;
+        col = pj->lado;
+        while (lin<=pj->lado && col>=1){ 
+            int indice = (lin-1)*pj->lado + (col-1);
+            if (pj->str[indice] == RAINHA) cont++;
+            lin++;
+            col--;
+        }
+        if (cont > 1) return false; 
+    }
+    return true;
+}
+void jogo_rainhas(jogo_t *pj){
+    int i, rainhas=0;
+    int lado = floorSqrt(pj->tamanho);
+
+    for (i=0; i<pj->tamanho; i++){
+        if (pj->str[i]==RAINHA) rainhas++;
+    }
+
+    if (!verifica_linha(pj) || !verifica_coluna(pj) || !verifica_diagonal(pj)) pj->cor_status=vermelho;
+    else {
+        if (rainhas<lado) pj->cor_status=amarelo; 
+        else {
+            pj->cor_status=verde;
+            pj->encerrado=1;
+        }
+    }
+}
+void mensagem_final(jogo_t *pj){
+    retangulo_t tela_final;
+    tela_final.inicio = (ponto_t){1,1};
+    tela_final.tamanho = pj->tamanho_janela;
+    char txt[150], txt2[150];
+
+    switch(pj->status){
+        case -1:
+            j_retangulo(tela_final, 0, preto, cinza);
+
+            sprintf(txt, "Tempo: %ld segundos.", pj->tempo_final);
+            j_texto((ponto_t){pj->tamanho_janela.largura/2 - 150, pj->tamanho_janela.altura/2 - 24}, 24, branco, txt);
+            sprintf(txt2, "Clique no mouse para encerrar...");
+            j_texto((ponto_t){pj->tamanho_janela.largura/2 - 200, pj->tamanho_janela.altura/2 + 24}, 24, branco, txt2);
+            break;
+        case 0:
+           j_retangulo(tela_final, 0, preto, cinza);
+
+            sprintf(txt, "Parabéns! %ld segundos.", pj->tempo_final);
+            j_texto((ponto_t){pj->tamanho_janela.largura/2 - 150, pj->tamanho_janela.altura/2 - 24}, 24, branco, txt);
+            sprintf(txt2, "Clique no mouse para encerrar...");
+            j_texto((ponto_t){pj->tamanho_janela.largura/2 - 200, pj->tamanho_janela.altura/2 + 24}, 24, branco, txt2);
+            break;
+        default: printf("\nErro!\n\n");
+    }
+}
+
 
 // FUNÇÕES DE DESENHO
 void desenha_janela(jogo_t *pj){
@@ -99,24 +238,22 @@ void desenha_gui(jogo_t *pj){
     j_texto(posicao_desistir, pj->tamanho_txt, branco, desistir);   
 }
 void desenha_rainha(jogo_t *pj){
-    pj->rainha.raio = pj->posicao.tamanho.largura/5;
     pj->rainha.centro.y = pj->posicao.inicio.y + (pj->posicao.tamanho.altura/2);
-    pj->rainha.centro.x = pj->posicao.inicio.x + (pj->posicao.tamanho.altura/2);
+    pj->rainha.centro.x = pj->posicao.inicio.x + (pj->posicao.tamanho.largura/2);
     j_circulo(pj->rainha, 0, preto, vermelho);
 }
 void desenha_posicoes(jogo_t *pj){
     pj->posicao.inicio.y = pj->tabuleiro.inicio.y + LARGURA_BORDA/2;
     pj->posicao.inicio.x = pj->tabuleiro.inicio.x + LARGURA_BORDA/2;
 
-    for (int i=1; i<=pj->lado; i++){
-        
+    for (int i=1; i<=pj->lado; i++){    
         for (int j=1; j<=pj->lado; j++){
-            pj->index = (pj->lin)*pj->lado + pj->col;
+            int index = (i-1)*pj->lado + j-1;
 
             if ((i+j)%2==0) j_retangulo(pj->posicao, 1, preto, preto);
             else j_retangulo(pj->posicao, 1, preto, branco);
             
-            if (pj->str[pj->index]==RAINHA) desenha_rainha(pj);
+            if (pj->str[index]==RAINHA) desenha_rainha(pj);
             pj->posicao.inicio.x += pj->posicao.tamanho.largura;
         }
         pj->posicao.inicio.x =  pj->tabuleiro.inicio.x + LARGURA_BORDA/2;
@@ -126,6 +263,46 @@ void desenha_posicoes(jogo_t *pj){
 void desenha_cursor(jogo_t *pj){
     pj->cursor = (circulo_t){pj->mouse.posicao, 5};
     j_circulo(pj->cursor, 0, preto, vermelho);
+}
+
+
+int indice_tabuleiro(jogo_t *pj){
+    if (pj->mouse.posicao.x < pj->tabuleiro.inicio.x ||
+        pj->mouse.posicao.x >= pj->tabuleiro.inicio.x + pj->tabuleiro.tamanho.largura ||     
+        pj->mouse.posicao.y < pj->tabuleiro.inicio.y ||
+        pj->mouse.posicao.y >= pj->tabuleiro.inicio.y + pj->tabuleiro.tamanho.altura) return -1;
+
+    int coluna = ((pj->mouse.posicao.x - pj->tabuleiro.inicio.x) / pj->posicao.tamanho.largura);
+    int linha = ((pj->mouse.posicao.y - pj->tabuleiro.inicio.y) / pj->posicao.tamanho.altura);
+
+    printf("Clique detectado em linha: %d, coluna: %d\n", linha+1, coluna+1);
+
+    printf("Indice: [%d] \n", (linha)*pj->lado + (coluna));
+    return linha*pj->lado + coluna;
+}
+bool desistiu(jogo_t *pj){
+    if (pj->mouse.posicao.x >= pj->desistir.inicio.x &&
+        pj->mouse.posicao.x <= pj->desistir.inicio.x + pj->desistir.inicio.x + pj->desistir.tamanho.largura &&
+        pj->mouse.posicao.y >= pj->desistir.inicio.y &&
+        pj->mouse.posicao.y <= pj->desistir.inicio.y + pj->desistir.inicio.x + pj->desistir.tamanho.altura) return 1;
+        else return 0;
+}
+void processa_mouse(jogo_t *pj){
+    pj->mouse = j_rato();
+    desenha_cursor(pj);
+
+    if (pj->mouse.clicado[0]){
+        if (desistiu(pj)){
+            pj->status    = -1;
+            pj->encerrado =  1;
+        } 
+        else {
+            int index = indice_tabuleiro(pj);
+            if (index != -1) {
+                pj->str[index] = (pj->str[index] == ESPACO_BRANCO) ? RAINHA : ESPACO_BRANCO;
+           } 
+        }
+    }
 }
 
 int main(){
@@ -152,13 +329,27 @@ int main(){
     t_inicializa(jogo.tamanho_janela, "Rainhas");
     inicializa_jogo(&jogo);
     inicia_tabuleiro(&jogo);
-    while(jogo.status==0){
+
+    while(jogo.encerrado!=1){
+        // printf("String: [");
+        // for (int i=0; i<jogo.tamanho; i++) printf("%c", jogo.str[i]);
+        // printf("]\n");
+
+        jogo_rainhas(&jogo);
         desenha_janela(&jogo);
         desenha_gui(&jogo);
         desenha_posicoes(&jogo);
         processa_mouse(&jogo);
-        desenha_cursor(&jogo);
         j_atualiza();
     }
     
+    jogo.tempo_final = time(NULL) - jogo.tempo_inicial;
+    while (true) {
+        mensagem_final(&jogo);
+        jogo.mouse = j_rato();
+        if (jogo.mouse.clicado[0]) break;
+        j_atualiza();  
+    }
+
+    j_finaliza();
 }
