@@ -1,2 +1,0 @@
-# comando para compilar o programa
-gcc -Wall -o novo novo.c janela.c -lallegro_font -lallegro_color -lallegro_ttf -lallegro_primitives -lallegro
