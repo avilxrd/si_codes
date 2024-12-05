@@ -32,11 +32,11 @@ typedef struct{
 void inicializa_matriz(int str[12][9]){
     srand(time(NULL));
     //inicializa as casas vazias: 5 primeiras linhas
-    for (int i=0; i<5; i++){
+    for (int i=0; i<6; i++){
     for (int j=0; j<9; j++) str[i][j] = 0;
     }
     //inicializa as casas não vazias: 6ª a 12ª linhas.
-    for (int i=5; i<12; i++){
+    for (int i=6; i<12; i++){
     for (int j=0; j<9; j++) str[i][j] = 1 + rand()%9;
     }
 }
@@ -114,7 +114,24 @@ void desenha_quad(jogo_t *pj){
         quad.inicio.y += quad.tamanho.altura; 
     }
 }
+// arredonda as bordas de um retangulo
+void arredonda(retangulo_t ret){
+    circulo_t borda;
 
+    if (ret.tamanho.largura > ret.tamanho.altura){
+        borda.raio = ret.tamanho.altura/2;
+        borda.centro = (ponto_t){ret.inicio.x, ret.inicio.y + (ret.tamanho.altura)/2};
+        j_circulo(borda, 0, branco, branco);
+        borda.centro = (ponto_t){ret.inicio.x + ret.tamanho.largura, ret.inicio.y + (ret.tamanho.altura)/2};
+        j_circulo(borda, 0, branco, branco);
+    } else {
+        borda.raio = ret.tamanho.largura/2;
+        borda.centro = (ponto_t){ret.inicio.x + (ret.tamanho.largura)/2, ret.inicio.y};
+        j_circulo(borda, 0, branco, branco);
+        borda.centro = (ponto_t){ret.inicio.x + (ret.tamanho.largura)/2, ret.inicio.y + ret.tamanho.altura};
+        j_circulo(borda, 0, branco, branco);
+    }
+}
 void desenha_add(tamanho_t janela){
     ponto_t final = {janela.largura, janela.altura};
 
@@ -127,23 +144,13 @@ void desenha_add(tamanho_t janela){
     cross_x.tamanho = (tamanho_t){(add.raio),6};
     cross_x.inicio  = (ponto_t){add.centro.x - (add.raio)/2, add.centro.y - (cross_x.tamanho.altura)/2};
     j_retangulo(cross_x, 0, preto, branco);
-    
-    circulo_t arredondar;
-    arredondar.raio = cross_x.tamanho.altura/2;
-    arredondar.centro = (ponto_t){cross_x.inicio.x, cross_x.inicio.y + (cross_x.tamanho.altura)/2};
-    j_circulo(arredondar, 0, branco, branco);
-    arredondar.centro = (ponto_t){cross_x.inicio.x + cross_x.tamanho.largura, cross_x.inicio.y + (cross_x.tamanho.altura)/2};
-    j_circulo(arredondar, 0, branco, branco);
+    arredonda(cross_x);
 
     retangulo_t cross_y;
     cross_y.tamanho = (tamanho_t){6,(add.raio)};
     cross_y.inicio  = (ponto_t){add.centro.x - (cross_y.tamanho.largura)/2, add.centro.y - (add.raio)/2};
     j_retangulo(cross_y, 0, preto, branco);
-    arredondar.centro = (ponto_t){cross_y.inicio.x + (cross_y.tamanho.largura)/2, cross_y.inicio.y};
-    j_circulo(arredondar, 0, branco, branco);
-    arredondar.centro = (ponto_t){cross_y.inicio.x + (cross_y.tamanho.largura)/2, cross_y.inicio.y + cross_y.tamanho.altura};
-    j_circulo(arredondar, 0, branco, branco);
-
+    arredonda(cross_y);
 }
 
 int main()  {
@@ -152,12 +159,12 @@ int main()  {
     inicializa_jogo(&jogo);
     t_inicializa(jogo.janela, "Numbers");
     while(true){
-    rato_t mouse = j_rato();
-    desenha_fundo(&jogo);
-    // desenha_tabuleiro(&jogo);
-    desenha_quad(&jogo);
-    desenha_add(jogo.janela);
-    desenha_cursor(mouse);
-    j_atualiza();
+        rato_t mouse = j_rato();
+        desenha_fundo(&jogo);
+        // desenha_tabuleiro(&jogo);
+        desenha_quad(&jogo);
+        desenha_add(jogo.janela);
+        desenha_cursor(mouse);
+        j_atualiza();
     }   
 }
