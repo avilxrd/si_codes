@@ -31,12 +31,12 @@ typedef struct{
 }index_t;
 
 typedef struct{
-    int str[12][9];
+    int str[LINHAS][COLUNAS];
     int recordes[10];
     int pontos;
+    int status;
     bool casa_selecionada;
     index_t selecionado;
-    bool jaPega[LINHAS][COLUNAS];
 
     rato_t mouse;
     tamanho_t janela;
@@ -52,21 +52,21 @@ typedef struct{
 //calcula o tamanho do "quadradinho" 
 tamanho_t calcula_tamanho(tamanho_t janela){
     tamanho_t quad;
-    quad.largura = (janela.largura - MARGEM_LARGURA)/9;
-    quad.altura  = (janela.altura  - MARGEM_ALTURA)/12;
+    quad.largura = (janela.largura - MARGEM_LARGURA)/COLUNAS;
+    quad.altura  = (janela.altura  - MARGEM_ALTURA)/LINHAS;
     return quad; 
 }
 
 // inicializa a matriz com numeros aleatorios
-void inicializa_matriz(int str[12][9]){
+void inicializa_matriz(int str[LINHAS][COLUNAS]){
     srand(time(NULL));
     //inicializa as casas vazias: 5 primeiras linhas
-    for (int i=0; i<6; i++){
-        for (int j=0; j<9; j++) str[i][j] = 0;
+    for (int i=0; i<LINHAS/2; i++){
+        for (int j=0; j<COLUNAS; j++) str[i][j] = 0;
     }
     //inicializa as casas não vazias: 6ª a 12ª linhas.
-    for (int i=6; i<12; i++){
-        for (int j=0; j<9; j++) str[i][j] = 1 + rand()%9;
+    for (int i=6; i<LINHAS; i++){
+        for (int j=0; j<COLUNAS; j++) str[i][j] = 1 + rand()%9;
     }
 }
 
@@ -82,6 +82,7 @@ void inicializaJaPega(jogo_t *pj) {
 void inicializa_jogo(jogo_t *pj){
     pj->janela = (tamanho_t){800, 600};
     pj->pontos = 0;
+    pj->status = 0; //jogo rodando
     pj->tamanho_quad = calcula_tamanho(pj->janela);
     pj->selecionado = (index_t){-1,-1};
 }
@@ -175,7 +176,7 @@ bool vizinhas_linha_seguinte(jogo_t *pj, index_t a, index_t b){
     if (b.i!=a.i+1) return false;
 
     int ultima_ocupada = -1;
-    for (int j = 0; j < 9; j++) if (pj->str[a.i][j] != 0) ultima_ocupada = j;
+    for (int j=0; j<9; j++) if (pj->str[a.i][j] != 0) ultima_ocupada = j;
 
     if (ultima_ocupada == -1 || b.j != 0 || pj->str[b.i][0] == 0) return false;
     return a.j == ultima_ocupada;
@@ -243,11 +244,14 @@ bool linha_vazia(int linha[9]){
 }
 
 // apaga a linha e desloca as linhas acima para baixo
-void atualizar_linhas(int str[12][9]){
-    for (int i=0; i<11; i++){
-        if (linha_vazia(str[i])){
-            for (int j=i; j>0; j--) for (int k=0; k<9; k++) str[j][k] = str[j-1][k];
-            for (int k=0; k<9; k++) str[0][k] = 0;
+void atualizar_linhas(jogo_t *pj){
+
+    for (int i=0; i<LINHAS; i++){
+        if (linha_vazia(pj->str[i])){
+            for (int j=i; j>0; j--){
+                for (int k=0; k<COLUNAS; k++) pj->str[j][k] = pj->str[j-1][k];
+            } 
+            for (int k=0; k<COLUNAS; k++) pj->str[0][k] = 0;
         }
     }
 }
@@ -270,7 +274,7 @@ void realiza_combinacao(jogo_t *pj, index_t indice){
     pj->str[pj->selecionado.i][pj->selecionado.j] = 0;
     pj->pontos += 9;
     desmarcar_selecao(pj);
-    atualizar_linhas(pj->str);
+    atualizar_linhas(pj);
 }
 
 // verifica se é válida a combinação
@@ -281,7 +285,7 @@ bool valida_combinacao(jogo_t *pj, index_t indice){
 }
 
 // processa quando uma casa já foi selecionada
-void processa_selecao_existente(jogo_t *pj, index_t indice){
+void processa_selecao(jogo_t *pj, index_t indice){
     if (sao_vizinhas(pj, pj->selecionado, indice)){
         if (valida_combinacao(pj, indice)) realiza_combinacao(pj, indice);
         else {
@@ -297,19 +301,11 @@ void processa_selecao_existente(jogo_t *pj, index_t indice){
 // 
 void processa_clique(jogo_t *pj, index_t indice){
     if (pj->str[indice.i][indice.j] != 0){
-        if (pj->casa_selecionada) processa_selecao_existente(pj, indice);
+        if (pj->casa_selecionada) processa_selecao(pj, indice);
         else selecionar_casa(pj, indice);
     }
 }
 
-void processa_mouse(jogo_t *pj){
-    pj->mouse = j_rato();
-
-    if (pj->mouse.clicado[0]){
-        index_t indice = converte_clique(pj);
-        if (indice.i >= 0 && indice.i < 12 && indice.j >= 0 && indice.j < 9) processa_clique(pj, indice);
-    }
-}
 
 // ********** funções de desenho **********
 
@@ -428,68 +424,77 @@ void desenha_pontos(int pontos){
     j_texto(pos, 24, branco, txt);
 }
 
+void desenha_parabens(tamanho_t janela){
+    // esc para desistir txt
+    char txt[100];
+    sprintf(txt, "Parabens!!");
+    retangulo_t alinhar = j_texto_contorno((ponto_t){1,1}, 50, txt);
+    ponto_t pos = (ponto_t){janela.largura/2 - alinhar.tamanho.largura/2, janela.altura/2};
+    j_texto(pos, 50, verde, txt);
+}
+
 // desenha a interface completa
 void desenha_interface(tamanho_t janela, int pontos, retangulo_t repovoar){
+    // esc para desistir txt
+    char txt[100];
+    sprintf(txt, "ESC para desistir");
+    retangulo_t alinhar = j_texto_contorno((ponto_t){1,1}, 20, txt);
+    ponto_t pos = (ponto_t){janela.largura/2 - alinhar.tamanho.largura/2, alinhar.tamanho.altura};
+ 
     desenha_fundo(janela);
     desenha_pontos(pontos);
     desenha_repovoar(janela, repovoar);
+    j_texto(pos, 20, vermelho, txt);
+}
+
+void desenha_tela_final(jogo_t *pj){
+    desenha_fundo(pj->janela);
+    retangulo_t alinha = j_texto_contorno((ponto_t){1,1}, 40, "Pontos: 999");
+    ponto_t pos = (ponto_t){pj->janela.largura/2 - alinha.tamanho.largura/2, pj->janela.altura/2 + 40};
+    char txt[100];
+    sprintf(txt, "Pontos: %d", pj->pontos);
+    j_texto(pos, 40, branco, txt);
+    pos.y += 100;
+    sprintf(txt, "Clique para sair...");
+    j_texto(pos, 40, branco, txt);
 }
 
 // ********** repovoamento **********
-bool clique_repovoa(retangulo_t repovoa){
-    rato_t mouse = j_rato();
-    if (mouse.posicao.x >= repovoa.inicio.x &&
-        mouse.posicao.x <= repovoa.inicio.x + repovoa.tamanho.largura &&
-        mouse.posicao.y >= repovoa.inicio.y &&
-        mouse.posicao.y <= repovoa.inicio.y + repovoa.tamanho.altura) return true;
+// apaguei as outras funcoes relacionadas ao repovoamento pois nao estavam funcionando
+// nao esta funcionando!!
+bool clique_repovoa(jogo_t *pj){
+    if (pj->mouse.posicao.x >= pj->repovoar.inicio.x &&
+        pj->mouse.posicao.x <= pj->repovoar.inicio.x + pj->repovoar.tamanho.largura &&
+        pj->mouse.posicao.y >= pj->repovoar.inicio.y &&
+        pj->mouse.posicao.y <= pj->repovoar.inicio.y + pj->repovoar.tamanho.altura) return true;
     return false;
 }
 
-int pegaUltimo(jogo_t *pj){
-  int carregador = 0;
-  for(int i = LINHAS - 1; i >= 0; i--){
-    for(int j = COLUNAS - 1; j >= 0; j--){
-      if((pj->str[i][j] != 0) && (pj->jaPega[i][j] == false)){
-        pj->jaPega[i][j] = true;
-        carregador = pj->str[i][j];
-        return carregador;
-      }
-    }
-  }
-  return carregador;
-}
+void processa_mouse(jogo_t *pj){
+    pj->mouse = j_rato();
 
-void repovoaTabuleiro(jogo_t *pj){
-  for(int i = LINHAS - 1; i >= 0; i--){
-    for(int j = COLUNAS - 1; j >= 0; j--){
-      if(pj->str[i][j] == 0){
-        pj->str[i][j] = pegaUltimo(pj);
-        pj->jaPega[i][j] = true;
-      }
+    if (pj->mouse.clicado[0]){
+        if (clique_repovoa(pj)) printf("ok");
+        index_t indice = converte_clique(pj);
+        if (indice.i>=0 && indice.i<LINHAS && indice.j>=0 && indice.j<COLUNAS) processa_clique(pj, indice);
     }
-  }
 }
-
 // ********** passando arquivo **********
 
 // modifiquei a funcao para ler os . mas converter para 0, pois meu tabuleiro é de int
-bool verifica_args(int nl, int nc, int tab[nl][nc], int argc, char *argv[])
-{
+bool verifica_args(int nl, int nc, int tab[nl][nc], int argc, char *argv[]){
     if (argc != 2) return false;
     char *nome = argv[1];
     FILE *arq = fopen(nome, "r");
     if (arq == NULL) return false;
-
     bool consegui_ler = true;
     for (int l = 0; l < nl; l++){
         for (int c = 0; c < nc; c++){
             char val;
             if (fscanf(arq, " %c", &val) == 1){
-                if (val == '.') {
-                    tab[l][c] = 0; 
-                } else if (val >= '1' && val<='9'){
-                    tab[l][c] = val - '0'; 
-                } else {
+                if (val == '.') tab[l][c] = 0; 
+                else if (val >= '1' && val<='9')tab[l][c] = val - '0'; 
+                else {
                     consegui_ler = false;
                     break;
                 }
@@ -504,6 +509,16 @@ bool verifica_args(int nl, int nc, int tab[nl][nc], int argc, char *argv[])
     return consegui_ler;
 }
 
+// verifica se o jogo acabou -> jogador ganhou
+bool tabuleiro_vazio(jogo_t *pj){
+    for (int i=0; i<LINHAS; i++){
+        for (int j=0; j<COLUNAS; j++) if (pj->str[i][j]!=0) return false;
+    } 
+    pj->status = 1; // win
+    return true;
+}
+
+
 // ********** lógica principal **********
 int main(int argc, char *argv[]){
     jogo_t jogo;
@@ -516,14 +531,26 @@ int main(int argc, char *argv[]){
     ler_recordes(jogo.recordes);
 
     t_inicializa(jogo.janela, "Numbers");
-    while(true){
-        if (j_tecla() == 27) break; // 27 == ESC na tabela ASCII.
+    while(jogo.status>=0 && tabuleiro_vazio(&jogo)==false){
+        if (j_tecla() == 27) jogo.status = -1; // 27 == ESC na tabela ASCII.
+        if (j_tecla() == 32) repovoaTabuleiro(&jogo); // 32 == SPACEBAR na tabela ASCII.
         desenha_interface(jogo.janela, jogo.pontos, jogo.repovoar);
         desenha_quad(&jogo);
         desenha_cursor(jogo.mouse);
         processa_mouse(&jogo);
         j_atualiza();
     }   
+    int i=0;
+    while(!jogo.mouse.clicado[0]){
+        jogo.mouse = j_rato();
+        desenha_tela_final(&jogo);
+        if (jogo.status == 1) desenha_parabens(jogo.janela);
+        if (i==0) {
+            j_atualiza();
+            i++;
+        }
+    }
+
     atualizar_recorde(jogo.recordes, jogo.pontos);
     salvar_recorde(jogo.recordes);
 
