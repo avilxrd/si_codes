@@ -177,6 +177,7 @@ bool verifica_diagonal(jogo_t *pj){
     }
     return true;
 }
+
 void jogo_rainhas(jogo_t *pj){
     int i, rainhas=0;
     int lado = floorSqrt(pj->tamanho);
@@ -194,6 +195,7 @@ void jogo_rainhas(jogo_t *pj){
         }
     }
 }
+
 void mensagem_final(jogo_t *pj){
     retangulo_t tela_final;
     tela_final.inicio = (ponto_t){1,1};
@@ -237,6 +239,7 @@ void desenha_gui(jogo_t *pj){
     pj->desistir = j_texto_contorno(posicao_desistir, pj->tamanho_txt, desistir);
     j_texto(posicao_desistir, pj->tamanho_txt, branco, desistir);
 }
+
 void desenha_rainha(jogo_t *pj){
     pj->rainha.centro.y = pj->posicao.inicio.y + (pj->posicao.tamanho.altura/2);
     pj->rainha.centro.x = pj->posicao.inicio.x + (pj->posicao.tamanho.largura/2);
@@ -305,12 +308,24 @@ void processa_mouse(jogo_t *pj){
     }
 }
 
-int main(){
+int main(int argc, char *argv[]){
     jogo_t jogo;
     jogo.tamanho_janela = (tamanho_t){800, 600};
-
-    printf("Tamanho (ex. 4 => 4x4): ");
-    scanf("%d", &jogo.lado);
+    
+    if (argc==1){
+        printf("\nnenhum argumento passado, tamanho default: 4\n\n");
+        jogo.lado = 4;
+    } else if (argc==2){
+        if (atoi(argv[1]) > 0) jogo.lado= atoi(argv[1]); //converte str para int
+        else{
+            // caso passe um valor negativo, pede outro
+            printf("O tamanho deve ser um número inteiro.\n");
+            printf("Digite um valor correto: ");
+            scanf("%d", &jogo.lado);    
+            // return 1;
+        }
+    }
+    
     jogo.tamanho = jogo.lado*jogo.lado;
 
     jogo.str = malloc(jogo.tamanho * sizeof(char));
@@ -349,6 +364,7 @@ int main(){
         if (jogo.mouse.clicado[0]) break;
         j_atualiza();
     }
-
+    free(jogo.str);
     j_finaliza();
+    return 0;
 }
