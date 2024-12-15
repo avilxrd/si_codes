@@ -3,21 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
 #include <time.h>
 
+// ********** constantes globais **********
 #define MARGEM_ALTURA  50
 #define MARGEM_LARGURA 350
 #define LINHAS 12
 #define COLUNAS 9
 
-// defini várias mas provavelmente não vou usar todas.
 cor_t branco      = {1, 1, 1, 1};
 cor_t preto       = {0, 0, 0, 1};
-cor_t amarelo     = {1, 1, 0, 1};
-
 cor_t cinza       = {0.16, 0.17, 0.25, 1};
-cor_t roxo        = {0.50, 0.07, 0.38, 1};
 cor_t azul_claro  = {0.16, 0.84, 0.91, 1};
 cor_t azul_escuro = {0.37, 0.53, 0.93, 1};
 cor_t verde       = {0.33, 0.79, 0.26, 1};
@@ -25,31 +21,39 @@ cor_t laranja     = {1.00, 0.53, 0.24, 1};
 cor_t vermelho    = {0.99, 0.30, 0.36, 1};
 cor_t cinza_claro = {0.87, 0.89, 0.90, 1};
 
+// estrutura indice
 typedef struct{
     int i;
     int j;
 }index_t;
 
+// estrutura do jogo
 typedef struct{
-    int str[LINHAS][COLUNAS];
+    rato_t mouse;
+    tamanho_t janela;
+    int str[LINHAS][COLUNAS]; 
+    int linhas_vazias[LINHAS];
     int recordes[10];
     int pontos;
-    int status;
+    int status; // -2: perdeu | -1: desistiu | 0: rodando | 1: ganhou
+    int restantes; // quantas peças faltam a serem retiradas
+    
     bool casa_selecionada;
     index_t selecionado;
 
-    rato_t mouse;
-    tamanho_t janela;
     tamanho_t tamanho_quad;
-    // retangulos: o meu codigo cada vez que desenha algo, cria um retangulo novo, nao sei se isso deixa o jogo mt mais lento
-    // ou não, mas na duvida (se der tempo) vou mudar para criar apenas 1 de cada e apenas desenhá-lo em posicoes diferentes
-    // retangulo_t desistir;
-    retangulo_t repovoar;
+    // retangulos e circulos para nao criar um novo dentro do loop
+    circulo_t cursor;
+    retangulo_t quad;
+    retangulo_t fundo;
+    retangulo_t half;
+    retangulo_t repovoar; 
+    retangulo_t status_final;
 }jogo_t;
 
 // ********** inicialização **********
 
-//calcula o tamanho do "quadradinho" 
+// calcula o tamanho do "quadradinho" 
 tamanho_t calcula_tamanho(tamanho_t janela){
     tamanho_t quad;
     quad.largura = (janela.largura - MARGEM_LARGURA)/COLUNAS;
@@ -57,65 +61,71 @@ tamanho_t calcula_tamanho(tamanho_t janela){
     return quad; 
 }
 
+// calcula quantas casas há diferentes de 0
+int inicializa_restantes(int str[LINHAS][COLUNAS]){
+    int restantes = 0;
+    for (int i=0; i<LINHAS; i++){
+        for (int j=0; j<COLUNAS; j++) if (str[i][j]!=0) restantes++;
+    } 
+    return restantes;
+}
+
 // inicializa a matriz com numeros aleatorios
 void inicializa_matriz(int str[LINHAS][COLUNAS]){
     srand(time(NULL));
-    //inicializa as casas vazias: 5 primeiras linhas
+    // inicializa as casas vazias: 5 primeiras linhas
     for (int i=0; i<LINHAS/2; i++){
         for (int j=0; j<COLUNAS; j++) str[i][j] = 0;
     }
-    //inicializa as casas não vazias: 6ª a 12ª linhas.
+    // inicializa as casas não vazias: 6ª a 12ª linhas
     for (int i=6; i<LINHAS; i++){
         for (int j=0; j<COLUNAS; j++) str[i][j] = 1 + rand()%9;
     }
 }
 
-// inicialização do jogo
-void inicializaJaPega(jogo_t *pj) {
-    for (int i = 0; i < LINHAS; i++) {
-        for (int j = 0; j < COLUNAS; j++) {
-            pj->jaPega[i][j] = false;  // Inicializa todas as posições como não "pegas"
-        }
-    }
-}
-
+// define os estados iniciais das variaveis de jogo
 void inicializa_jogo(jogo_t *pj){
-    pj->janela = (tamanho_t){800, 600};
-    pj->pontos = 0;
-    pj->status = 0; //jogo rodando
+    pj->janela       = (tamanho_t){800, 600};
+    pj->pontos       = 0;
+    pj->status       = 0; // jogo rodando
+    pj->selecionado  = (index_t){-1,-1};
     pj->tamanho_quad = calcula_tamanho(pj->janela);
-    pj->selecionado = (index_t){-1,-1};
+    pj->restantes = inicializa_restantes(pj->str);
 }
 
 // ********** funcoes para recordes **********
 
+// le os recordes de um arquibo recordes.txt e adiciona num array
 void ler_recordes(int recordes[10]){
     FILE *fp = fopen("recordes.txt", "r");
 
+    // se der erro ao abrir o arquivo, inicializa o array com 0 (todas as posições).
     if (fp == NULL){
         for (int i=0; i<10; i++) recordes[i] = 0;
         return;
     }
-
+    // se conseguir ler, adiciona no array os recordes enquanto existirem
     for (int i=0; i<10; i++){
         if (fscanf(fp, "%d", &recordes[i]) != 1) recordes[i] = 0;
     }
     fclose(fp);
 }
 
+// gravar os recordes do array para o arquivo
 void salvar_recorde(int recordes[10]){
     FILE *fp = fopen("recordes.txt", "w");
     if (fp == NULL){
         printf("Erro!");
         return;
     }
-
+    // adiciona cada recorde salvo no array em um arquivo recordes.txt
     for (int i=0; i<10; i++){
         fprintf(fp, "%d\n", recordes[i]);
     }
     fclose(fp);
 }
 
+// atualiza o array com a pontuação atual, já em ordem crescente
 void atualizar_recorde(int recordes[10], int pontos){
     int i;
     for (i=0; i<10; i++){
@@ -128,87 +138,99 @@ void atualizar_recorde(int recordes[10], int pontos){
 
 // ********** verificar a vizinhança **********
 
-// verifica se A e B estão na mesma linha e em colunas diferentes
-// e se não há casas ocupadas entre elas.
-bool vizinhas_linha(jogo_t *pj, index_t a, index_t b){
-    if (a.i != b.i || a.j == b.j) return false;
-    int inicio = (a.j < b.j) ? a.j : b.j;
-    int fim    = (a.j > b.j) ? a.j : b.j;
+// verifica se o clique foi feito na mesma casa
+bool mesma_casa(int str[LINHAS][COLUNAS], index_t clique_1, index_t clique_2){
+    if (clique_1.i == clique_2.i && clique_1.j == clique_2.j){
+        printf("Clique na mesma tecla!");
+        return true;
+    }
+    else return false;
+}
+
+// verifica se A e B sao vizinhas de linha
+bool vizinhas_linha(int str[LINHAS][COLUNAS], index_t clique_1, index_t clique_2){
+    if (clique_1.i != clique_2.i || clique_1.j == clique_2.j) return false;
+    // ve qual dos cliques vem "antes", para checar a linha
+    int inicio = (clique_1.j < clique_2.j) ? clique_1.j : clique_2.j;
+    int fim    = (clique_1.j > clique_2.j) ? clique_1.j : clique_2.j;
     
-    for (int j=inicio+1; j<fim; j++) if (pj->str[a.i][j] != 0) return false; //há uma casa ocupada entre elas
+    for (int j=inicio+1; j<fim; j++){
+        if (str[clique_1.i][j] != 0) return false; //há uma casa ocupada entre elas
+    } 
     return true;
 }
 
-// verifica se A e B estão na mesma coluna e em linhas diferentes
-// e se não há casas ocupadas entre elas.
-bool vizinhas_coluna(jogo_t *pj, index_t a, index_t b){
-    if (a.j != b.j || a.i == b.i) return false;
-    int inicio = (a.i < b.i) ? a.i : b.i;
-    int fim    = (a.i > b.i) ? a.i : b.i;
+// verifica se A e B sao vizinhas de coluna
+bool vizinhas_coluna(int str[LINHAS][COLUNAS], index_t clique_1, index_t clique_2){
+    if (clique_1.j != clique_2.j || clique_1.i == clique_2.i) return false;
 
-    for (int i = inicio + 1; i < fim; i++) if (pj->str[i][a.j] != 0) return false; //ha casa ocupada entre elas
+    int inicio = (clique_1.i < clique_2.i) ? clique_1.i : clique_2.i;
+    int fim    = (clique_1.i > clique_2.i) ? clique_1.i : clique_2.i;
+
+    for (int i = inicio + 1; i < fim; i++){
+        if (str[i][clique_1.j] != 0) return false; //ha casa ocupada entre elas
+    } 
     return true;
 }
 
-// verifica se A e B estão na mesma diagonal
-// e se não há casas ocupadas entre elas.
-bool vizinhas_diagonal(jogo_t *pj, index_t a, index_t b){
+// verifica se A e B sao vizinhas de diagonal
+bool vizinhas_diagonal(int str[LINHAS][COLUNAS], index_t clique_1, index_t clique_2){
     // calcula a diferença absoluta entre as coordenadas de linha dx e coluna dy
-    int dx = abs(a.i - b.i);
-    int dy = abs(a.j - b.j);
+    int dx = abs(clique_1.i - clique_2.i);
+    int dy = abs(clique_1.j - clique_2.j);
+    if (dx != dy) return false;
 
-    if (dx != dy) return false; // não estão na mesma diagonal
+    int di = clique_1.i < clique_2.i ? 1 : -1;
+    int dj = clique_1.j < clique_2.j ? 1 : -1;
+    int i = clique_1.i + di;
+    int j = clique_1.j + dj;
 
-    int di = a.i < b.i ? 1 : -1;
-    int dj = a.j < b.j ? 1 : -1;
-    int i = a.i + di;
-    int j = a.j + dj;
-
-    while (i!=b.i && j!=b.j){
-        if (pj->str[i][j] != 0) return false; // há alguma casa ocupada entre elas
+    while (i!=clique_2.i && j!=clique_2.j){
+        if (str[i][j] != 0) return false; // há alguma casa ocupada entre elas
         i += di;
         j += dj;
     }
     return true;
 }
 
-bool vizinhas_linha_seguinte(jogo_t *pj, index_t a, index_t b){
-    if (b.i!=a.i+1) return false;
+bool vizinhas_linha_seguinte(int str[LINHAS][COLUNAS], index_t clique_1, index_t clique_2){
+    if (clique_2.i != clique_1.i + 1) return false;
 
     int ultima_ocupada = -1;
-    for (int j=0; j<9; j++) if (pj->str[a.i][j] != 0) ultima_ocupada = j;
+    for (int j=0; j<9; j++) if (str[clique_1.i][j] != 0) ultima_ocupada = j;
 
-    if (ultima_ocupada == -1 || b.j != 0 || pj->str[b.i][0] == 0) return false;
-    return a.j == ultima_ocupada;
+    if (ultima_ocupada == -1 || clique_2.j != 0 || str[clique_2.i][0] == 0) return false;
+    return clique_1.j == ultima_ocupada;
 }
 
-bool vizinhas_loop(jogo_t *pj, index_t a, index_t b){
-    if (a.i != 11 || b.i != 0) return false;
+bool vizinhas_loop(jogo_t *pj, index_t clique_1, index_t clique_2){
+    if (clique_1.i != 11 || clique_2.i != 0) return false;
     int ultima_ocupada = -1, primeira_ocupada = -1;
 
-    for (int j = 0; j < 9; j++) if (pj->str[a.i][j] != 0) ultima_ocupada = j;
+    for (int j = 0; j < 9; j++) if (pj->str[clique_1.i][j] != 0) ultima_ocupada = j;
 
     for (int j = 0; j < 9; j++){
-        if (pj->str[b.i][j] != 0){
+        if (pj->str[clique_2.i][j] != 0){
             primeira_ocupada = j;
             break;
         }
     }
-    return ultima_ocupada != -1 && primeira_ocupada != -1 && b.j == primeira_ocupada && a.j == ultima_ocupada;
+    return ultima_ocupada != -1 && primeira_ocupada != -1 && clique_2.j == primeira_ocupada && clique_1.j == ultima_ocupada;
 }
 
 // retorna se alguma das condições é válida
-bool sao_vizinhas(jogo_t *pj, index_t a, index_t b){
-    return vizinhas_linha          (pj, a, b) || 
-           vizinhas_coluna         (pj, a, b) || 
-           vizinhas_diagonal       (pj, a, b) ||
-           vizinhas_linha_seguinte (pj, a, b) || 
-           vizinhas_loop           (pj, a, b);
+bool sao_vizinhas(jogo_t *pj, index_t clique_1, index_t clique_2){
+    return vizinhas_linha          (pj->str, clique_1, clique_2) || 
+           vizinhas_coluna         (pj->str, clique_1, clique_2) || 
+           vizinhas_diagonal       (pj->str, clique_1, clique_2) ||
+           vizinhas_linha_seguinte (pj->str, clique_1, clique_2) || 
+           vizinhas_loop           (pj, clique_1, clique_2);
 }
 
 // ********** processamento do mouse **********
 
 // verifica se o mouse esta dentro da posição passada
+// obs: funciona apenas para o caso do converte_clique()
 bool mouse_aqui(jogo_t *pj, int x, int y){
     pj->mouse = j_rato();
     if (pj->mouse.posicao.x>=x                              &&
@@ -239,22 +261,40 @@ index_t converte_clique(jogo_t *pj){
 
 // verifica se uma linha está vazia
 bool linha_vazia(int linha[9]){
-    for (int j=0; j<9; j++) if (linha[j] != 0) return false;
+    for (int i=0; i<9; i++){
+        if (linha[i] != 0) return false;  
+    } 
     return true;
 }
 
-// apaga a linha e desloca as linhas acima para baixo
-void atualizar_linhas(jogo_t *pj){
-
+// atualiza o array de vazias
+void atualiza_vazias(jogo_t *pj){
     for (int i=0; i<LINHAS; i++){
-        if (linha_vazia(pj->str[i])){
+        pj->linhas_vazias[i] = linha_vazia(pj->str[i]) ? 1 : 0; // 1 para vazia, 0 para ocupada
+    }
+}
+
+// apaga a linha e desloca as linhas acima para baixo
+void atualizar_linhas(jogo_t *pj, int prev_empty_lines[LINHAS]){
+    for (int i=0; i<LINHAS; i++){
+        // verifica se a linha era vazia -> cheia
+        if (!prev_empty_lines[i] && linha_vazia(pj->str[i])){
+            // Atualiza as linhas superiores
             for (int j=i; j>0; j--){
-                for (int k=0; k<COLUNAS; k++) pj->str[j][k] = pj->str[j-1][k];
-            } 
-            for (int k=0; k<COLUNAS; k++) pj->str[0][k] = 0;
+                for (int k=0; k<COLUNAS; k++){
+                    pj->str[j][k] = pj->str[j-1][k];
+                }
+            }
+
+            // Preenche a linha superior com zeros
+            for (int k=0; k<COLUNAS; k++){
+                pj->str[0][k] = 0;
+            }
+            pj->pontos += 109;
         }
     }
 }
+
 
 // ********** processamento **********
 
@@ -263,6 +303,7 @@ void selecionar_casa(jogo_t *pj, index_t indice){
     pj->casa_selecionada = true;
     pj->selecionado = indice;
 }
+
 void desmarcar_selecao(jogo_t *pj){
     pj->casa_selecionada = false;
 }
@@ -273,8 +314,9 @@ void realiza_combinacao(jogo_t *pj, index_t indice){
     pj->str[indice.i][indice.j] = 0;
     pj->str[pj->selecionado.i][pj->selecionado.j] = 0;
     pj->pontos += 9;
+    pj->restantes -= 2;
     desmarcar_selecao(pj);
-    atualizar_linhas(pj);
+    atualizar_linhas(pj, pj->linhas_vazias);
 }
 
 // verifica se é válida a combinação
@@ -289,23 +331,21 @@ void processa_selecao(jogo_t *pj, index_t indice){
     if (sao_vizinhas(pj, pj->selecionado, indice)){
         if (valida_combinacao(pj, indice)) realiza_combinacao(pj, indice);
         else {
-            printf("Vizinhas mas diferentes e somadas não é 10\n");
+            // printf("Vizinhas mas diferentes e somadas não é 10\n");
             desmarcar_selecao(pj);
         }
     } else {
-        printf("Não são vizinhas.\n");
+        // printf("Não são vizinhas.\n");
         desmarcar_selecao(pj);
     }
 }
 
-// 
 void processa_clique(jogo_t *pj, index_t indice){
     if (pj->str[indice.i][indice.j] != 0){
         if (pj->casa_selecionada) processa_selecao(pj, indice);
         else selecionar_casa(pj, indice);
     }
 }
-
 
 // ********** funções de desenho **********
 
@@ -320,27 +360,24 @@ cor_t detecta_cor(int num){
 }
 
 // desenha um retangulo do tamanho da janela
-void desenha_fundo(tamanho_t janela){
-    retangulo_t fundo;
+void desenha_fundo(tamanho_t janela, retangulo_t fundo){
     fundo.inicio = (ponto_t){1,1};
     fundo.tamanho = (tamanho_t){janela.largura, janela.altura};
     j_retangulo(fundo, 0, preto, cinza);
 }
 
 // desenha um circulo na posição do cursor
-void desenha_cursor(rato_t mouse){
-    circulo_t pos;
-    pos.centro = mouse.posicao;
-    pos.raio = 3;
-    j_circulo(pos, 1, preto, branco);
+void desenha_cursor(rato_t mouse, circulo_t cursor){
+    cursor.centro = mouse.posicao;
+    cursor.raio = 3;
+    j_circulo(cursor, 1, preto, branco);
 }
 
 // desenha cada quadradinho com o seu conteúdo [vazio ou numero]
 void desenha_quad(jogo_t *pj){
-    retangulo_t quad;
-    quad.tamanho = calcula_tamanho(pj->janela);
-    quad.inicio.x  = (pj->janela.largura/2) - (9*quad.tamanho.largura)/2;
-    quad.inicio.y  = (pj->janela.altura/2)  - (12*quad.tamanho.altura)/2;
+    pj->quad.tamanho = calcula_tamanho(pj->janela);
+    pj->quad.inicio.x  = (pj->janela.largura/2) - (9*pj->quad.tamanho.largura)/2;
+    pj->quad.inicio.y  = (pj->janela.altura/2)  - (12*pj->quad.tamanho.altura)/2;
 
     for (int i=0; i<12; i++){
         for (int j=0; j<9; j++){
@@ -352,21 +389,21 @@ void desenha_quad(jogo_t *pj){
                 cor_txt   = vermelho;
             }
 
-            j_retangulo(quad, 2, branco, cor);
+            j_retangulo(pj->quad, 2, branco, cor);
             
             char num[100];
             sprintf(num, "%d", pj->str[i][j]);
-            ponto_t pos = (ponto_t){quad.inicio.x + quad.tamanho.largura/2, quad.inicio.y + quad.tamanho.altura/2};
+            ponto_t pos = (ponto_t){pj->quad.inicio.x + pj->quad.tamanho.largura/2, pj->quad.inicio.y + pj->quad.tamanho.altura/2};
             retangulo_t txt = j_texto_contorno(pos, 24, num); // cria um retangulo invisivel para descobrir a largura do txt e alinhar
             
-            pos.x = (quad.inicio.x + quad.tamanho.largura/2) - txt.tamanho.largura/2;
-            pos.y = (quad.inicio.y + quad.tamanho.altura/2)  + txt.tamanho.altura/2;
+            pos.x = (pj->quad.inicio.x + pj->quad.tamanho.largura/2) - txt.tamanho.largura/2;
+            pos.y = (pj->quad.inicio.y + pj->quad.tamanho.altura/2)  + txt.tamanho.altura/2;
             if (pj->str[i][j]!=0) j_texto(pos, 24, cor_txt, num);
 
-            quad.inicio.x += quad.tamanho.largura;
+            pj->quad.inicio.x += pj->quad.tamanho.largura;
         }
-        quad.inicio.x  = (pj->janela.largura/2) - (9*quad.tamanho.largura)/2;
-        quad.inicio.y += quad.tamanho.altura; 
+        pj->quad.inicio.x  = (pj->janela.largura/2) - (9*pj->quad.tamanho.largura)/2;
+        pj->quad.inicio.y += pj->quad.tamanho.altura; 
     }
 }
 
@@ -390,8 +427,8 @@ void arredonda(retangulo_t ret){
 }
 
 // desenha o botão de repovoamento
-void desenha_repovoar(tamanho_t janela, retangulo_t repovoa){
-    ponto_t final = {janela.largura, janela.altura};
+void desenha_repovoar(jogo_t *pj){
+    ponto_t final = {pj->janela.largura, pj->janela.altura};
 
     circulo_t add;
     add.raio = 25;
@@ -411,9 +448,9 @@ void desenha_repovoar(tamanho_t janela, retangulo_t repovoa){
     arredonda(cross_y);
 
     // "hitbox" do botao circular (no caso é um retangulo)
-    repovoa.inicio  = (ponto_t){add.centro.x - add.raio, add.centro.y - add.raio};
-    repovoa.tamanho = (tamanho_t){add.raio*2, add.raio*2};
-    // j_retangulo(repovoa, 0, preto, azul_claro); 
+    pj->repovoar.inicio  = (ponto_t){add.centro.x - add.raio, add.centro.y - add.raio};
+    pj->repovoar.tamanho = (tamanho_t){add.raio*2, add.raio*2};
+    // j_retangulo(pj->repovoar, 0, preto, azul_claro); 
 }
 
 // desenha a pontuação atual do jogador
@@ -424,61 +461,112 @@ void desenha_pontos(int pontos){
     j_texto(pos, 24, branco, txt);
 }
 
-void desenha_parabens(tamanho_t janela){
-    // esc para desistir txt
-    char txt[100];
-    sprintf(txt, "Parabens!!");
-    retangulo_t alinhar = j_texto_contorno((ponto_t){1,1}, 50, txt);
-    ponto_t pos = (ponto_t){janela.largura/2 - alinhar.tamanho.largura/2, janela.altura/2};
-    j_texto(pos, 50, verde, txt);
-}
-
 // desenha a interface completa
-void desenha_interface(tamanho_t janela, int pontos, retangulo_t repovoar){
+void desenha_interface(jogo_t *pj){
     // esc para desistir txt
     char txt[100];
     sprintf(txt, "ESC para desistir");
     retangulo_t alinhar = j_texto_contorno((ponto_t){1,1}, 20, txt);
-    ponto_t pos = (ponto_t){janela.largura/2 - alinhar.tamanho.largura/2, alinhar.tamanho.altura};
+    ponto_t pos = (ponto_t){pj->janela.largura/2 - alinhar.tamanho.largura/2, alinhar.tamanho.altura};
  
-    desenha_fundo(janela);
-    desenha_pontos(pontos);
-    desenha_repovoar(janela, repovoar);
+    desenha_fundo(pj->janela, pj->fundo);
+    desenha_pontos(pj->pontos);
+    desenha_repovoar(pj);
     j_texto(pos, 20, vermelho, txt);
 }
 
-void desenha_tela_final(jogo_t *pj){
-    desenha_fundo(pj->janela);
-    retangulo_t alinha = j_texto_contorno((ponto_t){1,1}, 40, "Pontos: 999");
-    ponto_t pos = (ponto_t){pj->janela.largura/2 - alinha.tamanho.largura/2, pj->janela.altura/2 + 40};
-    char txt[100];
-    sprintf(txt, "Pontos: %d", pj->pontos);
-    j_texto(pos, 40, branco, txt);
-    pos.y += 100;
-    sprintf(txt, "Clique para sair...");
-    j_texto(pos, 40, branco, txt);
-}
-
-// ********** repovoamento **********
-// apaguei as outras funcoes relacionadas ao repovoamento pois nao estavam funcionando
-// nao esta funcionando!!
-bool clique_repovoa(jogo_t *pj){
-    if (pj->mouse.posicao.x >= pj->repovoar.inicio.x &&
-        pj->mouse.posicao.x <= pj->repovoar.inicio.x + pj->repovoar.tamanho.largura &&
-        pj->mouse.posicao.y >= pj->repovoar.inicio.y &&
-        pj->mouse.posicao.y <= pj->repovoar.inicio.y + pj->repovoar.tamanho.altura) return true;
+// ve se a pontuação é maior que o ultimo recorde
+bool pontuacao_entra(int pontos, int recordes[10]){
+    if (pontos >= recordes[9]) return true;
     return false;
 }
 
-void processa_mouse(jogo_t *pj){
-    pj->mouse = j_rato();
+void desenha_mensagem_final(jogo_t *pj){
+    char txt[100];
+    ponto_t pos = {1,40};
+    if (pj->status == -1){
+        sprintf(txt, "Desistiu");
+        j_texto(pos, 40, vermelho, txt);
+    } else if (pj->status == -2){
+        sprintf(txt, "Perdeu");
+        j_texto(pos, 40, vermelho, txt);
+    } else if (pj->status == 1){
+        sprintf(txt, "Parabéns!");
+        j_texto(pos, 40, verde, txt);       
+        pos.y += 50;
+        if (pontuacao_entra(pj->pontos, pj->recordes) == true){
+            sprintf(txt, "Sua pontuação entra nos recordes!");
+            j_texto(pos, 40, verde, txt);  
+        } else {
+            sprintf(txt, "Sua pontuação não entra nos recordes!");
+            j_texto(pos, 40, vermelho, txt);  
+        }
+    }
+}
 
+void desenha_tela_final(jogo_t *pj){
+    desenha_fundo(pj->janela, pj->fundo);
+    char txt[100];
+    ponto_t pos;
+
+    // metade da esquerda
+    pj->half.inicio  = (ponto_t){1,1};
+    pj->half.tamanho = (tamanho_t){pj->janela.largura/2, pj->janela.altura};
+    j_retangulo(pj->half, 0, preto, cinza);
+    sprintf(txt, "Ver Recordes ");
+    retangulo_t contorno = j_texto_contorno((ponto_t){1,1}, 40, txt);
+    pos = (ponto_t){pj->half.tamanho.largura/2 - contorno.tamanho.largura/2, pj->half.tamanho.altura/2 + 40};
+    j_texto(pos, 40, branco, txt);
+
+    // metade da direita
+    pj->half.inicio  = (ponto_t){pj->janela.largura/2,1};
+    pj->half.tamanho = (tamanho_t){pj->janela.largura/2, pj->janela.altura};
+    j_retangulo(pj->half, 0, preto, branco);
+    sprintf(txt, "Sair ");
+    contorno = j_texto_contorno((ponto_t){1,1}, 40, txt);
+    pos = (ponto_t){pj->half.inicio.x + pj->half.tamanho.largura/2 - contorno.tamanho.largura/2, pj->half.tamanho.altura/2 + 40};
+    j_texto(pos, 40, cinza, txt);
+}
+
+int processa_tela_final(rato_t mouse, tamanho_t janela){
+    if (mouse.clicado[0]){
+        if (mouse.posicao.x >= 1 && 
+            mouse.posicao.x <= janela.largura/2 && 
+            mouse.posicao.y >= 1 
+            && mouse.posicao.y <= janela.altura){
+                printf("0 esquerda\n");
+                return 0; // esquerda
+            } 
+        else if (mouse.posicao.x > janela.largura/2 &&
+            mouse.posicao.x <= janela.largura  &&
+            mouse.posicao.y >= 1 && 
+            mouse.posicao.y <= janela.altura){
+            printf("1 direita\n");
+            return 1; // direita
+            }
+    }
+    return -1; 
+}
+
+// tela com os recordes dos jogadores
+void desenha_recordes(jogo_t *pj){
+    desenha_fundo(pj->janela, pj->fundo);
+    ponto_t pos_inicial = (ponto_t){1, 40};
+    char txt[100];
+    for (int i=0; i<10; i++){
+        sprintf(txt, "%d: %d pontos.", i+1, pj->recordes[i]);
+        j_texto(pos_inicial, 20, branco, txt);
+        pos_inicial.y += 30;
+    }
+}
+
+void processa_mouse(jogo_t *pj){
     if (pj->mouse.clicado[0]){
-        if (clique_repovoa(pj)) printf("ok");
         index_t indice = converte_clique(pj);
         if (indice.i>=0 && indice.i<LINHAS && indice.j>=0 && indice.j<COLUNAS) processa_clique(pj, indice);
     }
 }
+
 // ********** passando arquivo **********
 
 // modifiquei a funcao para ler os . mas converter para 0, pois meu tabuleiro é de int
@@ -509,51 +597,143 @@ bool verifica_args(int nl, int nc, int tab[nl][nc], int argc, char *argv[]){
     return consegui_ler;
 }
 
-// verifica se o jogo acabou -> jogador ganhou
-bool tabuleiro_vazio(jogo_t *pj){
-    for (int i=0; i<LINHAS; i++){
-        for (int j=0; j<COLUNAS; j++) if (pj->str[i][j]!=0) return false;
-    } 
-    pj->status = 1; // win
-    return true;
-}
+// ********** repovoa **********
+void repovoar(jogo_t *pj){
 
+    int ocupadas[LINHAS * COLUNAS], livres[LINHAS * COLUNAS];   
+    int ocupadas_cont = 0, livres_cont = 0;
+    int primeiro_encontrado = 0;
 
-// ********** lógica principal **********
-int main(int argc, char *argv[]){
-    jogo_t jogo;
-
-    if (!verifica_args(12, 9, jogo.str, argc, argv)){
-        inicializa_matriz(jogo.str);
-    }
-
-    inicializa_jogo(&jogo);
-    ler_recordes(jogo.recordes);
-
-    t_inicializa(jogo.janela, "Numbers");
-    while(jogo.status>=0 && tabuleiro_vazio(&jogo)==false){
-        if (j_tecla() == 27) jogo.status = -1; // 27 == ESC na tabela ASCII.
-        if (j_tecla() == 32) repovoaTabuleiro(&jogo); // 32 == SPACEBAR na tabela ASCII.
-        desenha_interface(jogo.janela, jogo.pontos, jogo.repovoar);
-        desenha_quad(&jogo);
-        desenha_cursor(jogo.mouse);
-        processa_mouse(&jogo);
-        j_atualiza();
-    }   
-    int i=0;
-    while(!jogo.mouse.clicado[0]){
-        jogo.mouse = j_rato();
-        desenha_tela_final(&jogo);
-        if (jogo.status == 1) desenha_parabens(jogo.janela);
-        if (i==0) {
-            j_atualiza();
-            i++;
+    // procura o primeiro número diferente de 0 e as casas livres antes dele
+    for (int lin=0; lin<LINHAS && !primeiro_encontrado; lin++){
+        for (int col=0; col<COLUNAS && !primeiro_encontrado; col++){
+            if (pj->str[lin][col] != 0){
+                primeiro_encontrado = 1; 
+                break;
+            }
+            livres[livres_cont++] = lin * COLUNAS + col;
         }
     }
 
-    atualizar_recorde(jogo.recordes, jogo.pontos);
-    salvar_recorde(jogo.recordes);
+    for (int lin=0; lin<LINHAS; lin++){
+        for (int col=0; col<COLUNAS; col++){
+            if (pj->str[lin][col] != 0) ocupadas[ocupadas_cont++] = pj->str[lin][col];
+        }
+    }
+
+    // TODO
+    // adicionar verificação se há jogadas disponíveis
+    if (livres_cont < ocupadas_cont){
+        pj->status = -2;
+        return;
+    }
+
+    for (int i = 0; i < ocupadas_cont; i++){
+        int idx_livre = livres[livres_cont-1-i];
+        int lin = idx_livre / COLUNAS;
+        int col = idx_livre % COLUNAS;
+        pj->str[lin][col] = ocupadas[ocupadas_cont-1-i];
+    }
+    pj->restantes = pj->restantes * 2;
+}
+
+// retorna true se o clique foi feito na area do botao repovoar
+bool clique_repovoar(jogo_t *pj){
+    if (pj->mouse.clicado[0]){
+        if (pj->mouse.posicao.x >= pj->repovoar.inicio.x                                &&
+            pj->mouse.posicao.x <= pj->repovoar.inicio.x + pj->repovoar.tamanho.largura &&
+            pj->mouse.posicao.y >= pj->repovoar.inicio.y                                &&
+            pj->mouse.posicao.y <= pj->repovoar.inicio.y + pj->repovoar.tamanho.altura){
+                printf("repovoa\n");
+                return true;
+        } else return false;
+    }
+    return false;
+}
+
+// ********** modularizando a main **********
+
+// verifica se o jogo acabou
+bool jogo_acabou(jogo_t *pj){
+    if (pj->restantes == 0){
+        pj->status = 1;
+        return true;
+    } else if (j_tecla() == 27){
+        pj->status = -1;
+        return true;
+    } 
+    return false;
+}
+
+// funções de inicialização
+void inicializar_sistema(jogo_t *jogo, int argc, char *argv[]){
+    if (!verifica_args(12, 9, jogo->str, argc, argv)){
+        inicializa_matriz(jogo->str);
+    }
+    inicializa_jogo(jogo);
+    ler_recordes(jogo->recordes);
+    t_inicializa(jogo->janela, "Numbers");
+}
+
+// loop principal do jogo
+void executar_jogo(jogo_t *jogo){
+    while (!jogo_acabou(jogo)) {
+        jogo->mouse = j_rato();
+        if (clique_repovoar(jogo)) {
+            repovoar(jogo);
+        }
+        desenha_interface(jogo);
+        desenha_quad(jogo);
+        desenha_cursor(jogo->mouse, jogo->cursor);
+        processa_mouse(jogo);
+        j_atualiza();
+    }
+    // só salva o recorde se o jogador ganhou
+    if (jogo->status == 1) {
+        atualizar_recorde(jogo->recordes, jogo->pontos);
+        salvar_recorde(jogo->recordes);
+    }
+}
+
+// loop que fica mostrando os recordes
+void exibir_recordes(jogo_t *jogo){
+    while (true){
+        jogo->mouse = j_rato();
+        desenha_recordes(jogo);
+        j_atualiza();
+        if (jogo->mouse.clicado[0]){
+            break;
+        }
+    }
+}
+
+// loop da tela final
+void finalizar_jogo(jogo_t *jogo){
+    while (true){
+        jogo->mouse = j_rato();
+        desenha_tela_final(jogo);
+        desenha_mensagem_final(jogo);
+        desenha_cursor(jogo->mouse, jogo->cursor);
+        j_atualiza();
+
+        int retorno = processa_tela_final(jogo->mouse, jogo->janela);
+        if (retorno == 1){
+            break;
+        } else if (retorno == 0){
+            exibir_recordes(jogo);
+        }
+    }
 
     j_finaliza();
+}
+
+int main(int argc, char *argv[]){
+    jogo_t jogo;
+
+    inicializar_sistema(&jogo, argc, argv);
+    atualiza_vazias(&jogo);
+    executar_jogo(&jogo);
+    finalizar_jogo(&jogo);
+
     return 0;
 }
