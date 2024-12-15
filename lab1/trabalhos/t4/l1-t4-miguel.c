@@ -195,28 +195,45 @@ bool vizinhas_diagonal(int str[LINHAS][COLUNAS], index_t clique_1, index_t cliqu
 }
 
 bool vizinhas_linha_seguinte(int str[LINHAS][COLUNAS], index_t clique_1, index_t clique_2){
-    if (clique_2.i != clique_1.i + 1) return false;
+    if (clique_1.i > clique_2.i) {
+        index_t temp = clique_1;
+        clique_1 = clique_2;
+        clique_2 = temp;
+    }
 
-    int ultima_ocupada = -1;
-    for (int j=0; j<9; j++) if (str[clique_1.i][j] != 0) ultima_ocupada = j;
+    if (clique_1.i + 1 > clique_2.i) return false;
 
-    if (ultima_ocupada == -1 || clique_2.j != 0 || str[clique_2.i][0] == 0) return false;
-    return clique_1.j == ultima_ocupada;
+    int ultima_ocupada = clique_1.j;
+    int primeira_ocupada = clique_2.j;
+
+    for (int i = clique_1.i + 1; i < clique_2.i; i++) {
+        for (int j = 0; j < COLUNAS; j++) {
+            if (str[i][j] != 0) return false;
+        }
+    }
+
+    return str[clique_1.i][ultima_ocupada] != 0 &&
+           str[clique_2.i][primeira_ocupada] != 0 &&
+           ultima_ocupada == clique_1.j &&
+           primeira_ocupada == clique_2.j;
 }
 
 bool vizinhas_loop(jogo_t *pj, index_t clique_1, index_t clique_2){
-    if (clique_1.i != 11 || clique_2.i != 0) return false;
+
+    index_t ultima = clique_1.i == LINHAS - 1 ? clique_1 : clique_2;
+    index_t primeira = clique_1.i == 0 ? clique_1 : clique_2;
+
+    if (ultima.i != LINHAS-1 || primeira.i != 0) return false;
+
     int ultima_ocupada = -1, primeira_ocupada = -1;
 
-    for (int j = 0; j < 9; j++) if (pj->str[clique_1.i][j] != 0) ultima_ocupada = j;
-
-    for (int j = 0; j < 9; j++){
-        if (pj->str[clique_2.i][j] != 0){
-            primeira_ocupada = j;
-            break;
-        }
+    for (int j=0; j<COLUNAS; j++){
+        if (pj->str[ultima.i][j] != 0) ultima_ocupada = j;
+        if (pj->str[primeira.i][j] != 0 && primeira_ocupada == -1) primeira_ocupada=j;
     }
-    return ultima_ocupada != -1 && primeira_ocupada != -1 && clique_2.j == primeira_ocupada && clique_1.j == ultima_ocupada;
+
+    return ultima_ocupada != -1 && primeira_ocupada != -1 &&
+           ultima.j == ultima_ocupada && primeira.j == primeira_ocupada;
 }
 
 // retorna se alguma das condições é válida
@@ -630,22 +647,18 @@ void repovoar(jogo_t *pj){
         }
     }
 
+    if (livres_cont < pj->restantes){
+        printf("nao ha espaço\n");
+        return;
+    }
+
     for (int lin=0; lin<LINHAS; lin++){
         for (int col=0; col<COLUNAS; col++){
             if (pj->str[lin][col] != 0) ocupadas[ocupadas_cont++] = pj->str[lin][col];
         }
     }
 
-    // TODO
-    // adicionar verificação se há jogadas disponíveis
-    if (livres_cont < ocupadas_cont){
-        if (pj->jogadas_disponiveis == false){    
-            pj->status = -2;
-            return;
-        } 
-        else printf("nao ha espaço, mas ha jogadas disponiveis\n");
-    }
-
+    
     for (int i = 0; i < ocupadas_cont; i++){
         int idx_livre = livres[livres_cont-1-i];
         int lin = idx_livre / COLUNAS;
@@ -697,7 +710,7 @@ void inicializar_sistema(jogo_t *jogo, int argc, char *argv[]){
 }
 
 
-void ha_jogadas_disponiveis(jogo_t *pj) {
+void jogadas_disponiveis(jogo_t *pj) {
     for (int i = 0; i < LINHAS; i++) {
         for (int j = 0; j < COLUNAS; j++) {
             if (pj->str[i][j] == 0) continue; // Pula casas vazias
@@ -731,8 +744,9 @@ void ha_jogadas_disponiveis(jogo_t *pj) {
 
 // loop principal do jogo
 void executar_jogo(jogo_t *jogo){
-    while (!jogo_acabou(jogo)) {
-        ha_jogadas_disponiveis(jogo);
+    while (!jogo_acabou(jogo)){
+        atualiza_vazias(jogo);
+        jogadas_disponiveis(jogo);
         jogo->mouse = j_rato();
         if (clique_repovoar(jogo)) {
             repovoar(jogo);
