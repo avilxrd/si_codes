@@ -37,7 +37,8 @@ typedef struct{
     int pontos;
     int status; // -2: perdeu | -1: desistiu | 0: rodando | 1: ganhou
     int restantes; // quantas peças faltam a serem retiradas
-    
+    bool jogadas_disponiveis;
+
     bool casa_selecionada;
     index_t selecionado;
 
@@ -275,26 +276,24 @@ void atualiza_vazias(jogo_t *pj){
 }
 
 // apaga a linha e desloca as linhas acima para baixo
-void atualizar_linhas(jogo_t *pj, int prev_empty_lines[LINHAS]){
+void atualizar_linhas(jogo_t *pj, int vazias_antes[LINHAS]){
     for (int i=0; i<LINHAS; i++){
-        // verifica se a linha era vazia -> cheia
-        if (!prev_empty_lines[i] && linha_vazia(pj->str[i])){
-            // Atualiza as linhas superiores
+        if (!vazias_antes[i] && linha_vazia(pj->str[i])){   // verifica se a linha era vazia -> cheia
+            // desloca as linhas de cima para baixo
             for (int j=i; j>0; j--){
                 for (int k=0; k<COLUNAS; k++){
                     pj->str[j][k] = pj->str[j-1][k];
                 }
             }
 
-            // Preenche a linha superior com zeros
+            // zera a linha superior
             for (int k=0; k<COLUNAS; k++){
                 pj->str[0][k] = 0;
             }
-            pj->pontos += 109;
+            pj->pontos += 109; // incremento de quando uma linha é esvaziada
         }
     }
 }
-
 
 // ********** processamento **********
 
@@ -408,44 +407,60 @@ void desenha_quad(jogo_t *pj){
 }
 
 // arredonda as bordas de um retangulo
-void arredonda(retangulo_t ret){
+void arredonda(retangulo_t ret, bool jogadas_disp){
     circulo_t borda;
-    
+    cor_t cor;
+
+    if (jogadas_disp == false) cor = vermelho;
+    else cor = branco;
+
     if (ret.tamanho.largura > ret.tamanho.altura){
+        
         borda.raio = ret.tamanho.altura/2;
         borda.centro = (ponto_t){ret.inicio.x, ret.inicio.y + (ret.tamanho.altura)/2};
-        j_circulo(borda, 0, branco, branco);
+        j_circulo(borda, 0, branco, cor);
         borda.centro = (ponto_t){ret.inicio.x + ret.tamanho.largura, ret.inicio.y + (ret.tamanho.altura)/2};
-        j_circulo(borda, 0, branco, branco);
+        j_circulo(borda, 0, branco, cor);
     } else {
         borda.raio = ret.tamanho.largura/2;
         borda.centro = (ponto_t){ret.inicio.x + (ret.tamanho.largura)/2, ret.inicio.y};
-        j_circulo(borda, 0, branco, branco);
+        j_circulo(borda, 0, branco, cor);
         borda.centro = (ponto_t){ret.inicio.x + (ret.tamanho.largura)/2, ret.inicio.y + ret.tamanho.altura};
-        j_circulo(borda, 0, branco, branco);
+        j_circulo(borda, 0, branco, cor);
     }
 }
 
 // desenha o botão de repovoamento
 void desenha_repovoar(jogo_t *pj){
     ponto_t final = {pj->janela.largura, pj->janela.altura};
+    cor_t cor_ret, cor_borda, cor_fundo;
+    if (pj->jogadas_disponiveis == false){
+        cor_ret = vermelho;
+        cor_fundo = branco;
+        cor_borda = vermelho;
+    } else {
+        cor_ret = branco;
+        cor_fundo = vermelho;
+        cor_borda = branco;
+    }
+
 
     circulo_t add;
     add.raio = 25;
     add.centro = (ponto_t){final.x - MARGEM_LARGURA/4, final.y - MARGEM_ALTURA};
-    j_circulo(add, 1, branco, vermelho);
+    j_circulo(add, 1, cor_borda, cor_fundo); 
 
     retangulo_t cross_x;
     cross_x.tamanho = (tamanho_t){(add.raio),6};
     cross_x.inicio  = (ponto_t){add.centro.x - (add.raio)/2, add.centro.y - (cross_x.tamanho.altura)/2};
-    j_retangulo(cross_x, 0, preto, branco);
-    arredonda(cross_x);
+    j_retangulo(cross_x, 0, preto, cor_ret);
+    arredonda(cross_x, pj->jogadas_disponiveis);
 
     retangulo_t cross_y;
     cross_y.tamanho = (tamanho_t){6,(add.raio)};
     cross_y.inicio  = (ponto_t){add.centro.x - (cross_y.tamanho.largura)/2, add.centro.y - (add.raio)/2};
-    j_retangulo(cross_y, 0, preto, branco);
-    arredonda(cross_y);
+    j_retangulo(cross_y, 0, preto, cor_ret);
+    arredonda(cross_y, pj->jogadas_disponiveis);
 
     // "hitbox" do botao circular (no caso é um retangulo)
     pj->repovoar.inicio  = (ponto_t){add.centro.x - add.raio, add.centro.y - add.raio};
@@ -491,7 +506,7 @@ void desenha_mensagem_final(jogo_t *pj){
         sprintf(txt, "Perdeu");
         j_texto(pos, 40, vermelho, txt);
     } else if (pj->status == 1){
-        sprintf(txt, "Parabéns!");
+        sprintf(txt, "Parabéns! %d pts", pj->pontos);
         j_texto(pos, 40, verde, txt);       
         pos.y += 50;
         if (pontuacao_entra(pj->pontos, pj->recordes) == true){
@@ -624,8 +639,11 @@ void repovoar(jogo_t *pj){
     // TODO
     // adicionar verificação se há jogadas disponíveis
     if (livres_cont < ocupadas_cont){
-        pj->status = -2;
-        return;
+        if (pj->jogadas_disponiveis == false){    
+            pj->status = -2;
+            return;
+        } 
+        else printf("nao ha espaço, mas ha jogadas disponiveis\n");
     }
 
     for (int i = 0; i < ocupadas_cont; i++){
@@ -661,7 +679,10 @@ bool jogo_acabou(jogo_t *pj){
     } else if (j_tecla() == 27){
         pj->status = -1;
         return true;
-    } 
+    } else if (pj->status == -2){
+        printf("perdeu\n");
+        return true;
+    }
     return false;
 }
 
@@ -675,9 +696,43 @@ void inicializar_sistema(jogo_t *jogo, int argc, char *argv[]){
     t_inicializa(jogo->janela, "Numbers");
 }
 
+
+void ha_jogadas_disponiveis(jogo_t *pj) {
+    for (int i = 0; i < LINHAS; i++) {
+        for (int j = 0; j < COLUNAS; j++) {
+            if (pj->str[i][j] == 0) continue; // Pula casas vazias
+
+            for (int k = 0; k < LINHAS; k++) {
+                for (int l = 0; l < COLUNAS; l++) {
+                    if ((i == k && j == l) || pj->str[k][l] == 0) continue; // Mesma casa ou vazia
+
+                    int num1 = pj->str[i][j];
+                    int num2 = pj->str[k][l];
+
+                    if ((num1 == num2 || num1 + num2 == 10)) {
+                        index_t clique_1 = {i, j};
+                        index_t clique_2 = {k, l};
+
+                        if (sao_vizinhas(pj, clique_1, clique_2)) {
+                            // printf("ha jogadas disponiveis\n");
+                            pj->jogadas_disponiveis = true;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    printf("nao ha jogadas, repovoe\n");
+    pj->jogadas_disponiveis = false;
+    return;
+}
+
+
 // loop principal do jogo
 void executar_jogo(jogo_t *jogo){
     while (!jogo_acabou(jogo)) {
+        ha_jogadas_disponiveis(jogo);
         jogo->mouse = j_rato();
         if (clique_repovoar(jogo)) {
             repovoar(jogo);
