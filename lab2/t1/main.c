@@ -37,7 +37,7 @@ void moveFinais(Carta pilha[], int cartaMover, Carta finais[4][13])
             return;
         }
     }
-    else printf("nao pode mover para as pilha finais");
+    else printf("\nNao pode mover para as pilha finais...\n");
 }
 
 void inicializaFinais(Carta pilhasFinais[4][13])
@@ -59,6 +59,7 @@ void inicializaJogo(Carta baralho[CARTAS_BARALHO], Carta pilhas[NUM_PILHAS][MAX_
     preencheBaralho(baralho);
     embaralharBaralho(baralho);
     distribuiCartas(baralho, pilhas, tamanho_pilha);
+    // facilita(baralho, pilhas);
     // limpaTela();
 }
 
@@ -67,27 +68,34 @@ void mostra_jogo(Carta pilhas[NUM_PILHAS][MAX_CARTAS], int tamanho_pilha[NUM_PIL
     for (int i=0; i<4; i++) printf("[%d%s] ", finais[i][quantidadePilha(finais[i], 13)-1].valor, lista_de_naipes[finais[i][0].naipe]);
     printf("\n\n");
     mostraPilhas(7, pilhas, false);
-    // mostraPilhas(4, finais, true);
-    mostraDeposito(deposito, baralho);
+    printf("\n");
+    // mostraDeposito(deposito, baralho);
 }
 
 int verificaInstrucao(Carta pilhas[NUM_PILHAS][MAX_CARTAS], int instrucao, Carta baralho[], Carta deposito[], int tamanho_pilha[], Carta finais[4][13]) {
     int pilha_origem, pilha_destino;
-    
+
     if (instrucao >= 1 && instrucao <= 7) {
         pilha_origem = instrucao - 1;
         int carta_mover = selecionarCarta(pilha_origem, pilhas);
         if (carta_mover == -1) return -1; // Pilha vazia
 
-        printf("\nA carta selecionada foi: %d de %s!\n\n", 
-               pilhas[pilha_origem][carta_mover].valor, 
-               lista_de_naipes[pilhas[pilha_origem][carta_mover].naipe]);
+        if (pilhas[pilha_origem][carta_mover].naipe == 0 || pilhas[pilha_origem][carta_mover].naipe == 1){
+            printf("\033[33m\nA carta selecionada foi: \033[0m%d de %s\n\n", 
+                   pilhas[pilha_origem][carta_mover].valor, 
+                   lista_de_naipes[pilhas[pilha_origem][carta_mover].naipe]);
+        }
+        else{
+            printf("\033[33m\nA carta selecionada foi: \033[31m%d de %s\033[0m\n\n", 
+                pilhas[pilha_origem][carta_mover].valor, 
+                lista_de_naipes[pilhas[pilha_origem][carta_mover].naipe]);
+        }
 
         int conectadas = 0;
         for (int i = carta_mover + 1; i < MAX_CARTAS; i++) {
             if (pilhas[pilha_origem][i].valor != 0) conectadas++;
         }
-        printf("%d conectadas.\n\n", conectadas);
+        // printf("%d conectadas.\n\n", conectadas);
 
         do {
             pilha_destino = selecionarDestino();
@@ -106,9 +114,15 @@ int verificaInstrucao(Carta pilhas[NUM_PILHAS][MAX_CARTAS], int instrucao, Carta
                 }
                 pilhas[pilha_origem][carta_mover - 1].visivel = true;
             }
-        } else if (pilha_destino == 7) {
-            moveFinais(pilhas[pilha_origem], carta_mover, finais);
-            // pilhas_finais(pilhas, pilha_origem, tamanho_pilha);
+        } else if (pilha_destino == 7){
+            int topoOrigem = ultimaCarta(pilhas[pilha_origem]);
+            printf("\ntopo: %d%s\tmover: %d%s", pilhas[pilha_origem][topoOrigem].valor, lista_de_naipes[pilhas[pilha_origem][topoOrigem].naipe],
+                                                pilhas[pilha_origem][carta_mover].valor, lista_de_naipes[pilhas[pilha_origem][carta_mover].naipe]);
+            if (pilhas[pilha_origem][topoOrigem].naipe == pilhas[pilha_origem][carta_mover].naipe && pilhas[pilha_origem][topoOrigem].valor == pilhas[pilha_origem][carta_mover].valor)
+            {
+                moveFinais(pilhas[pilha_origem], carta_mover, finais);
+            }
+            else printf("\nNao pode mover essa carta.\n");
         }
     }
 
@@ -123,7 +137,7 @@ int verificaInstrucao(Carta pilhas[NUM_PILHAS][MAX_CARTAS], int instrucao, Carta
             do {
                 pilha_destino = selecionarDestino();
             } while (pilha_destino < 0 || pilha_destino > 7);
-
+            
             if (pilha_destino >= 0 && pilha_destino <= 6){
                 moveDeposito(deposito, pilhas[pilha_destino]);
             }

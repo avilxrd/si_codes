@@ -135,6 +135,13 @@ int cartaTopo(Carta pilha[])
     return contador;
 }
 
+int ultimaCarta(Carta pilha[])
+{
+    for (int i=12; i>=0; i--) if (pilha[i].valor != 0) return i; 
+    return 0;
+}
+
+
 void revelaCarta(Carta pilhas[NUM_PILHAS][MAX_CARTAS], int pilha, int carta)
 {
     pilhas[pilha][carta].visivel = true;
@@ -163,6 +170,22 @@ int ultimaVisivel(Carta pilha[], int tamanho){
 
 // ======================================= //
 // === funcoes relacionadas ao baralho === //
+
+void facilita(Carta baralho[CARTAS_BARALHO], Carta pilhas[7][13])
+{
+    int cont=0;
+    for (int i=0; i<4; i++)
+    {
+        for (int j=12; j>=0; j--)
+        {
+            pilhas[i][j] = baralho[cont];
+            pilhas[i][j].visivel = true;
+            cont++;
+        }
+    }   
+
+    for (int i=0; i<52; i++) baralho[i] = carta_vazia; 
+}
 
 void preencheBaralho(Carta *baralho){
     inicializaPilhas(baralho, CARTAS_BARALHO);
@@ -212,7 +235,7 @@ int moveCartas(Carta pilhas[NUM_PILHAS][MAX_CARTAS], int pilhaOrigem, int cartaM
     int topoDestino = cartaTopo(pilhas[pilhaDestino]);
     if (movimento_valido(pilhas[pilhaOrigem][cartaMover], pilhas[pilhaDestino][topoDestino], false))
     {
-        printf("movendo %d%s para pilha %d.\n", pilhas[pilhaOrigem][cartaMover].valor, lista_de_naipes[pilhas[pilhaOrigem][cartaMover].naipe], pilhaDestino);
+        // printf("movendo %d%s para pilha %d.\n", pilhas[pilhaOrigem][cartaMover].valor, lista_de_naipes[pilhas[pilhaOrigem][cartaMover].naipe], pilhaDestino);
         pilhas[pilhaDestino][topoDestino+1] = pilhas[pilhaOrigem][cartaMover];
         pilhas[pilhaOrigem][cartaMover].valor = 0; 
         pilhas[pilhaOrigem][cartaMover].naipe = 0; 
@@ -299,7 +322,7 @@ int selecionarCarta(int pilhaOrigem, Carta pilhas[NUM_PILHAS][MAX_CARTAS]){
         printf("Pilha Vazia");
         return -1;
     } else if (quant_visiveis == 1){
-        printf("Retornando a unica carta.\n");
+        // printf("Retornando a unica carta.\n");
         return primeira_visivel;
     } 
     
@@ -351,13 +374,15 @@ int pedeInstrucoes(Carta pilhas[NUM_PILHAS][MAX_CARTAS], Carta *baralho, Carta *
         if(quantidadePilha(baralho, CARTAS_BARALHO) == 0) printf("(10) - Restituir baralho | ");
         
         printf("(0) - Sair ");
+        printf("\n----> ");
         scanf("%d", &instrucao);
         printf("\n");
 
-        if(instrucao >= 1 && instrucao <= 7) printf("Pilha %d selecionada\n\n", instrucao);
+        if(instrucao >= 1 && instrucao <= 7) printf("Pilha %d selecionada\n", instrucao);
         else if(instrucao ==  8) printf("Carta comprada\n\n");
         else if(instrucao ==  9) printf("Pilha de descarte selecionada\n\n");
         else if(instrucao == 10) printf("Restituindo o baralho\n\n");
+        else if(instrucao == 0) return 0;
         else if(instrucao !=  0) printf("Digite uma instrução valida\n\n");
     }
     while(!(instrucao >= 0 && instrucao <= 10));

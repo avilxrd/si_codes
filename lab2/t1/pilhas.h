@@ -70,11 +70,15 @@ int ultimaVisivel(Carta pilha[], int tamanho);
 // ======================================= //
 // === funcoes relacionadas ao baralho === //
 
+void facilita(Carta baralho[CARTAS_BARALHO], Carta pilhas[7][13]);
+
 //preenche o baralho com todas as cartas possiveis
 void preencheBaralho(Carta *baralho);
 
 //embaralha o baralho
 void embaralharBaralho(Carta *baralho);
+
+int ultimaCarta(Carta pilha[]);
 
 // 
 void removerBaralho(Carta *baralho, Carta removida);
