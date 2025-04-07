@@ -49,6 +49,5 @@ Node* remove_lista(Node* lista, int valor)
   free(p); //desaloca a memoria do nó p
   return lista;
 }
-
 ```
 
