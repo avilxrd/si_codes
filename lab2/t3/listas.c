@@ -7,8 +7,11 @@ Node* cria_lista()
 }
 
 //insere um elemento no inicio de uma lista
+//0: insere no inicio da lista
+//1: insere no final  da lista
 Node* insere_lista(Node* lista, int valor)
 {
+  
   Node* novo = (Node*)malloc(sizeof(Node));
   novo->valor = valor;
   novo->prox = lista;
