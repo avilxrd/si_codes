@@ -1,0 +1,2 @@
+gcc main.c listas.c -o main
+
