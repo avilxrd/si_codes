@@ -37,7 +37,7 @@ Node* busca_lista(Node* lista, int valor)
 ```
 
 ### Função de Remoção
-Podemos fazer uma remoção no início, meio ou fim da lista. O código terá algumas modificações dependendo de onde for feita a remoção <//br>
+Podemos fazer uma remoção no início, meio ou fim da lista. O código terá algumas modificações dependendo de onde for feita a remoção </br>
 ```c
 Node* remove_lista(Node* lista, int valor)
 {
@@ -50,4 +50,7 @@ Node* remove_lista(Node* lista, int valor)
   return lista;
 }
 ```
+## Trabalho 01: representação de matrizes com listas encadeadas
+O pdf do trabalho está no site da disciplina</br>
+sites.google.com/view/edados20251 </br>
 
