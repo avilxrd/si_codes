@@ -52,5 +52,6 @@ Node* remove_lista(Node* lista, int valor)
 ```
 ## Trabalho 01: representação de matrizes com listas encadeadas
 O pdf do trabalho está no site da disciplina</br>
-[Site da Disciplina] (sites.google.com/view/edados20251) </br>
+
+**[Site da Disciplina](https://sites.google.com/view/edados20251/)**.
 
