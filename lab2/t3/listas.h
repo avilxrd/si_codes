@@ -15,8 +15,13 @@ typedef struct node Node;
 Node* cria_lista();
 
 //insere um elemento em uma lista
-//0: inicio  1: final
+//inicio
 Node* insere_lista(Node* lista, int valor_inserido/*, int flag*/);
+//final
+Node* insere_final(Node* lista, int valor_inserido);
+
+//percorre a lista até chegar no último elemento
+Node* final_lista(Node* lista);
 
 //mostra todos os elementos de uma lista
 void mostra_lista(Node* lista);
