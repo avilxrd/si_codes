@@ -24,7 +24,7 @@ Node* soma_listas(Node* lista1, Node* lista2) {
             carry=0;
         }
 
-        resultado = insere_lista(resultado, res);
+        resultado = insere_lista(resultado, res, false);
         a = a->ant;
         b = b->ant;
     }
@@ -32,7 +32,7 @@ Node* soma_listas(Node* lista1, Node* lista2) {
     {
         while (a != NULL)
         {
-            resultado = insere_lista(resultado, a->valor);
+            resultado = insere_lista(resultado, a->valor, false);
             a = a->ant;
         }
     }
@@ -40,11 +40,11 @@ Node* soma_listas(Node* lista1, Node* lista2) {
     {
         while (b != NULL)
         {
-            resultado = insere_lista(resultado, b->valor);
+            resultado = insere_lista(resultado, b->valor, false);
             b = b->ant;
         }
     }
-    if (carry == 1) resultado = insere_lista(resultado, carry);
+    if (carry == 1) resultado = insere_lista(resultado, carry, false);
 
     return resultado;
 }
@@ -52,15 +52,37 @@ Node* soma_listas(Node* lista1, Node* lista2) {
 Node* subtrai_listas(Node* lista1, Node* lista2)
 {
     Node* resultado = NULL;
+    bool negativo=false;
+
     Node* a = lista1;
     Node* b = lista2;
 
-    //se o resultado for negativo quebra
-    if (a->valor <= b->valor)
+    while (lista1!=NULL && lista2!=NULL)
     {
-        printf("\nEncerrando pois nao trato negativos ainda...\n");
-        return 0;
+        if (lista1->valor < lista2->valor)
+        {
+            Node* temp;
+            temp = a;
+            a = b;
+            b = temp;
+            negativo=true;
+            break;
+        }
+        else if (lista1->valor == lista2->valor)
+        {
+            lista1 = lista1->prox;
+            lista2 = lista2->prox;
+        }
+        else break;
+
     }
+    
+    //se o resultado for negativo quebra
+    // if (a->valor <= b->valor)
+    // {
+    //     printf("\nEncerrando pois nao trato negativos ainda...\n");
+    //     return 0;
+    // }
 
     a = final_lista(a);
     b = final_lista(b);
@@ -69,16 +91,12 @@ Node* subtrai_listas(Node* lista1, Node* lista2)
     int carry=0;
     while (a != NULL && b != NULL)
     {
-
-        if (a->valor >= b->valor)
-        {
-            resultado = insere_lista(resultado, a->valor - b->valor);
-        }
+        if (a->valor >= b->valor) resultado = insere_lista(resultado, a->valor - b->valor, negativo);
         else
         {
             a->ant->valor -= 1;
             a->valor += 10;
-            resultado = insere_lista(resultado, a->valor - b->valor);  
+            resultado = insere_lista(resultado, a->valor - b->valor, negativo);  
         }
         a = a->ant;
         b = b->ant;
@@ -88,7 +106,7 @@ Node* subtrai_listas(Node* lista1, Node* lista2)
     {
         while (a != NULL)
         {
-            resultado = insere_lista(resultado, a->valor);
+            resultado = insere_lista(resultado, a->valor, negativo);
             a = a->ant;
         }
     }
@@ -96,7 +114,7 @@ Node* subtrai_listas(Node* lista1, Node* lista2)
     {
         while (b != NULL)
         {
-            resultado = insere_lista(resultado, b->valor);
+            resultado = insere_lista(resultado, b->valor, negativo);
             b = b->ant;
         }
     }
@@ -122,8 +140,8 @@ int main()
     Node* num2 = NULL;
 
     //preenchendo as listas
-    for (int i=0; i<3; i++) num1 = insere_lista(num1, rand()%9);
-    for (int i=0; i<3; i++) num2 = insere_lista(num2, rand()%9);
+    for (int i=0; i<3; i++) num1 = insere_lista(num1, rand()%9, false);
+    for (int i=0; i<3; i++) num2 = insere_lista(num2, rand()%9, false);
 
     //mostrando os numeros
     printf("\nNumero 1: \n");
@@ -137,7 +155,7 @@ int main()
     // mostra_lista(resultado);
 
     //subtraindo um numero com o outro
-    printf("\nSoma das listas: \n");
+    printf("\nSubtração das listas: \n");
     Node* resultado = subtrai_listas(num1, num2);
     mostra_lista(resultado);
 

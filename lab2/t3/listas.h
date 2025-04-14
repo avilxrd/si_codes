@@ -7,6 +7,7 @@ struct node{
     int valor;
     struct node* prox;
     struct node* ant;
+    bool negativo;
 };
 
 typedef struct node Node;
@@ -16,7 +17,7 @@ Node* cria_lista();
 
 //insere um elemento em uma lista
 //inicio
-Node* insere_lista(Node* lista, int valor_inserido/*, int flag*/);
+Node* insere_lista(Node* lista, int valor_inserido, bool negativo);
 //final
 Node* insere_final(Node* lista, int valor_inserido);
 

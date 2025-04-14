@@ -9,12 +9,13 @@ Node* cria_lista()
 //insere um elemento no inicio de uma lista
 //0: insere no inicio da lista
 //1: insere no final  da lista
-Node* insere_lista(Node* lista, int valor)
+Node* insere_lista(Node* lista, int valor, bool negativo)
 {  
     Node* novo = (Node*)malloc(sizeof(Node));
     novo->valor = valor;
     novo->prox = lista;
     novo->ant = NULL;
+    novo->negativo = negativo;
     if (lista != NULL) lista->ant = novo;
     return novo;
 }
@@ -57,6 +58,7 @@ Node* final_lista(Node* lista)
 void mostra_lista(Node* lista)
 {
     Node* novo;
+    if (lista != NULL && lista->negativo==true) printf("-");
     for (novo=lista; novo!=NULL; novo=novo->prox)
     {
         if (novo->ant == NULL && novo->valor == 0) printf(" ");
