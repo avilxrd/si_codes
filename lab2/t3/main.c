@@ -49,6 +49,8 @@ Node* soma_listas(Node* lista1, Node* lista2) {
     return resultado;
 }
 
+//por enquanto so ta funcionando para numeros de mesmo "tamanho"
+//TODO: criar uma funcao para contar quantos algarismos tem uma lista 
 Node* subtrai_listas(Node* lista1, Node* lista2)
 {
     Node* resultado = NULL;
@@ -77,13 +79,6 @@ Node* subtrai_listas(Node* lista1, Node* lista2)
 
     }
     
-    //se o resultado for negativo quebra
-    // if (a->valor <= b->valor)
-    // {
-    //     printf("\nEncerrando pois nao trato negativos ainda...\n");
-    //     return 0;
-    // }
-
     a = final_lista(a);
     b = final_lista(b);
     
