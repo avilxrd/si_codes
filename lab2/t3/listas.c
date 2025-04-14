@@ -57,8 +57,11 @@ Node* final_lista(Node* lista)
 void mostra_lista(Node* lista)
 {
     Node* novo;
-    printf("\n--> ");
-    for (novo=lista; novo!=NULL; novo=novo->prox) printf("%d ", novo->valor);
+    for (novo=lista; novo!=NULL; novo=novo->prox)
+    {
+        if (novo->ant == NULL && novo->valor == 0) printf(" ");
+        else printf("%d", novo->valor);
+    } 
     printf("\n");
 }
 

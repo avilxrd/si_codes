@@ -9,12 +9,19 @@ Node* soma_listas(Node* lista1, Node* lista2) {
     b = final_lista(b);
 
     int carry=0;
+
     while (a != NULL && b != NULL)
     {
-        int res = a->valor + b->valor;
-        if (res > 10)
+        int res = carry + a->valor + b->valor;
+
+        if (res >= 10)
         {
-            printf("\ncarry: %d\tres: %d", carry, res);
+            res -= 10;
+            carry = 1;
+        }
+        else 
+        {
+            carry=0;
         }
 
         resultado = insere_lista(resultado, res);
@@ -37,22 +44,52 @@ Node* soma_listas(Node* lista1, Node* lista2) {
             b = b->ant;
         }
     }
+    if (carry == 1) resultado = insere_lista(resultado, carry);
+
+    return resultado;
+}
+
+Node* multiplica_lista(Node* lista1, int valor)
+{
+    Node* resultado = lista1;
+
+    for (int i=1; i<valor; i++)
+    {
+        resultado = soma_listas(resultado, lista1);
+    }
 
     return resultado;
 }
 
 int main()
 {
+    srand(time(NULL));
     Node* num1 = NULL;
     Node* num2 = NULL;
-    srand(time(NULL));
-    for (int i=0; i<3; i++) num1 = insere_lista(num1, rand()%9);
-    for (int i=0; i<3; i++) num2 = insere_lista(num2, rand()%9);
+
+    //preenchendo as listas
+    for (int i=0; i<100; i++) num1 = insere_lista(num1, rand()%9);
+    for (int i=0; i<100; i++) num2 = insere_lista(num2, rand()%9);
+
+    //mostrando os numeros
+    printf("\nNumero 1: \n");
     mostra_lista(num1);
+    printf("\nNumero 2: \n");
     mostra_lista(num2);
 
+    //somando um numero com o outro
+    printf("\nSoma das listas: \n");
     Node* resultado = soma_listas(num1, num2);
     mostra_lista(resultado);
+
+    //multiplicando por 2 (para testar, mas pode ser qualquer int (a principio)).
+    printf("\nMultiplicando por 2: \n");
+    mostra_lista(num1);
+    printf("x 2\n");
+    printf("___\n");
+    resultado = multiplica_lista(num1, 2);
+    mostra_lista(resultado);
+
 
     return 0;
 }
