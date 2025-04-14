@@ -55,3 +55,87 @@ O pdf do trabalho está no site da disciplina</br>
 
 **[Site da Disciplina](https://sites.google.com/view/edados20251/)**.
 
+## Listas de Tipos Estruturados
+Até então, estavamos armazenando nos Nós de nossa lista, valores simples, como um Int. Porém, nada nos impede de armazenarmos mais de um dado (de tipos iguais ou diferentes).</br>
+### Exemplo de Estrutura que guarda mais de um dado:
+```c
+struct node
+{
+    int numero1;
+    float numero2;
+    struct node* prox;
+};
+
+typedef struct node Node;
+```
+Caso quisermos armazenar os lados de um retângulo, por exemplo, podemos armazenar 2 floats, ou podemos armazenar outra struct do tipo Retangulo.
+```c
+struct retangulo
+{
+    float lado1;
+    float lado2;
+};
+typedef struct retangulo Retangulo;
+
+struct node
+{
+    Retangulo retangulo;
+    struct node* prox;
+};
+typedef struct node Node;
+```
+Ainda temos outra possibilidade: armazenar o ponteiro para um Retangulo na nossa estrutura.
+```c
+struct retangulo
+{
+    float lado1;
+    float lado2;
+};
+typedef struct retangulo Retangulo;
+
+struct node
+{
+    Retangulo* retangulo;
+    struct node* prox;
+};
+typedef struct node Node;
+```
+
+## Listas de Tipos Heterogêneos
+São listas em que as informações diferem de Nó para Nó.</br>
+Obs: as listas são homogênes, pois o Nó é sempre o mesmo, o que é heterogêneo são as informações armazenadas (tipos diferentes ou não).</br>
+Para entender as listas de tipos heterogêneos, vamos criar 3 estruturas que representem formas geométricas.
+```c
+struct retangulo
+{
+    float base;
+    float altura;
+}
+typedef struct retangulo Retangulo;
+
+struct triangulo
+{
+    float base;
+    float altura;
+}
+typedef struct triangulo Triangulo;
+
+struct circulo
+{
+    float raio;
+}
+typedef struct circulo Circulo;
+
+```
+Para encadear essas informações, precisaremos utilizar um Ponteiro Genérico.</br>
+Na nossa estrutura, precisaremos ter um identificador para saber qual o tipo de Nó.</br>
+
+```c
+struct node
+{
+    void* informacao;  //ponteiro genérico (sem tipo)
+    int tipo;          //identificador de qual tipo é o nó
+    struct node* prox; //ponteiro para o próximo elemento
+}
+typedef struct node Node;
+```
