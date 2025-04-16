@@ -143,4 +143,27 @@ typedef struct node Node;
 # Pilhas
 
 ## Introdução e implementação de pilhas 16/04
+Uma pilha é um container de objetos que são inseridos e retirados pelo topo.</br>
+As pilhas seguem uma política de inserções e remoções denominadas LIFO (last in, first out), ou seja, a última a ser inserida é a primeira a ser retirada.</br>
+Objetos podem ser inseridos em uma pilha a qualquer momento, mas somente o último objeto inserido pode ser removido da pilha imediatamente, não podemos remover um elemento do meio da pilha.</br>
+As operações principais são comumente chamadas de PUSH (adicionar um elemento ao topo da pilha / empilha) e POP (remover o elemento do topo da pilha / desempilha)</br>
+Podemos implementar uma pilha de duas formas: armazenando os elementos em um vetor ou em uma lista encadeada.</br>
+Podemos observar que para fazer um POP a pilha nao pode estar vazia, enquanto para fazer um PUSH ela não pode estar cheia.</br>
+
+### Implementando uma pilha com um vetor
+```c
+struct pilha
+{
+    int topo;            //índice do elemento do topo da pilha, também pode ser usado para saber quantos elementos temos na pilha
+    float vetor[50];     //vetor que armazena os elementos da pilha [numero maximo de elementos da pilha]
+}Pilha;
+```
+### Implementando uma lista com um vetor
+```c
+struct pilha
+{
+    int topo;            //índice do elemento do topo da pilha, também pode ser usado para saber quantos elementos temos na pilha
+    float* lista;        //lista que armazena os elementos da pilha
+}Pilha;
+```
 
