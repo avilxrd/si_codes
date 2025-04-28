@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include <time.h>
 
+#define MAX_VALUE 9 //valores maximos que estou gerando para
+                    //preencher aleatoriamente a matriz.
+
 struct node{
     int          valor;
     int          linha;
@@ -56,8 +59,9 @@ Matriz* preenche_matriz(Matriz* matriz, int ordem, bool random)
     {
         for (int j=0; j<ordem; j++)
         {
-            if (random == true) mat->valores = inserir_lista(mat->valores, rand()%9, i, j);
-            else
+            int rand_int = rand()%MAX_VALUE;
+            if (random == true && rand_int != 0) mat->valores = inserir_lista(mat->valores, rand_int, i, j);
+            else if (random == false)
             {
                 int val;
                 printf("\n[%d][%d]: ", i, j);
@@ -73,14 +77,15 @@ Matriz* preenche_matriz(Matriz* matriz, int ordem, bool random)
 void mostra_lista(Node* lista)
 {
     Node* temp = lista;
-    int cont = 0;
+    int cont=0;
+    printf("Mostrando os valores armazenados na memoria (struct node* valores): \n\n");
     while (temp!=NULL)
     {
         printf("%d ", temp->valor);
         temp = temp->prox;
         cont++;
     }
-    printf("\nok\n");
+    printf("\n\nA matriz e de 5x5 --> 25 numeros.\n\nTemos %d numeros armazenados na lista.\n\n", cont);
 }
 
 bool busca_matriz(Node* matriz, int lin, int col)
@@ -98,6 +103,7 @@ bool busca_matriz(Node* matriz, int lin, int col)
 void imprime_matriz(Matriz* matriz)
 {
     Node* temp = matriz->valores;
+    printf("\nMostrando a Matriz (os ZEROS nao estao guardados na memoria): \n\n");
 
     for (int i=0; i<matriz->ordem; i++)
     {
