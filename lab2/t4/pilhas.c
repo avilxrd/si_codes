@@ -14,7 +14,12 @@ void mostra_pilha(Stack* pilha)
     if (vazia(pilha)) return;
     int quant_elementos = pilha->topo + 1;
     printf("\nImprimindo uma pilha:\n");
-    for (int i=0; i<quant_elementos; i++) printf("\npilha[%d]:\t%d", i, pilha->item[i]);
+    for (int i=quant_elementos-1; i>=0; i--)
+    {
+        printf("\npilha[%d]:\t%d", i, pilha->item[i]);
+        printf("\t"); 
+        for (int x=0; x<pilha->item[i]; x++) printf("#");
+    } 
 }
 
 
