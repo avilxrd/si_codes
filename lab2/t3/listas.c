@@ -1,27 +1,14 @@
 #include "listas.h"
 
-//retorna um ponteiro NULL
-Node* cria_lista()
+bool digito_valido(const char caractere)
 {
-    return NULL;
+    if (caractere >= 48 && caractere <= 57) return true;
+    else return false;
 }
 
-//insere um elemento no inicio de uma lista
-//0: insere no inicio da lista
-//1: insere no final  da lista
-Node* insere_lista(Node* lista, int valor, bool negativo)
-{  
-    Node* novo = (Node*)malloc(sizeof(Node));
-    novo->valor = valor;
-    novo->prox = lista;
-    novo->ant = NULL;
-    novo->negativo = negativo;
-    if (lista != NULL) lista->ant = novo;
-    return novo;
-}
-
-Node* insere_final(Node* lista, int valor_inserido)
+Numero* insere_final(Numero* numero, int valor_inserido)
 {
+    Node* lista = numero->lista;
     //caso a lista esteja vazia
     if (lista == NULL)
     {
@@ -29,7 +16,7 @@ Node* insere_final(Node* lista, int valor_inserido)
         novo_node->ant  = NULL;
         novo_node->prox = NULL;
         novo_node->valor = valor_inserido;
-        return novo_node;
+        numero->lista = novo_node;
     }
     else
     {
@@ -40,30 +27,45 @@ Node* insere_final(Node* lista, int valor_inserido)
         novo_node->ant  = temp;
         novo_node->valor = valor_inserido;
         temp->prox = novo_node;
-        return lista;
+        numero->lista = lista;
     }
-
+    return numero;
 }
 
-Node* final_lista(Node* lista)
+Numero* ler_numero(const char* string)
 {
-    if (lista == NULL) return lista;
-    else
+    Numero* numero = (Numero*)malloc(sizeof(Numero));
+    numero->negativo = false;
+    numero->lista    = NULL;
+
+    int i=0;
+    if (string[0] == '-')
     {
-        while (lista->prox != NULL) lista = lista->prox;
-        return lista;
+        numero->negativo = true;
+        i++;
     }
+
+    for (i; string[i] != '\0'; i++)
+    {
+        if (digito_valido(string[i]) == true)
+        {
+            int digito = string[i] - '0';
+            numero = insere_final(numero, digito);
+        }
+    }
+    return numero;
 }
 
-void mostra_lista(Node* lista)
+void imprime_numero(Numero* numero)
 {
-    Node* novo;
-    if (lista != NULL && lista->negativo==true) printf("-");
-    for (novo=lista; novo!=NULL; novo=novo->prox)
+    Numero* temp = numero;
+    printf("\nNUMERO DIGITADO\n");
+    printf("‣ ");
+    if (numero->negativo == true) printf("-");
+    while (temp->lista != NULL)
     {
-        if (novo->ant == NULL && novo->valor == 0) printf(" ");
-        else printf("%d", novo->valor);
-    } 
+        printf("%d", temp->lista->valor);
+        temp->lista = temp->lista->prox;
+    }
     printf("\n");
 }
-

@@ -1,28 +1,28 @@
-#include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 
+//  lista duplamente encadeada de inteiros
 struct node{
-    int valor;
+    int          valor;
     struct node* prox;
     struct node* ant;
-    bool negativo;
 };
-
 typedef struct node Node;
 
-//retorna um ponteiro NULL
-Node* cria_lista();
+//  representacao de um numero com lista
+struct numero{
+    bool  negativo;
+    Node* lista;
+};
+typedef struct numero Numero;
 
-//insere um elemento em uma lista
-//inicio
-Node* insere_lista(Node* lista, int valor_inserido, bool negativo);
-//final
-Node* insere_final(Node* lista, int valor_inserido);
+Numero* insere_final(Numero* numero, int valor_inserido);
 
-//percorre a lista até chegar no último elemento
-Node* final_lista(Node* lista);
+//  le o input de uma string pelo usuario e 
+//  transforma em uma lista encadeada
+Numero* ler_numero(const char* string);
 
-//mostra todos os elementos de uma lista
-void mostra_lista(Node* lista);
+//  printa o numero
+void imprime_numero(Numero* numero);
