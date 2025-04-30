@@ -2,13 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include "cores.h"
 
 #define VALOR_MAX 9   //numero maximo que pode ser atribuido na funcao  
                       //preenche matriz ao usar valores_aleatorios.
-#define COR_VERDE    "\033[32m"
-#define COR_AMARELO  "\033[33m"
-#define COR_VERMELHO "\033[31m"
-#define COR_BRANCO   "\033[37m"
 
 //  estruturas dadas pela professora
 struct node{
@@ -91,10 +88,19 @@ int preenche_matriz(Matriz* matriz, bool indices_aleatorios, bool valores_aleato
     }
     else
     {
-        printf("\n(0-%d) [*][ ]: ", matriz->linhas-1);
-        scanf("%d", &lin);
-        printf("\nCOLUNA A INSERIR (0-%d): ", matriz->colunas-1);
-        scanf("%d", &col);
+        int contl=0, contc=0;
+        do{
+            if (contl != 0) printf("%sValor fora de intervalo, escolha outro: \n%s", COR_VERMELHO, COR_BRANCO);
+            printf("\nLinha para inserir (0-%d): ", matriz->linhas-1);
+            scanf("%d", &lin);
+            contl++;
+        } while (lin < 0 || lin >= matriz->linhas);
+        do{
+            if (contc != 0) printf("%sValor fora de intervalo, escolha outro: \n%s", COR_VERMELHO, COR_BRANCO);
+            printf("Coluna para inserir (0-%d): ", matriz->colunas-1);
+            scanf("%d", &col);
+            contc++;
+        } while (col < 0 || col >= matriz->colunas);
     }
     
     // flag: valores_aleatorios
@@ -104,7 +110,7 @@ int preenche_matriz(Matriz* matriz, bool indices_aleatorios, bool valores_aleato
     }
     else
     {
-        printf("VALOR A INSERIR: ");
+        printf("Valor inserido: ");
         scanf("%d", &val);
     }
 
@@ -146,6 +152,10 @@ void imprime_matriz(Matriz* matriz)
 {
     Node* temp = matriz->primeiro;
 
+    printf("%s\nOBSERVACAO: CASO TENTE ADICIONAR UM VALOR EM UM INDICE QUE JA POSSUA UM VALOR\n", COR_VERMELHO);
+    printf("O VALOR ANTERIOR SERA REMOVIDO DA LISTA, ADICIONANDO O NOVO VALOR POR CIMA.\n");
+    printf("POR CONTA DISSO, AS VEZES AO PEDIR PARA ADICIONAR X VALORES NA LISTA\n");
+    printf("ALEATORIAMENTE, PODE SER QUE ADICIONE MENOS, POIS UM SOBRESCREVERA O OUTRO\n%s", COR_BRANCO);
 
     printf("\n%s\t", COR_BRANCO);
     for (int x=0; x<matriz->colunas; x++) printf("%s%d ", COR_AMARELO, x);
@@ -162,10 +172,38 @@ void imprime_matriz(Matriz* matriz)
             }
             else printf("%s0 ", COR_BRANCO);
         }
-        printf("\n");
+        printf("%s\n", COR_BRANCO);
     }
 }
 
+// somatorio de uma linha
+int somatorio_linha(Matriz* matriz, int linha)
+{
+    Node* temp = matriz->primeiro;
+    int soma=0;
+    while (temp != NULL)
+    {
+        if (temp->linha == linha) soma += temp->info;
+        temp = temp->prox;
+    } 
+    return soma;
+}
+
+int percentual_nao_nulo(Matriz* matriz)
+{
+    float total = matriz->colunas * matriz->colunas;
+    float quant = 0;
+    Node* temp = matriz->primeiro;
+    while (temp != NULL)
+    {
+        quant++;
+        temp = temp->prox;
+    }
+    printf("\n%.0f valores nao nulos de %.0f valores possiveis.\n", quant, total);
+    float resultado = (100*quant)/total;
+    printf("\n%.1f%% de nao nulos.\n", resultado);
+    return resultado;
+}
 
 int main()
 {
@@ -176,18 +214,22 @@ int main()
     int opcao;
     bool indices, valores;
     
-    printf("\nPARA FACILITAR O TESTE EU ADICIONEI UMA OPCAO DE INSERIR INDICES E VALORES ALEATORIOS\n\n");
-    printf("%s0%s DEMONSTRACAO RAPIDA\n",                                                                       COR_AMARELO, COR_BRANCO);
-    printf("%s1%s VALORES ALEATORIOS & INDICES ALEATORIOS (PREENCHE A MATRIZ ALEATORIAMENTE)\n",                COR_AMARELO, COR_BRANCO);
-    printf("%s2%s VALORES ALEATORIOS                      (ESCOLHER OS INDICES, MAS VALORES SAO ALEATORIOS)\n", COR_AMARELO, COR_BRANCO);
-    printf("%s3%s INDICES ALEATORIOS                      (ESCOLHER APENAS OS VALORES A SEREM INSERIDOS)\n\n",  COR_AMARELO, COR_BRANCO);
-    printf("%s---> %s", COR_VERMELHO, COR_BRANCO);
-    scanf("%d", &opcao);
+    do
+    {
+        printf("\nPARA FACILITAR O TESTE EU ADICIONEI UMA OPCAO DE INSERIR INDICES E VALORES ALEATORIOS\n\n");
+        printf("%s0%s DEMONSTRACAO RAPIDA\n",                                                                       COR_AMARELO, COR_BRANCO);
+        printf("%s1%s VALORES ALEATORIOS & INDICES ALEATORIOS (PREENCHE A MATRIZ ALEATORIAMENTE)\n",                COR_AMARELO, COR_BRANCO);
+        printf("%s2%s VALORES ALEATORIOS                      (ESCOLHER OS INDICES, MAS VALORES SAO ALEATORIOS)\n", COR_AMARELO, COR_BRANCO);
+        printf("%s3%s INDICES ALEATORIOS                      (ESCOLHER APENAS OS VALORES A SEREM INSERIDOS)\n",  COR_AMARELO, COR_BRANCO);
+        printf("%s4%s MATRIZ MANUAL                           (PREENCHE MANUALMENTE A MATRIZ)\n\n",  COR_AMARELO, COR_BRANCO);
+        printf("%s---> %s", COR_VERMELHO, COR_BRANCO);
+        scanf("%d", &opcao);
+    } while (opcao < 0 || opcao > 4);
     
     if (opcao == 0)
     {
         printf("\n%sCriando matriz 5x5%s\n\n", COR_AMARELO, COR_BRANCO);
-        matriz = cria_matriz(7, 7);
+        matriz = cria_matriz(5, 5);
         printf("%sInserindo 10 valores aleatorios em indices aleatorios%s\n\n", COR_AMARELO, COR_BRANCO);
         for (int i=0; i<10; i++) preenche_matriz(matriz, 1, 1);
         printf("\n%sImprimindo a Matriz\n\n", COR_AMARELO);
@@ -197,21 +239,41 @@ int main()
     }
     else
     {
-        int lin, col;
+        int lin, col, quant;
         printf("\n%sQuantidade de Linhas:  \n%s---> %s", COR_AMARELO, COR_VERMELHO, COR_BRANCO);
         scanf("%d", &lin);
-        printf("\n%sQuantidade de Colunas: \n%s---> %s", COR_AMARELO, COR_VERMELHO, COR_BRANCO);
+        printf("%sQuantidade de Colunas: \n%s---> %s",   COR_AMARELO, COR_VERMELHO, COR_BRANCO);
         scanf("%d", &col);
+        printf("%sQuantidade de valores a ser inserido: \n%s---> %s",   COR_AMARELO, COR_VERMELHO, COR_BRANCO);
+        scanf("%d", &quant);
+
         system("clear||cls");
         printf("\n%sCriando matriz %d x %d\n%s", COR_AMARELO, lin, col, COR_BRANCO);
         matriz = cria_matriz(lin, col);
     
         printf("%sPreenchendo Matriz%s\n\n", COR_AMARELO, COR_BRANCO);
-             if (opcao == 1) preenche_matriz(matriz, 1, 1);
-        else if (opcao == 2) preenche_matriz(matriz, 0, 1);
-        else if (opcao == 3) preenche_matriz(matriz, 1, 0);
+             if (opcao == 1) for(int i=0; i<quant; i++) preenche_matriz(matriz, 1, 1);
+        else if (opcao == 2) for(int i=0; i<quant; i++) preenche_matriz(matriz, 0, 1);
+        else if (opcao == 3) for(int i=0; i<quant; i++) preenche_matriz(matriz, 1, 0);
+        else if (opcao == 4) for(int i=0; i<quant; i++) preenche_matriz(matriz, 0, 0);
         imprime_matriz(matriz);
+        float nao_nulos = percentual_nao_nulo(matriz);
+        int lin_soma;
+        while (1)
+        {
+            printf("\nDigite uma linha para ver o somatorio: ");
+            scanf("%d", &lin_soma);
+            if (lin_soma < 0 || lin_soma >= matriz->linhas) printf("\nValor Fora do intervalo aceito\n");
+            else printf("\nSomatorio da linha %d %s--> %d%s\n", lin_soma, COR_VERMELHO, somatorio_linha(matriz, lin_soma), COR_BRANCO);
+        
+            int acabou;
+            do{
+                printf("\n0. Ver somatorio de outra linha        1. Encerrar\n%s--> %s", COR_VERMELHO, COR_BRANCO);
+                scanf("%d", &acabou);
+            } while (acabou!=0 && acabou!=1);
+        
+            if (acabou == 1) break;
+        }
     }
-
-
+    return 0;
 }
