@@ -11,15 +11,34 @@ Stack* cria_pilha(int max_elementos)
 
 void mostra_pilha(Stack* pilha)
 {
-    if (vazia(pilha)) return;
-    int quant_elementos = pilha->topo + 1;
-    printf("\nImprimindo uma pilha:\n");
-    for (int i=quant_elementos-1; i>=0; i--)
+    if (pilha->topo == -1)
     {
-        printf("\npilha[%d]:\t%d", i, pilha->item[i]);
-        printf("\t"); 
-        for (int x=0; x<pilha->item[i]; x++) printf("#");
-    } 
+        printf("\n");
+        for (int i=0; i<pilha->max_elementos; i++) printf ("\t|\n");
+        printf("\n");
+    }
+    else
+    {
+        printf("\n");
+        for (int i=0; i<pilha->max_elementos; i++)
+        {
+            if (i <= pilha->topo)
+            {
+                printf("\t");
+                for (int j=0; j<pilha->item[i]; j++) printf("*");
+                printf("\n");
+            }
+            else
+            {
+                printf("\n");
+                printf ("\t|\n");
+                printf("\n");
+            }
+
+        } 
+        printf("\n");
+
+    }
 }
 
 
@@ -58,7 +77,7 @@ int topo(Stack* pilha)
 
 void destroy(Stack* pilha)
 {
-    free(pilha->item);                     //libera a região de memória onde estão os elementos
-    free(pilha);                           //libera a região de memoria da pilha
+    free(pilha->item);                     //libera pilha1 região de memória onde estão os elementos
+    free(pilha);                           //libera pilha1 região de memoria da pilha
     pilha = NULL;                          //arruma o ponteiro da pilha para NULL
 }

@@ -377,6 +377,18 @@ Numero* multiplica_numeros(Numero* numero1, Numero* numero2)
     return resultado;
 }
 
+void odd_even(int number)
+{
+    if (number%2 == 0)
+    {
+        printf("odd");
+        return 1;
+    }
+    
+    printf("even");
+    return 0;
+}
+
 Numero* divide_numeros(Numero* numero1, Numero* numero2)
 {
     if (compara_numeros(numero2, ler_numero("0")) == 0) 
