@@ -8,7 +8,7 @@ int main()
         tabela_hash[i] = NULL;
     }    
 
-    FILE *file = fopen("dezmil", "r");
+    FILE *file = fopen("mil", "r");
     tabela_hash = preenche_tabela(tabela_hash, file);
     imprime_hash(tabela_hash);
     
