@@ -4,26 +4,28 @@
 #include <ctype.h>
 #include <string.h>
 
-struct aluno
+struct pessoa
 {
     char nome[155];
     char cpf[20];
 };
 
-typedef struct aluno Aluno;
+typedef struct pessoa Pessoa;
 
 struct node
 {
-    Aluno* aluno;
+    Pessoa* pessoa;
     struct node* prox;
 };
 
 typedef struct node Node;
 
-Node* insere_lista(Node* lista, Aluno* aluno);
+Node* insere_lista(Node* lista, Pessoa* pessoa);
 
 Node** preenche_tabela(Node** tabela_hash, FILE* file);
 
 void imprime_hash(Node** tabela);
 
-Aluno* busca_cpf(Node** tabela_hash, const char* cpf);
+Pessoa* busca_cpf(Node** tabela_hash, const char* cpf);
+
+Pessoa* busca_arquivo(Node** );
