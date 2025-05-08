@@ -6,8 +6,8 @@
 
 struct aluno
 {
-    char* nome;
-    char* matricula;
+    char nome[155];
+    char cpf[20];
 };
 
 typedef struct aluno Aluno;
@@ -25,3 +25,5 @@ Node* insere_lista(Node* lista, Aluno* aluno);
 Node** preenche_tabela(Node** tabela_hash, FILE* file);
 
 void imprime_hash(Node** tabela);
+
+Aluno* busca_cpf(Node** tabela_hash, const char* cpf);

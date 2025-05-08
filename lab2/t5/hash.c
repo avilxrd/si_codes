@@ -9,52 +9,66 @@ Node* insere_lista(Node* lista, Aluno* aluno)
     return lista;
 }
 
-Node** preenche_tabela(Node** tabela_hash, FILE* file)
-{
-    file = fopen("cem", "r");
+Node** preenche_tabela(Node** tabela_hash, FILE* file) {
     char linha[255];
-    Aluno* aluno;
 
-    while (fgets(linha, sizeof(linha), file) != NULL)
-    {
-        //extrai os numeros de uma string
-        char numeros[20] = "";
-        int j=0, k=0;
-        for (int i=0; i<strlen(linha); i++)
-        {
-            if (isdigit(linha[i]))
-            {
-                numeros[j] = linha[i];
-                j++;
-            }
-            if (!isdigit(linha[i]))
-            {
-                aluno->nome[k] = linha[i];
-                k++; 
-            }
-        }
-        numeros[j] = '\0';
-        aluno->matricula = numeros;
+    while (fgets(linha, sizeof(linha), file) != NULL) {
+        linha[strcspn(linha, "\n")] = '\0';  // remove '\n'
 
-        int primeiro_num = numeros[0] - '0';
+        char* ult_espaco = strrchr(linha, ' ');
+        if (ult_espaco == NULL || !isdigit(ult_espaco[1])) continue;
 
-        tabela_hash[primeiro_num] = insere_lista(tabela_hash[primeiro_num], aluno);
+        Aluno* aluno = (Aluno*)malloc(sizeof(Aluno));
+
+        // Copia o nome
+        size_t len_nome = ult_espaco - linha;
+        strncpy(aluno->nome, linha, len_nome);
+        aluno->nome[len_nome] = '\0';
+
+        // Copia a matrícula
+        strcpy(aluno->cpf, ult_espaco + 1);
+
+        int chave = aluno->cpf[0] - '0';
+        tabela_hash[chave] = insere_lista(tabela_hash[chave], aluno);
     }
 
     return tabela_hash;
 }
 
-void imprime_hash(Node** tabela)
-{
-
-    for (int i=0; i<9; i++)
-    {
+void imprime_hash(Node** tabela) {
+    for (int i = 0; i < 10; i++) {
         Node* temp = tabela[i];
-        printf("linha %d: ", i);
-        while (temp != NULL)
-        {
-            printf("[%s, %s] ", temp->aluno->nome, temp->aluno->matricula);
+        printf("\nLinha %d: \n\n", i);
+        while (temp != NULL) {
+            printf("[%s | %s]  ", temp->aluno->nome, temp->aluno->cpf);
             temp = temp->prox;
         }
+        printf("\n");
     }
 }
+
+Aluno* busca_cpf(Node** tabela_hash, const char* cpf) 
+{
+    clock_t inicio = clock();
+
+    if (cpf == NULL || strlen(cpf) == 0) return NULL;
+
+    int chave = cpf[0] - '0';
+    Node* atual = tabela_hash[chave];
+
+    while (atual != NULL) 
+    {
+        if (strcmp(atual->aluno->cpf, cpf) == 0)
+        {
+            if (atual->aluno==NULL) printf("\nAluno nao encontrado.\n");
+            if (atual->aluno!=NULL) printf("\nAluno Encontrado\nNome: %s\tCpf: %s\n", atual->aluno->nome, atual->aluno->cpf);
+            clock_t fim = clock();
+            double tempo_exec = (double)(fim - inicio) / CLOCKS_PER_SEC;
+            printf("\nTempo de execucao: %.6f\n", tempo_exec);
+            return atual->aluno;
+        } 
+        atual = atual->prox;
+    }
+    return NULL;
+}
+
