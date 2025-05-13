@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+
+#define QUANT_PILHAS 3
 
 //estrutura da pilha
 //como não vimos em ED ainda, vi aqui: https://dev.to/josethz00/data-structures-in-c-stack-55c7
@@ -16,6 +19,8 @@ Stack* cria_pilha(int max_elementos);
 
 //mostra todos os elementos de uma pilha
 void mostra_pilha(Stack* pilha);
+
+void mostra_pilhas(Stack* pilhas[3], int altura_maxima);
 
 //retorna se a pilha esta vazia
 int vazia(Stack* pilha);
@@ -34,3 +39,5 @@ int topo(Stack* pilha);
 
 //destroi uma pilha
 void destroy(Stack* pilha);
+
+int fim(Stack** pilhas, int quant_pilhas);

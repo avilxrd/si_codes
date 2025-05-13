@@ -2,12 +2,12 @@
 
 int jogada_possivel(Stack* origem, Stack* destino)
 {
-    if (origem->item[origem->topo] < destino->item[destino->topo] || destino->topo == -1)
+    if (origem->topo != -1 && (origem->item[origem->topo] < destino->item[destino->topo] || destino->topo == -1))
     {
-        printf("\nJOGADA VALIDA\n");
+        printf("JOGADA VALIDA\n\n");
         return 1;
     }
-    printf("\nJOGADA INVALIDA\n");
+    printf("JOGADA INVALIDA\n\n");
     return 0;
 }
 
@@ -19,14 +19,14 @@ int main()
     printf("\nQuantos elementos voce quer que tenha a pilha inicial? ");
     scanf("%d", &quantidade);
 
-    Stack* pilhas[3];
-    for (int i=0; i<3; i++)
+    Stack* pilhas[QUANT_PILHAS];
+    for (int i=0; i<QUANT_PILHAS; i++)
     {
         pilhas[i] = cria_pilha(quantidade);
         if (i==0) for (int j=quantidade; j>0; j--) push(pilhas[i], j); //preenche a primeira
     } 
     
-    for (int i=0; i<3; i++) mostra_pilha(pilhas[i]);
+    mostra_pilhas(pilhas, quantidade);
 
     int acabou = 0;
     while (acabou == 0)
@@ -35,7 +35,6 @@ int main()
         printf("\n\nSelecione a pilha origem: ");
         scanf("%d", &origem);
         printf("\nSelecione a pilha destino: ");
-        printf("\n--> ");
         scanf("%d", &destino);
         destino--;
         origem --;
@@ -47,8 +46,8 @@ int main()
             pop(pilhas[origem]);
         }
 
-        for (int i=0; i<3; i++) mostra_pilha(pilhas[i]);
-
+        mostra_pilhas(pilhas, quantidade);
+        acabou = fim(pilhas, QUANT_PILHAS);
     }
 
 
