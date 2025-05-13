@@ -1,0 +1,19 @@
+<chat>
+    <mensagens>
+        <msg codigo_usuario="codigo" data_hora="horario">
+            <texto></texto>
+            <status></status>
+            <tipo></tipo>
+        </msg>
+    </mensagens>
+    <participantes>
+        <participante codigo_usuario="codigo">
+            <nome></nome>
+        </participante>
+        <participante codigo_usuario="codigo">
+            <nome></nome>
+        </participante>
+    </participantes>
+    <nome_conversa></nome_conversa>
+    <status_notificacao></status_notificacao>
+</chat>

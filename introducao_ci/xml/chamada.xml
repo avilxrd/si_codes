@@ -1,0 +1,19 @@
+<chamada>
+    <detalhes_chamador>
+        <nome></nome>
+        <numero></numero>
+        <departamento></departamento>
+    </detalhes_chamador>
+    <detalhes_chamada>
+        <tipo></tipo>
+        <data_hora></data_hora>
+        <protocolo></protocolo>
+    </detalhes_chamada>
+    <detalhes_local>
+        <local></local>
+        <ramal></ramal>
+    </detalhes_local>
+    <detalhes_problema>
+        <tipo></tipo>
+    </detalhes_problema>
+</chamada>
