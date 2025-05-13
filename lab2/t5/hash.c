@@ -1,5 +1,11 @@
 #include "hash.h"
 
+void flush_in()
+{
+    int ch;
+    while( (ch = fgetc(stdin)) != EOF && ch != '\n' ){}
+}
+
 Node* insere_lista(Node* lista, Pessoa* pessoa)
 {
     Node* novo = (Node*)malloc(sizeof(Node));
@@ -38,13 +44,12 @@ void imprime_hash(Node** tabela)
     for (int i=0; i<10; i++) 
     {
         Node* temp = tabela[i];
-        printf("\nLinha %d: \n\n", i);
+        printf("%sLinha %d: %s\n", AMARELO, i, BRANCO);
         while (temp != NULL) 
         {
-            printf("\tNOME: %s\tCPF: %s\n", temp->pessoa->nome, temp->pessoa->cpf);
+            printf("\t%sNOME%s: %s\t%sCPF%s: %s\n", VERMELHO, BRANCO, temp->pessoa->nome, VERMELHO, BRANCO, temp->pessoa->cpf);
             temp = temp->prox;
         }
-        printf("\n");
     }
 }
 
@@ -68,9 +73,9 @@ Pessoa* busca_cpf(Node** tabela_hash, const char* cpf)
         if (strcmp(atual->pessoa->cpf, cpf) == 0)
         {
             if (atual->pessoa!=NULL) printf("\nPessoa Encontrada\nNome: %s\tCpf: %s\n", atual->pessoa->nome, atual->pessoa->cpf);
-            // for (volatile int i = 0; i < 1000000000; i++); // Só para gastar tempo
-            fim = clock() - inicio;
-            printf("\nTempo de execucao: %.12f\n", fim/CLOCKS_PER_SEC);
+            fim = clock();
+            double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
+            printf("\nTempo de execucao: %.6f segundos\n", tempo);
             return atual->pessoa;
         } 
         atual = atual->prox;
@@ -80,3 +85,70 @@ Pessoa* busca_cpf(Node** tabela_hash, const char* cpf)
     return NULL;
 }
 
+Pessoa* ler_registro()
+{
+    Pessoa* pessoa = (Pessoa*) malloc (sizeof(Pessoa));
+    char nome[155], cpf[15];
+
+    printf("\nNome: ");
+    fgets(nome, sizeof(nome), stdin);
+    nome[strcspn(nome, "\n")] = '\0';
+    strcpy(pessoa->nome, nome);
+    
+    printf("\nCPF: ");
+    fgets(cpf, sizeof(cpf), stdin);
+    cpf[strcspn(cpf, "\n")] = '\0';
+    strcpy(pessoa->cpf, cpf);
+
+    return pessoa;
+}
+
+int adicionar_registro(Node** hash)
+{
+    printf("\n%sAdicionando novo registro:%s", AMARELO, BRANCO);
+    Pessoa *pessoa = ler_registro();
+    char* cpf = pessoa->cpf;
+    int primeiro_digito = cpf[0] - '0';
+    hash[primeiro_digito] = insere_lista(hash[primeiro_digito], pessoa);
+    printf("\n%sRegistro Adicionado%s\n", VERDE, BRANCO);
+    return 0;
+}
+
+int remover_registro(Node** hash)
+{
+    printf("\n%sRemovendo registro:%s", AMARELO, BRANCO);
+    char cpf[15];
+    printf("\nCPF: ");
+    fgets(cpf, sizeof(cpf), stdin);
+    cpf[strcspn(cpf, "\n")] = '\0';
+
+    int primeiro_digito = cpf[0] - '0';
+    
+    Node *lista = hash[primeiro_digito];
+    Node *ant = NULL;
+    
+    if (strcmp(lista->pessoa->cpf, cpf) == 0)
+    {
+        printf("\n%sPessoa removida:%s\nNOME: %s\tCPF: %s\n", AMARELO, BRANCO, hash[primeiro_digito]->pessoa->nome, hash[primeiro_digito]->pessoa->cpf);
+        hash[primeiro_digito] = hash[primeiro_digito]->prox;
+        printf("\n%sPessoa removida com sucesso%s\n", VERDE, BRANCO);
+        return 1; //removeu
+    }
+
+    while (lista != NULL)
+    {
+        if (strcmp(lista->pessoa->cpf, cpf) == 0)
+        {
+            printf("\n%sPessoa removida:%s\nNOME: %s\tCPF: %s\n", AMARELO, BRANCO, lista->pessoa->nome, lista->pessoa->cpf);
+            Node *lixo = lista;
+            ant->prox = lista->prox;
+            free(lixo);
+            printf("\n%sPessoa removida com sucesso%s\n", VERDE, BRANCO);
+            return 1; //removeu
+        }
+        ant   = lista;
+        lista = lista->prox;
+    }
+    
+    return 0; //nao removeu
+}
