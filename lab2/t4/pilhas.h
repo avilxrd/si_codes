@@ -5,6 +5,11 @@
 
 #define QUANT_PILHAS 3
 
+#define BRANCO   "\u001b[37m"
+#define VERMELHO "\u001b[31m"
+#define VERDE    "\u001b[32m"
+#define AMARELO  "\u001b[33m"
+
 //estrutura da pilha
 //como não vimos em ED ainda, vi aqui: https://dev.to/josethz00/data-structures-in-c-stack-55c7
 typedef struct stack

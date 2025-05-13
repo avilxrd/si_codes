@@ -4,10 +4,10 @@ int jogada_possivel(Stack* origem, Stack* destino)
 {
     if (origem->topo != -1 && (origem->item[origem->topo] < destino->item[destino->topo] || destino->topo == -1))
     {
-        printf("JOGADA VALIDA\n\n");
+        printf("Status: [Jogada %sVALIDA%s]\n\n", VERDE, BRANCO);
         return 1;
     }
-    printf("JOGADA INVALIDA\n\n");
+    printf("Status: [Jogada %sINVALIDA%s]\n\n", VERMELHO, BRANCO);
     return 0;
 }
 
@@ -15,7 +15,7 @@ int main()
 {
     system("clear");
     
-    int quantidade;
+    int quantidade, jogadas=0;
     printf("\nQuantos elementos voce quer que tenha a pilha inicial? ");
     scanf("%d", &quantidade);
 
@@ -39,13 +39,15 @@ int main()
         destino--;
         origem --;
         
-        system("clear");
+        system("clear || cls");
         if (jogada_possivel(pilhas[origem], pilhas[destino]) == 1)
         {
             push(pilhas[destino], pilhas[origem]->item[pilhas[origem]->topo]);
             pop(pilhas[origem]);
+            jogadas++;
         }
 
+        printf("Jogadas feitas: %d\n", jogadas);
         mostra_pilhas(pilhas, quantidade);
         acabou = fim(pilhas, QUANT_PILHAS);
     }
