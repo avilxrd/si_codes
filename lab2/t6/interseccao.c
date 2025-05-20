@@ -2,25 +2,29 @@
 
 
 void remove_repetidos(Node *lista) {
-    Node *atual = lista;
+    Node *temp = lista;
 
-    while (atual != NULL) {
-        Node *anterior = atual;
-        Node *verificador = atual->prox;
+    while (temp != NULL) 
+    {
+        Node *anterior = temp;
+        Node *temp_prox = temp->prox;
 
-        while (verificador != NULL) {
-            if (verificador->valor == atual->valor) {
-                // Remove o nó duplicado
-                anterior->prox = verificador->prox;
-                free(verificador);
-                verificador = anterior->prox;
-            } else {
-                anterior = verificador;
-                verificador = verificador->prox;
+        while (temp_prox != NULL) 
+        {
+            if (temp_prox->valor == temp->valor) 
+            {
+                anterior->prox = temp_prox->prox;
+                free(temp_prox);
+                temp_prox = anterior->prox;
+            } 
+            else 
+            {
+                anterior = temp_prox;
+                temp_prox = temp_prox->prox;
             }
         }
 
-        atual = atual->prox;
+        temp = temp->prox;
     }
 }
 
