@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct node
+{
+    int valor;
+    struct node *prox;
+};
+
+typedef struct node Node;
+
+Node* cria_lista();
+
+Node* insere_inicio(Node *lista, int elemento);
+
+Node* preenche_lista(Node *lista, int quantidade);
+
+void imprime_lista(Node *lista);
