@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int tabela[26];
+
 typedef struct node {
     int valor;
     struct node *sad;
@@ -50,31 +52,64 @@ void inserir(Node** raiz, int valor) {
         inserir(&((*raiz)->sad), valor);
 }
 
-// recebe uma string e retorna um array de inteiros 
-// com cada posição do vetor representando o código
-// ascii do caractere correspondente
-int* str_ascii(char *string)
+char* string_binario(char *string)
 {
     int len = strlen(string);
-    int *str_ascii = (int*)malloc(len*sizeof(int));
+    char *resultado = (char*) malloc (255*sizeof(char));
+    int controlador=0;
 
-    for (int i=0; i<len; i++) str_ascii[i] = (int)string[i];
-    return str_ascii;
+    for (int i=0; i<len; i++)
+    {
+        char c = string[i];
+        int val_c = (int)c;
+        
+        for (int j=0; j<26; j++)
+        {
+            // printf("\nVal_c = %d\nc = %c (%d)\n", val_c, c, (int)c);
+            if (val_c == tabela[j])
+            {
+                printf("j+1 = %d, controlador = %d\n", j+1, controlador);
+                resultado[controlador] = j+1;
+                controlador++;
+                break;
+            } 
+        }
+    }
+    for (int i=0; i<len; i++) printf("%d", resultado[i]);
+    // printf("%s", resultado);
+    return resultado;
 }
 
-int* ascii_bin(int *ascii)
+void teste_string()
 {
-    
+    char buffer[255];
+    int size = sizeof(buffer);
+    printf("Digite a string: ");
+    // fgets(buffer, size,stdin);
+    scanf("%s", buffer);
+    char *res = (char*) malloc (255*sizeof(char));
+
+    res = string_binario(buffer);
+    printf("\nBinario: %s ", res);
 }
 
-int main() {
+int main() 
+{
     Arvore *arvore = (Arvore*)malloc(sizeof(Arvore));
     arvore->raiz = cria_arvore();
 
-    inserir(&arvore->raiz, 0);
-    inserir(&arvore->raiz, 1);
-    inserir(&arvore->raiz, 1);
-    imprime_arvore(arvore->raiz);
+    int j=97;
+    for (int i=0; i<26; i++)
+    {
+        tabela[i] = j;
+        j++;
+    }
+
+    // inserir(&arvore->raiz, 0);
+    // inserir(&arvore->raiz, 1);
+    // inserir(&arvore->raiz, 1);
+    // imprime_arvore(arvore->raiz);
+    teste_string();
 
     return 0;
 }
