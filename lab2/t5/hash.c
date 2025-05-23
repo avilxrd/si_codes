@@ -45,9 +45,11 @@ void imprime_hash(Node** tabela)
     {
         Node* temp = tabela[i];
         printf("%sLinha %d: %s\n", AMARELO, i, BRANCO);
+        int cont = 0;
         while (temp != NULL) 
         {
-            printf("\t%sNOME%s: %s\t%sCPF%s: %s\n", VERMELHO, BRANCO, temp->pessoa->nome, VERMELHO, BRANCO, temp->pessoa->cpf);
+            printf("[%sTABELA HASH%s][%d][%d]\t%sNOME%s: %s\t%sCPF%s: %s\n", AMARELO, BRANCO, i, cont, VERMELHO, BRANCO, temp->pessoa->nome, VERMELHO, BRANCO, temp->pessoa->cpf);
+            cont++;
             temp = temp->prox;
         }
     }
@@ -64,7 +66,7 @@ Pessoa* busca_cpf(Node** tabela_hash, const char* cpf)
 
     if (cpf == NULL || strlen(cpf) == 0)
     {
-        printf("\nPessoa nao encontrada.\n");
+        printf("\n%sPessoa nao encontrada.%s\n", VERMELHO, BRANCO);
         return NULL;
     }
 
@@ -72,10 +74,10 @@ Pessoa* busca_cpf(Node** tabela_hash, const char* cpf)
     {
         if (strcmp(atual->pessoa->cpf, cpf) == 0)
         {
-            if (atual->pessoa!=NULL) printf("\nPessoa Encontrada\nNome: %s\tCpf: %s\n", atual->pessoa->nome, atual->pessoa->cpf);
+            if (atual->pessoa!=NULL) printf("\n%sPessoa Encontrada%s\nNome%s: %s\t%sCpf%s: %s\n", VERDE, VERMELHO, BRANCO, atual->pessoa->nome, VERMELHO, BRANCO, atual->pessoa->cpf);
             fim = clock();
             double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-            printf("\nTempo de execucao: %.6f segundos\n", tempo);
+            printf("\nTempo de busca: %s%.6f%s segundos\n", AMARELO, tempo, BRANCO);
             return atual->pessoa;
         } 
         atual = atual->prox;
@@ -151,4 +153,61 @@ int remover_registro(Node** hash)
     }
     
     return 0; //nao removeu
+}
+
+void imprime_lista(Node* lista)
+{
+    int cont = 0;
+    Node *temp = lista;
+    while (temp != NULL && temp->prox != NULL)
+    {
+        printf("[%sLISTA ENCADEADA%s][%d] %sNOME%s: %s\t\t%sCPF%s: %s\n", AMARELO, BRANCO, cont, VERMELHO, BRANCO, temp->pessoa->nome, VERMELHO, BRANCO, temp->pessoa->cpf);
+        cont++;
+        temp = temp->prox;
+    }
+}
+
+Node* arquivo_lista(Node *lista, FILE *file)
+{
+    char linha[255];
+
+    while (fgets(linha, sizeof(linha), file) != NULL) 
+    {
+        linha[strcspn(linha, "\n")] = '\0';
+
+        char* ult_espaco = strrchr(linha, ' ');
+        if (ult_espaco == NULL || !isdigit(ult_espaco[1])) continue;
+
+        Pessoa *pessoa = (Pessoa*)malloc(sizeof(Pessoa));
+
+        size_t len_nome = ult_espaco - linha;
+        strncpy(pessoa->nome, linha, len_nome);
+        pessoa->nome[len_nome] = '\0';
+
+        strcpy(pessoa->cpf, ult_espaco + 1);
+
+        lista = insere_lista(lista, pessoa);
+    }
+    return lista;
+}
+
+Pessoa* busca_lista(Node *lista, char *cpf)
+{
+    Node *temp = lista;
+    clock_t inicio = clock(), fim;
+    while (temp != NULL && temp->prox != NULL)
+    {
+        if (!strcmp(cpf, temp->pessoa->cpf))
+        {
+            fim = clock();
+            double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
+
+            printf("\n%sPessoa encontrada%s\n%sNome%s: %s          %sCPF%s: %s\nTempo de busca: %s%.6f%s segundos!", VERDE, BRANCO, VERMELHO, BRANCO, temp->pessoa->nome, VERMELHO, BRANCO, temp->pessoa->cpf, AMARELO, tempo, BRANCO);
+            return temp->pessoa;
+        }
+        temp = temp->prox;
+    }
+
+    printf("\nPessoa nao encontrada!");
+    return NULL;
 }
