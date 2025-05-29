@@ -21,6 +21,20 @@
 
 .data                                                       # declaraÃ§Ã£o de variÃ¡veis
 # ------------------------------------- registradores -------------------------------------
+str_branch_taken:   .asciiz "\n  Branch TAKEN"
+str_branch_not_taken: .asciiz "\n  Branch NOT taken"
+str_arreg:       .asciiz "Valor de arr_register[RS]: "
+str_addr_error: .asciiz "Erro: Endereço inválido!\n"
+str_endfinal:    .asciiz "\nEndereco efetivo: "
+str_carregado:   .asciiz "\nValor carregado: "
+str_invalid_offset:   .asciiz "\noffset invalido: "
+str_syscall:        .asciiz "\nsyscall ["
+str_invalid_mem:        .asciiz "\nmemoria invalida "
+str_param:          .asciiz "] Parâmetro: "
+str_newline:        .asciiz "\n"
+str_syscall_debug:  .asciiz "SYSCALL: code="
+str_invalid_syscall: .asciiz "\nErro: Código inválido: "
+str_space:          .asciiz " arg="
 arr_register:       .word 0, 0, 0, 0, 0, 0, 0, 0
                     .word 0, 0, 0, 0, 0, 0, 0, 0
                     .word 0, 0, 0, 0, 0, 0, 0, 0
@@ -73,12 +87,15 @@ str_lw:             .asciiz "\n[lw] "
 str_j:              .asciiz "\n[j] "
 str_jr:             .asciiz "\n[jr] "
 str_jal:            .asciiz "\n[jal] "
-str_syscall:         .asciiz "\n[syscall] "
+#str_syscall:         .asciiz "\n[syscall] "
 str_beq:            .asciiz "\n[beq] " 
 str_bne:            .asciiz "\n[bne] "
 str_lbu:            .asciiz "\n[lbu] "
 str_sb:             .asciiz "\n[sb] "
 str_nao_mapeada:    .asciiz "\n[!! instrucao nao mapeada] "
+str_jal_debug:      .asciiz "JAL: novo PC = "
+str_armazenado: .asciiz " valor armazendado: "
+
 
 .text
 .globl main
@@ -294,7 +311,7 @@ instrucao_R:
                     la $t2, funct                            #
                     sw $t1, 0($t2)                           # 
 
-                    jal printf_r
+                    #jal printf_r
 
                     lw $ra, 0($sp)
                     addi $sp, $sp, 4
@@ -347,7 +364,7 @@ extender_immediate:
                     sw $t7, 0($t6)
 
 fim_extensao:
-                    jal printf_i
+                    #jal printf_i
 
                     lw $ra, 0($sp)
                     addi $sp, $sp, 4
@@ -363,7 +380,7 @@ instrucao_J:
                     la $t2, address                          #
                     sw $t1, 0($t2)                           #  
 
-                    jal printf_j
+                    #jal printf_j
 
                     lw $ra, 0($sp)
                     addi $sp, $sp, 4
@@ -379,13 +396,13 @@ loop_processador:
                     jal busca_pc                             # busca a proxima instrução 
                     move $s0, $v0                            # $s0 = instrução buscada
 
-                    li $v0, 4
-                    la $t2, str_print1
-                    move $a0, $t2
-                    syscall
-                    li $v0, 34                               # print hex
-                    move $a0, $s0                            # $a0 = instrução
-                    syscall
+                    #li $v0, 4
+                    #la $t2, str_print1
+                    #move $a0, $t2
+                    #syscall
+                    #li $v0, 34                               # print hex
+                    #move $a0, $s0                            # $a0 = instrução
+                    #syscall
 
                     move $a0, $s0                            # instrução para decodificar
                     jal decodifica_pc                        # decodifica a instrução
@@ -669,10 +686,10 @@ ADDU:               # ADD: ARR_REGISTER[RD] = ARR_REGISTER[RS] + ARR_REGISTER[RT
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_addu
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_addu
+                    #move $a0, $t0
+                    #syscall
 
                     la $t0, RS                               
                     lw $t1, 0($t0)                           # $t1 = RS
@@ -709,10 +726,10 @@ SUBU:               # SUB: ARR_REGISTER[RD] = ARR_REGISTER[RS] - ARR_REGISTER[RT
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_subu
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_subu
+                    #move $a0, $t0
+                    #syscall
 
                     la $t0, RS                               
                     lw $t1, 0($t0)                           # $t1 = RS
@@ -750,10 +767,10 @@ XOR:                # XOR: ARR_REGISTER[RD] = ARR_REGISTER[RS] ^ ARR_REGISTER[RT
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_xor
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_xor
+                    #move $a0, $t0
+                    #syscall
 
                     la $t0, RS                               
                     lw $t1, 0($t0)                           # $t1 = RS
@@ -792,10 +809,10 @@ JR:                 # jr $rs -> JUMP RS 0X0000 0X0000 0X0000 0X001000
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_jr
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_jr
+                    #move $a0, $t0
+                    #syscall
 
 
                     la $s0, arr_register                     # $s0 = endereço base arr_register
@@ -827,10 +844,10 @@ ADDIU:              # ADDIU: ARR_REGISTER[RT] = ARR_REGISTER[RS] + immediate
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_addiu
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_addiu
+                    #move $a0, $t0
+                    #syscall
 
                     la $s0, arr_register                     # $s0 = endereço base arr_register
                     li $t0, 4                                # $t0 = 4
@@ -864,12 +881,12 @@ ADDIU:              # ADDIU: ARR_REGISTER[RT] = ARR_REGISTER[RS] + immediate
                     addu $t9, $s1, $s3                       # $t9 = array[RS] + immediate
                     sw $t9, 0($s2)                           # guarda no vetor o resultado
                     # "PRINTFS"
-                    li $v0, 4
-                    la $a0, str_resultado
-                    syscall
-                    li $v0, 34
-                    move $a0, $t9
-                    syscall
+                    #li $v0, 4
+                    #la $a0, str_resultado
+                    #syscall
+                    #li $v0, 34
+                    #move $a0, $t9
+                    #syscall
 
                     lw $ra, 0($sp)
                     lw $s0, 4($sp)
@@ -877,16 +894,43 @@ ADDIU:              # ADDIU: ARR_REGISTER[RT] = ARR_REGISTER[RS] + immediate
 
                     jr $ra
 
-LUI:                # LUI: ARR_REGISTER[RT] = ARR_REGISTER[RS] + immediate
+LUI:                # LUI $rt, immediate -> $rt = immediate << 16
                     # addi $rt, $rs, imm
                     addi $sp, $sp, -8
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_lui
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_lui
+                    #move $a0, $t0
+                    #syscall
+
+                    la $s0, arr_register                     # $s0 = endereço base arr_register
+                    li $t0, 4                                # $t0 = 4
+
+################### RT
+                    la $t1, RT                               # $t1 = &RT
+                    lw $t2, 0($t1)                           # $t2 =  RT 
+
+                    mul $t2, $t2, $t0                        # $t2 = 4 * RT        (offset)
+                    add $t2, $s0, $t2                        # $t2 = arr_register + offset end. rt vetor
+                    
+# immediate
+                    la $t1, immediate
+                    lw $t5, 0($t1)                           # $t5 = valor de immediate
+
+                    sll $t3, $t5, 16                         # $t3 = immediate << 16 
+
+                    sw $t3, 0($t2)                           # guardar em vetor[rt]
+
+
+                    #li $v0, 4                                # print string
+                    #la $t0, str_resultado
+                    #move $a0, $t0
+                    #syscall
+                    #li $v0, 34                                # print string
+                   # move $a0, $t3
+                    #syscall
 
                     lw $ra, 0($sp)
                     lw $s0, 4($sp)
@@ -894,16 +938,49 @@ LUI:                # LUI: ARR_REGISTER[RT] = ARR_REGISTER[RS] + immediate
 
                     jr $ra
 
-ORI:                # ORI: ARR_REGISTER[RT] = ARR_REGISTER[RS] + immediate
-                    # addi $rt, $rs, imm
+ORI:                # ORI $rt, $rs, immediate -> $rt = $rs | (zero_extended(immediate))
                     addi $sp, $sp, -8
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4                                # print string
-                    la $t0, str_ori
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4                                # print string
+                    #la $t0, str_ori
+                    #move $a0, $t0
+                    #syscall
+
+                    la $s0, arr_register                     # $s0 = endereço base arr_register
+                    li $t0, 4                                # $t0 = 4
+
+################### RS
+                    la $t1, RS                               # $t1 = &RS
+                    lw $t2, 0($t1)                           # $t2 =  RS
+
+                    mul $t2, $t2, $t0                        # $t2 = 4 * RS        (offset)
+                    add $t2, $s0, $t2                        # $t2 = arr_register + offset
+                    lw $s1, 0($t2)                           # $s1 = valor de arr_register[RS]                    
+
+################### RT
+                    la $t1, RT                               # $t1 = &RT
+                    lw $t2, 0($t1)                           # $t2 =  RT 
+
+                    mul $t2, $t2, $t0                        # $t2 = 4 * RT        (offset)
+                    add $t2, $s0, $t2                        # $t2 = arr_register + offset
+
+                    # immediate
+                    la $t1, immediate
+                    lw $t3, 0($t1)                           # $t3 = valor de immediate
+
+                    or $t4, $s1, $t3                         # $t4 = arr_register[rs] or immediate
+
+                    sw $t4, 0($t2)                            # guarda o valor no vetor[rt]
+
+                    #li $v0, 4                                # print string
+                    #la $t0, str_resultado
+                    #move $a0, $t0
+                    #syscall
+                    #li $v0, 34                                # print string
+                    #move $a0, $t4
+                    #syscall
 
                     lw $ra, 0($sp)
                     lw $s0, 4($sp)
@@ -916,10 +993,10 @@ LW:                 # LW: arr_register[RT] = MEM[arr_register[RS] + imm]
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4
-                    la $t0, str_lw
-                    move $a0, $t0
-                    syscall
+                    #li $v0, 4
+                    #la $t0, str_lw
+                    #move $a0, $t0
+                    #syscall
 
                     la $s0, arr_register
                     li $t0, 4
@@ -934,37 +1011,76 @@ LW:                 # LW: arr_register[RT] = MEM[arr_register[RS] + imm]
 ################### RT
                     la $t1, RT
                     lw $t2, 0($t1)
-
-                    mul $t3, $t2, $t0                         # t3 = offset RT
-                    add $t3, $s0, $t3                         # endereço em arr_register[RT]
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    move $t3, $t2                             # salvar endereço de RT
 
 ################### immediate
                     la $t1, immediate
-                    lw $s3, 0($t1)
+                    lw $s2, 0($t1)
 
-                    add $s4, $s1, $s3                         # endereço efetivo
+                    add $s3, $s1, $s2                         # $s3 = endereço efetivo
 
 ################### PRINTS
-                    li $v0, 34
-                    move $a0, $s1
-                    syscall                                  # imprime arr_register[RS]
+                    #li $v0, 4
+                    #la $a0, str_arreg
+                    #syscall  
+                    #li $v0, 34
+                    #move $a0, $s1
+                    #syscall                                  # imprime arr_register[RS]
 
-                    li $v0, 34
-                    move $a0, $s3
-                    syscall                                  # imprime immediate
+#                    li $v0, 4
+#                    la $a0, str_imm
+#                    syscall                                  
+#                    li $v0, 34
+#                    move $a0, $s2
+#                    syscall                                  # imprime immediate
 
-                    li $v0, 34
-                    move $a0, $s4
-                    syscall                                  # imprime endereço final
+#                    li $v0, 4
+#                    la $a0, str_endfinal
+#                    syscall  
+#                    li $v0, 34
+#                    move $a0, $s3
+#                    syscall                                  # imprime endereço final
 
-################### LW
-                    lw $t5, 0($s4)
-                    sw $t5, 0($t3)                            # arr_register[RT] = valor lido
+################### Verificação de memória
+                    li $t4, 0x10010000
+                    li $t6, 5000
+                    subu $t7, $s3, $t4
+                    blt $t7, $t6, LW_DATA
 
-                    li $v0, 34
-                    move $a0, $t5
-                    syscall                                  # imprime valor carregado
+                    li $t4, 0x7FFFEFFC
+                    subu $t7, $t4, $s3
+                    blt $t7, $t6, LW_STACK
 
+                    li $v0, 4
+                    la $a0, str_invalid_mem
+                    syscall
+                    j FIM_LW
+
+LW_DATA:
+                    la $t8, vet_data
+                    addu $t8, $t8, $t7
+                    lw $t9, 0($t8)
+                    j ARMAZENA
+
+LW_STACK:
+                    la $t8, vet_pilha
+                    addu $t8, $t8, $t7
+                    lw $t9, 0($t8)
+                    j ARMAZENA
+
+ARMAZENA:
+                    sw $t9, 0($t3)                             # arr_register[RT] = valor carregado
+
+                    #li $v0, 4
+                    #la $a0, str_carregado
+                   # syscall  
+                    #li $v0, 34
+                 #   move $a0, $t9
+                #    syscall                                  # imprime valor carregado
+
+FIM_LW:
                     lw $ra, 0($sp)
                     lw $s0, 4($sp)
                     addi $sp, $sp, 8
@@ -975,10 +1091,10 @@ SW:                 # SW: MEM[arr_register[RS] + imm] = arr_register[RT]
                     sw $ra, 0($sp)
                     sw $s0, 4($sp)
 
-                    li $v0, 4
-                    la $t0, str_sw
-                    move $a0, $t0
-                    syscall
+                #    li $v0, 4
+               #     la $t0, str_sw
+              #      move $a0, $t0
+             #       syscall
 
                     la $s0, arr_register
                     li $t0, 4
@@ -1004,28 +1120,423 @@ SW:                 # SW: MEM[arr_register[RS] + imm] = arr_register[RT]
                     add $s4, $s1, $s3                         # endereço efetivo
 
 ################### PRINTS
-                    li $v0, 34
-                    move $a0, $s1
-                    syscall                                  # imprime arr_register[RS]
+                    
+                  #  li $v0, 4
+                 #   la $a0, str_arreg
+                 #   syscall  
+                 #   li $v0, 34
+                #    move $a0, $s1
+               #     syscall                                  # imprime arr_register[RS]
 
-                    li $v0, 34
-                    move $a0, $s3
-                    syscall                                  # imprime immediate
+                 #   li $v0, 4
+                 #   la $a0, str_imm
+                #    syscall                                  # imprime immediate
+               #     li $v0, 34
+               #     move $a0, $s3
+               #     syscall                                  # imprime immediate
 
-                    li $v0, 34
-                    move $a0, $s4
-                    syscall                                  # imprime endereço final
+                  #  li $v0, 4
+                 #   la $a0, str_endfinal
+                #    syscall  
+                #    li $v0, 34
+                #    move $a0, $s4
+                #    syscall                                  # imprime endereço final
 
-################### SW
-                    sw $s2, 0($s4)                            # MEM[arr_register[RS] + imm] = arr_register[RT]
+                    li $t4, 0x10010000
+                    li $t6, 5000
+                    subu $t7, $s4, $t4
+                    blt $t7, $t6, SW_DATA
 
-                    li $v0, 34
-                    move $a0, $s2
-                    syscall                                  # imprime valor armazenado
+                    li $t4, 0x7FFFEFFC
+                    subu $t7, $t4, $s4
+                    blt $t7, $t6, SW_STACK
 
+                    li $v0, 4
+                    la $a0, str_invalid_mem
+                    syscall
+                    j FIM_SW
+SW_DATA:
+                    la $t8, vet_data
+                    addu $t8, $t8, $t7
+                    sw $s2, 0($t8)
+                    j FIM_SW
+SW_STACK:
+                    la $t8, vet_pilha
+                    addu $t8, $t8, $t7
+                    sw $s2, 0($t8)
+                    j FIM_SW
+FIM_SW:
+                   # li $v0, 4
+                  #  la $a0, str_armazenado
+                 #   syscall  
+                  #  li $v0, 34
+                  #  move $a0, $s2
+                 #   syscall                                  # imprime valor armazenado
                     lw $ra, 0($sp)
                     lw $s0, 4($sp)
                     addi $sp, $sp, 8
+                    jr $ra
+
+LBU:                # LBU: arr_register[RT] = zero_extend(MEM[arr_register[RS] + imm])
+                    addi $sp, $sp, -8
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+
+                   # li $v0, 4
+                 #   la $t0, str_lbu
+                #    move $a0, $t0
+             #       syscall
+
+                    la $s0, arr_register
+                    li $t0, 4
+
+                    # Carrega RS
+                    la $t1, RS
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s1, 0($t2)         # $s1 = arr_register[RS]
+
+                    # Carrega RT (apenas para endereço de destino)
+                    la $t1, RT
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t3, $s0, $t2      # $t3 = endereço de RT no arr_register
+
+                    # Carrega immediate
+                    la $t1, immediate
+                    lw $s2, 0($t1)
+
+                    # Calcula endereço efetivo
+                    add $s3, $s1, $s2      # $s3 = endereço efetivo
+
+                    # Debug prints
+                 #   li $v0, 4
+               #     la $a0, str_arreg
+               #     syscall  
+              #      li $v0, 34
+                #    move $a0, $s1
+                #    syscall
+
+                 #   li $v0, 4
+                  #  la $a0, str_imm
+                  #  syscall  
+                  #  li $v0, 34
+                  #  move $a0, $s2
+                  #  syscall
+
+                   # li $v0, 4
+                   # la $a0, str_endfinal
+                   # syscall  
+                   # li $v0, 34
+                   # move $a0, $s3
+                   # syscall
+
+                    # Verificação de memória
+                    li $t4, 0x10010000     # Base da memória de dados
+                    li $t6, 5000           # Tamanho máximo
+                    subu $t7, $s3, $t4     # Offset
+                    blt $t7, $t6, LBU_DATA
+
+                    li $t4, 0x7FFFEFFC     # Base da pilha
+                    subu $t7, $t4, $s3
+                    blt $t7, $t6, LBU_STACK
+
+                    li $v0, 4
+                    la $a0, str_invalid_mem
+                    syscall
+                    j FIM_LBU
+
+LBU_DATA:
+                    la $t8, vet_data
+                    addu $t8, $t8, $t7
+                    lbu $t9, 0($t8)        # Carrega byte com zero-extend
+                    j ARMAZENA_LBU
+
+LBU_STACK:
+                    la $t8, vet_pilha
+                    addu $t8, $t8, $t7
+                    lbu $t9, 0($t8)        # Carrega byte com zero-extend
+
+ARMAZENA_LBU:
+                    sw $t9, 0($t3)         # Armazena no registrador RT
+
+                   # li $v0, 4
+                   # la $a0, str_carregado
+                   # syscall  
+                    #li $v0, 36             # Print unsigned integer
+                   # move $a0, $t9
+                   # syscall
+
+FIM_LBU:
+                    lw $ra, 0($sp)
+                    lw $s0, 4($sp)
+                    addi $sp, $sp, 8
+                    jr $ra
+
+SB:                 # SB: MEM[arr_register[RS] + imm] = byte_menos_significativo(arr_register[RT])
+                    addi $sp, $sp, -8
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+
+                  #  li $v0, 4
+                  #  la $t0, str_sb
+                  #  move $a0, $t0
+                  #  syscall
+
+                    la $s0, arr_register
+                    li $t0, 4
+
+                    # Carrega RS
+                    la $t1, RS
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s1, 0($t2)         # $s1 = arr_register[RS]
+
+                    # Carrega RT
+                    la $t1, RT
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s2, 0($t2)         # $s2 = arr_register[RT]
+                    andi $s2, $s2, 0xFF    # Pega apenas o byte menos significativo
+
+                    # Carrega immediate
+                    la $t1, immediate
+                    lw $s3, 0($t1)
+
+                    # Calcula endereço efetivo
+                    add $s4, $s1, $s3      # $s4 = endereço efetivo
+
+                    # Debug prints
+                   # li $v0, 4
+                   # la $a0, str_arreg
+                   # syscall  
+                   # li $v0, 34
+                   # move $a0, $s1
+                   # syscall
+
+                   # li $v0, 4
+                   # la $a0, str_imm
+                   # syscall  
+                   # li $v0, 34
+                   # move $a0, $s3
+                   # syscall
+
+                   # li $v0, 4
+                   # la $a0, str_endfinal
+                    #syscall  
+                   # li $v0, 34
+                   # move $a0, $s4
+                   # syscall
+
+                    # Verificação de memória
+                    li $t4, 0x10010000     # Base da memória de dados
+                    li $t6, 5000           # Tamanho máximo
+                    subu $t7, $s4, $t4     # Offset
+                    blt $t7, $t6, SB_DATA
+
+                    li $t4, 0x7FFFEFFC     # Base da pilha
+                    subu $t7, $t4, $s4
+                    blt $t7, $t6, SB_STACK
+
+                    li $v0, 4
+                    la $a0, str_invalid_mem
+                    syscall
+                    j FIM_SB
+
+SB_DATA:
+                    la $t8, vet_data
+                    addu $t8, $t8, $t7
+                    sb $s2, 0($t8)         # Armazena apenas 1 byte
+                    j FIM_SB
+
+SB_STACK:
+                    la $t8, vet_pilha
+                    addu $t8, $t8, $t7
+                    sb $s2, 0($t8)         # Armazena apenas 1 byte
+
+FIM_SB:
+                   # li $v0, 4
+                  #  la $a0, str_armazenado
+                  #  syscall  
+                  #  li $v0, 34
+                 #   move $a0, $s2
+                 #   syscall
+                    lw $ra, 0($sp)
+                    lw $s0, 4($sp)
+                    addi $sp, $sp, 8
+                    jr $ra
+
+BEQ:                # BEQ: if (RS == RT) PC += imm << 2
+                    addi $sp, $sp, -12
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+                    sw $s1, 8($sp)
+
+                    #li $v0, 4
+                    #la $a0, str_beq
+                    #syscall
+
+                    la $s0, arr_register
+                    li $t0, 4
+
+                    # Carrega RS
+                    la $t1, RS
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s1, 0($t2)         # $s1 = arr_register[RS]
+
+                    # Carrega RT
+                    la $t1, RT
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s2, 0($t2)         # $s2 = arr_register[RT]
+
+                    # Carrega immediate
+                    la $t1, immediate
+                    lw $s3, 0($t1)         # $s3 = immediate
+
+                    # Debug prints
+                    #li $v0, 4
+                    #la $a0, str_rs
+                   # syscall
+                    #li $v0, 34
+                   # move $a0, $s1
+                   # syscall
+
+                 #   li $v0, 4
+                  #  la $a0, str_rt
+                  #  syscall
+                   # li $v0, 34
+                   # move $a0, $s2
+                  #  syscall
+
+                   # li $v0, 4
+                   # la $a0, str_imm
+                    #syscall
+                 #   li $v0, 1
+                #    move $a0, $s3
+               #     syscall
+
+                    # Comparação
+                    bne $s1, $s2, beq_nao_tomar
+
+                    # Calcula novo PC
+                    lw $t0, PC
+                    sll $t1, $s3, 2        # immediate << 2
+                    addu $t0, $t0, $t1     # PC + (imm << 2)
+
+                    # Atualiza PC
+                    sw $t0, PC
+
+                    # Desativa incremento automático
+                    li $t1, 1
+                    sw $t1, flag_incremento
+
+                    li $v0, 4
+                    la $a0, str_branch_taken
+                    syscall
+                    j beq_fim
+
+beq_nao_tomar:
+                    li $v0, 4
+                    la $a0, str_branch_not_taken
+                    syscall
+
+beq_fim:
+                    lw $s1, 8($sp)
+                    lw $s0, 4($sp)
+                    lw $ra, 0($sp)
+                    addi $sp, $sp, 12
+                    jr $ra
+
+BNE:                # BNE: if (RS != RT) PC += imm << 2
+                    addi $sp, $sp, -12
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+                    sw $s1, 8($sp)
+
+                   # li $v0, 4
+                    #la $a0, str_bne
+                   # syscall
+
+                    la $s0, arr_register
+                    li $t0, 4
+
+                    # Carrega RS
+                    la $t1, RS
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s1, 0($t2)         # $s1 = arr_register[RS]
+
+                    # Carrega RT
+                    la $t1, RT
+                    lw $t2, 0($t1)
+                    mul $t2, $t2, $t0
+                    add $t2, $s0, $t2
+                    lw $s2, 0($t2)         # $s2 = arr_register[RT]
+
+                    # Carrega immediate
+                    la $t1, immediate
+                    lw $s3, 0($t1)         # $s3 = immediate
+
+                    # Debug prints
+                   # li $v0, 4
+                   # la $a0, str_rs
+                   # syscall
+                   # li $v0, 34
+                  #  move $a0, $s1
+                  #  syscall
+
+                  #  li $v0, 4
+                  #  la $a0, str_rt
+                 #   syscall
+                    #li $v0, 34
+                   # move $a0, $s2
+                   # syscall
+
+                  #  li $v0, 4
+                #    la $a0, str_imm
+                #    syscall
+                #    li $v0, 1
+               #     move $a0, $s3
+                #    syscall
+
+                    # Comparação
+                    beq $s1, $s2, bne_nao_tomar
+
+                    # Calcula novo PC
+                    lw $t0, PC
+                    sll $t1, $s3, 2        # immediate << 2
+                    addu $t0, $t0, $t1     # PC + (imm << 2)
+
+                    # Atualiza PC
+                    sw $t0, PC
+
+                    # Desativa incremento automático
+                    li $t1, 1
+                    sw $t1, flag_incremento
+
+                    li $v0, 4
+                    la $a0, str_branch_taken
+                    syscall
+                    j bne_fim
+
+bne_nao_tomar:
+                    li $v0, 4
+                    la $a0, str_branch_not_taken
+                    syscall
+
+bne_fim:
+                    lw $s1, 8($sp)
+                    lw $s0, 4($sp)
+                    lw $ra, 0($sp)
+                    addi $sp, $sp, 12
                     jr $ra
 
 #########################################################################################
@@ -1037,9 +1548,9 @@ J:                  # J: JUMP -> ADDRESS (28 BITS)
                     addi $sp, $sp, -4
                     sw $ra, 0($sp)
 
-                    li $v0, 4                                # print string
-                    la $a0, str_j
-                    syscall
+                   # li $v0, 4                                # print string
+                   # la $a0, str_j
+                   # syscall
 
                     li $t9, 0x00400000                        # endereço base vet_text
                     la $t0, address                           # $t0 = variavel address       
@@ -1070,32 +1581,130 @@ J:                  # J: JUMP -> ADDRESS (28 BITS)
 # SYSCALL === SYSCALL === SYSCALL === SYSCALL === SYSCALL === SYSCALL === SYSCALL === 
 #########################################################################################
 SYSCALL:
-                    addi $sp, $sp, -4
-                    sw $ra, 0($sp)                    
-                    
-                    la $t0, vet_data                        # e. base vetor_data
-                    
-                    li $t1, 2                                 # indice de $v0 no vetor
-                    mul $t2, $t1, 4                           # offset
-                    addu $t2, $t0, $t2                        # end. base + offset
-                    lw $t3, 0($t2)                            # $t3 = valor de $v0
-                    
-                    li $t1, 4                                 # indice de $a0 no vetor
-                    mul $t2, $t1, 4                           # offset
-                    addu $t2, $t0, $t2                         # end. base + offset
-                    lw $t4, 0($t2)                            # $t4 = valor de $a0
-                    
-                    li $v0, 4                                # print string
-                    la $t0, str_aux_syscall
-                    move $a0, $t0
+                    addi $sp, $sp, -16
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+                    sw $s1, 8($sp)
+                    sw $s2, 12($sp)
+
+                    # Carrega código da syscall (arr_register[2])
+                    la $s0, arr_register
+                    li $t0, 2
+                    sll $t1, $t0, 2
+                    add $t1, $s0, $t1
+                    lw $s1, 0($t1)         # $s1 = código syscall
+
+                    # Carrega parâmetro (arr_register[4])
+                    li $t0, 4
+                    sll $t1, $t0, 2
+                    add $t1, $s0, $t1
+                    lw $s2, 0($t1)         # $s2 = parâmetro
+
+                    # Debug: mostra syscall e parâmetro
+                    #li $v0, 4
+                   # la $a0, str_syscall
+                 #   syscall
+                #    li $v0, 1
+               #     move $a0, $s1
+              #      syscall
+              #      li $v0, 4
+             #       la $a0, str_param
+            #        syscall
+            #        li $v0, 34
+            #        move $a0, $s2
+            #        syscall
+             #       li $v0, 4
+             #       la $a0, str_newline
+             #       syscall
+
+                    # Prepara para syscall real
+                    move $v0, $s1         # Código da syscall
+
+                    # Verifica tipo de parâmetro
+                    li $t0, 4              # print_string
+                    beq $s1, $t0, syscall_string
+                    li $t0, 8              # read_string
+                    beq $s1, $t0, syscall_string
+                    li $t0, 9              # sbrk
+                    beq $s1, $t0, syscall_string
+
+                    # Outras syscalls (usa valor direto)
+                    move $a0, $s2
+                    j exec_syscall
+
+syscall_string:
+                    # Verifica se endereço está no segmento de dados
+                    li $t0, 0x10010000     # Início da memória estática
+                    li $t1, 0x10020000     # Fim da memória estática
+                    blt $s2, $t0, addr_error
+                    bge $s2, $t1, addr_error
+
+                    # Converte para offset no vet_data
+                    sub $t2, $s2, $t0      # Calcula offset
+                    la $a0, vet_data
+                    add $a0, $a0, $t2      # Endereço real no simulador
+
+exec_syscall:
                     syscall
-                    
-                    move $v0, $t3
-                    move $a0, $t4
+                    j syscall_end
+
+addr_error:
+                    li $v0, 4
+                    la $a0, str_addr_error
                     syscall
-                    
+
+syscall_end:
+                    lw $s2, 12($sp)
+                    lw $s1, 8($sp)
+                    lw $s0, 4($sp)
                     lw $ra, 0($sp)
-                    addi $sp, $sp, 4
+                    addi $sp, $sp, 16
+                    jr $ra
+
+JAL:                
+                    addi $sp, $sp, -8
+                    sw $ra, 0($sp)
+                    sw $t0, 4($sp)          # Preserva $t0
+                    
+                    la $t0, vet_data        # e. base vetor_data
+                    
+                    # guarda PC+4 em $ra reg[31]
+                    lw $t1, PC             # carrega PC atual
+                    addi $t1, $t1, 4       # PC + 4 (endereço de retorno)
+                    
+                    li $t2, 31             # indice do registrador $ra
+                    mul $t3, $t2, 4        # offset
+                    addu $t3, $t0, $t3     # end. base + offset
+                    sw $t1, 0($t3)         # Armazena PC+4 em $ra
+                    
+ 
+                    # calcula novo endereço de jump
+                    lw $t1, address        # Carrega address (26 bits)
+                    sll $t1, $t1, 2        # address << 2 (28 bits)
+                    
+                    # upper 4 bits do PC atual
+                    lw $t2, PC
+                    srl $t2, $t2, 28       # isola bits 31-28
+                    sll $t2, $t2, 28       # posiciona nos bits altos
+                    
+                    or $t1, $t1, $t2       # Novo PC = [31:28]PC | (address << 2)
+
+                    # atualiza PC e flag
+                    sw $t1, PC             # Atualiza PC
+                    
+                    li $t2, 1
+                    sw $t2, flag_incremento # desativa incremento automático
+                    
+                    li $v0, 4
+                    la $a0, str_jal_debug
+                    syscall
+                    li $v0, 34
+                    lw $a0, PC
+                    syscall
+                    
+                    lw $t0, 4($sp)
+                    lw $ra, 0($sp)
+                    addi $sp, $sp, 8
                     jr $ra
 
 fim:
