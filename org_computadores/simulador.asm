@@ -21,7 +21,10 @@
 
 .data                                                       # declaraÃ§Ã£o de variÃ¡veis
 # ------------------------------------- registradores -------------------------------------
+tamanho_codigo:    .word 0                 # Será preenchido com o tamanho real do código
+str_fim_sucesso:   .asciiz "\n[Programa executado com sucesso - Todas instruções completas]\n"
 str_branch_taken:   .asciiz "\n  Branch TAKEN"
+str_fim_execucao:   .asciiz "\n[Execução finalizada pelo simulador]\n"
 str_branch_not_taken: .asciiz "\n  Branch NOT taken"
 str_arreg:       .asciiz "Valor de arr_register[RS]: "
 str_addr_error: .asciiz "Erro: Endereço inválido!\n"
@@ -393,45 +396,58 @@ fim_decodificacao:
                     jr $ra
 
 loop_processador:
-                    jal busca_pc                             # busca a proxima instrução 
-                    move $s0, $v0                            # $s0 = instrução buscada
+                    # 1. Verifica se PC atingiu o fim das instruções válidas
+                    la $t0, PC
+                    lw $t1, 0($t0)          # Carrega PC atual
+                    la $t2, vet_instr        # Endereço inicial do código
+                    lw $t3, tamanho_codigo  # Tamanho em bytes do código
+                    add $t4, $t2, $t3       # Endereço final do código
+                    
+                    bge $t1, $t4, fim_execucao_sucesso  # Se PC ≥ final do código, termina
 
-                    #li $v0, 4
-                    #la $t2, str_print1
-                    #move $a0, $t2
-                    #syscall
-                    #li $v0, 34                               # print hex
-                    #move $a0, $s0                            # $a0 = instrução
-                    #syscall
+                    # 2. Busca segura da instrução
+                    jal busca_pc
+                    move $s0, $v0           # Guarda instrução
 
-                    move $a0, $s0                            # instrução para decodificar
-                    jal decodifica_pc                        # decodifica a instrução
+                    # 3. Verifica instrução nula ou inválida
+                    beqz $s0, fim_execucao_sucesso  # Se instrução = 0x00000000
 
+                    # 4. Processamento normal
+                    move $a0, $s0
+                    jal decodifica_pc
+
+                    # Verificação de syscall exit (código 10)
+                    la $t0, arr_register
+                    lw $t1, 8($t0)          # $v0 (índice 2)
+                    li $t2, 10
+                    beq $t1, $t2, fim_execucao_sucesso
+
+                    # Controle do PC
                     la $t4, flag_incremento
                     lw $t5, 0($t4)
                     beq $t5, $zero, incrementa_pc
-                    li $t5, 0                                # reseta a flag
+                    li $t5, 0               # Reseta flag
                     sw $t5, 0($t4)
-                    j pula_incremento
+                    j executa_instrucao
 
 incrementa_pc:
                     la $t0, PC
                     lw $t1, 0($t0)
-                    addi $t1, $t1, 4
+                    addi $t1, $t1, 4       # PC += 4
                     sw $t1, 0($t0)
 
-pula_incremento:
+executa_instrucao:
                     jal verifica_instrucao
                     j loop_processador
 
-                    la $t0, PC                               # $t0 = endereço de PC
-                    lw $t1, 0($t0)                           # $t1 = valor de PC
-                    addi $t1, $t1, 4                         # incrementa o PC
-                    sw $t1, 0($t0)                           # guarda em PC o valor incrementado
-
-                    jal verifica_instrucao
-
-                    j loop_processador                       # infinito
+fim_execucao_sucesso:
+                    # Mensagem de término controlado
+                    li $v0, 4
+                    la $a0, str_fim_sucesso
+                    syscall
+                    
+                    li $v0, 10              # Exit syscall
+                    syscall
 
 printf_r:
 # opcode, rs, rt, rd, shamt, funct
@@ -1649,9 +1665,9 @@ exec_syscall:
                     j syscall_end
 
 addr_error:
-                    li $v0, 4
-                    la $a0, str_addr_error
-                    syscall
+                    #li $v0, 4
+                    #la $a0, str_addr_error
+                    #syscall
 
 syscall_end:
                     lw $s2, 12($sp)
