@@ -60,6 +60,7 @@ str_addr:           .asciiz "    address: "
 fadd:               .asciiz "\nfazendo a add" 
 fcheg:              .asciiz "\nchegou aqui"
 str_resultado:      .asciiz "\nresultado: "
+str_aux_syscall:    .asciiz "\nresultado da syscall: \n"
 # strings dos nomes das instrucoes
 str_addu:           .asciiz "\n[addu] "
 str_subu:           .asciiz "\n[subu] "
@@ -67,10 +68,16 @@ str_addiu:          .asciiz "\n[addiu] "
 str_xor:            .asciiz "\n[xor] "
 str_lui:            .asciiz "\n[lui] "
 str_ori:            .asciiz "\n[ori] "
-str_sw:            .asciiz "\n[sw] "
-str_lw:            .asciiz "\n[lw] "
+str_sw:             .asciiz "\n[sw] "
+str_lw:             .asciiz "\n[lw] "
 str_j:              .asciiz "\n[j] "
-
+str_jr:             .asciiz "\n[jr] "
+str_jal:            .asciiz "\n[jal] "
+str_syscall:         .asciiz "\n[syscall] "
+str_beq:            .asciiz "\n[beq] " 
+str_bne:            .asciiz "\n[bne] "
+str_lbu:            .asciiz "\n[lbu] "
+str_sb:             .asciiz "\n[sb] "
 str_nao_mapeada:    .asciiz "\n[!! instrucao nao mapeada] "
 
 .text
@@ -593,20 +600,9 @@ verifica_funct:
                     
                     li $t2, 0x20
                     beq $t1, $t2, ADDU
-#                    li $t2, 0x22
-#                    beq $t1, $t2, SUBU
-#                    li $t2, 0x24
-#                    beq $t1, $t2, AND
-#                    li $t2, 0x25
-#                    beq $t1, $t2, OR
-#                    li $t2, 0x00
-#                    beq $t1, $t2, SLL
-#                    li $t2, 0x02
-#                    beq $t1, $t2, SRL
-#                    li $t2, 0x08
-#                    beq $t1, $t2, JR
-#                    li $t2, 0x0C
-#                    beq $t1, $t2, SYSCALL
+                    li $t2, 0x0C
+                    beq $t1, $t2, SYSCALL
+
                     j fim_verifica_funct
                     
 fim_verifica_funct:
@@ -748,6 +744,80 @@ SUBU:               # SUB: ARR_REGISTER[RD] = ARR_REGISTER[RS] - ARR_REGISTER[RT
 
                     jr $ra
  
+XOR:                # XOR: ARR_REGISTER[RD] = ARR_REGISTER[RS] ^ ARR_REGISTER[RT]
+                    # addi $rt, $rs, imm
+                    addi $sp, $sp, -8
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+
+                    li $v0, 4                                # print string
+                    la $t0, str_xor
+                    move $a0, $t0
+                    syscall
+
+                    la $t0, RS                               
+                    lw $t1, 0($t0)                           # $t1 = RS
+                    la $t0, RT
+                    lw $t2, 0($t0)                           # $t2 = RT 
+                    la $t0, RD
+                    lw $t3, 0($t0)                           # $t3 = RD
+
+                    la $s0, arr_register                     # $s0 = endereço base arr_register
+                    li $s1, 4                                # $s1 = 4
+################### RS
+                    mul $t0, $t1, $s1                        # $t0 = offset RS
+                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RS
+                    lw $t1, 0($t0)                           # $t1 = valor de RS
+################### RT
+                    mul $t0, $t2, $s1                        # $t0 = offset RT
+                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RT
+                    lw $t2, 0($t0)                           # $t2 = valor de RT
+
+                    xor $s2, $t1, $t2                        # $s2 = resultado
+################### RD
+                    mul $t0, $t3, $s1                        # $t0 = offset RD
+                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RD
+                    sw $s2, 0($t0)                           # guarda o resultado de RD na memoria
+
+                    lw $ra, 0($sp)
+                    lw $s0, 4($sp)
+                    addi $sp, $sp, 8
+
+                    jr $ra
+
+JR:                 # jr $rs -> JUMP RS 0X0000 0X0000 0X0000 0X001000
+                    # pula para o endereco armazendado em RS
+                    
+                    addi $sp, $sp, -8
+                    sw $ra, 0($sp)
+                    sw $s0, 4($sp)
+
+                    li $v0, 4                                # print string
+                    la $t0, str_jr
+                    move $a0, $t0
+                    syscall
+
+
+                    la $s0, arr_register                     # $s0 = endereço base arr_register
+                    li $s1, 4                                # $s1 = 4
+################### RS
+                    mul $t0, $t1, $s1                        # $t0 = offset RS
+                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RS
+                    lw $t1, 0($t0)                           # $t1 = valor de RS
+
+                    la $t0, PC                               # $t0 = endereço de PC
+                    sw $t1, 0($t0)                           # guarda o valor de RS (endereço de pulo)em PC
+
+                    la $t4, flag_incremento                  # atualiza a flag de incremento de pc
+                    li $t5, 1
+                    sw $t5, 0($t4)
+
+                    lw $ra, 0($sp)
+                    lw $s0, 4($sp)
+                    addi $sp, $sp, 8
+
+                    jr $ra
+                    
 #########################################################################################
 # TIPO I === TIPO I === TIPO I === TIPO I === TIPO I === TIPO I === TIPO I === TIPO I ===
 #########################################################################################
@@ -958,47 +1028,6 @@ SW:                 # SW: MEM[arr_register[RS] + imm] = arr_register[RT]
                     addi $sp, $sp, 8
                     jr $ra
 
-XOR:                # XOR: ARR_REGISTER[RD] = ARR_REGISTER[RS] ^ ARR_REGISTER[RT]
-                    # addi $rt, $rs, imm
-                    addi $sp, $sp, -8
-                    sw $ra, 0($sp)
-                    sw $s0, 4($sp)
-
-                    li $v0, 4                                # print string
-                    la $t0, str_xor
-                    move $a0, $t0
-                    syscall
-
-                    la $t0, RS                               
-                    lw $t1, 0($t0)                           # $t1 = RS
-                    la $t0, RT
-                    lw $t2, 0($t0)                           # $t2 = RT 
-                    la $t0, RD
-                    lw $t3, 0($t0)                           # $t3 = RD
-
-                    la $s0, arr_register                     # $s0 = endereço base arr_register
-                    li $s1, 4                                # $s1 = 4
-################### RS
-                    mul $t0, $t1, $s1                        # $t0 = offset RS
-                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RS
-                    lw $t1, 0($t0)                           # $t1 = valor de RS
-################### RT
-                    mul $t0, $t2, $s1                        # $t0 = offset RT
-                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RT
-                    lw $t2, 0($t0)                           # $t2 = valor de RT
-
-                    xor $s2, $t1, $t2                        # $s2 = resultado
-################### RD
-                    mul $t0, $t3, $s1                        # $t0 = offset RD
-                    add $t0, $s0, $t0                        # $t0 = vet_data + offset RD
-                    sw $s2, 0($t0)                           # guarda o resultado de RD na memoria
-
-                    lw $ra, 0($sp)
-                    lw $s0, 4($sp)
-                    addi $sp, $sp, 8
-
-                    jr $ra
-
 #########################################################################################
 # TIPO J === TIPO J === TIPO J === TIPO J === TIPO J === TIPO J === TIPO J === TIPO J ===
 #########################################################################################
@@ -1033,6 +1062,38 @@ J:                  # J: JUMP -> ADDRESS (28 BITS)
                     li $t5, 1
                     sw $t5, 0($t4)
 
+                    lw $ra, 0($sp)
+                    addi $sp, $sp, 4
+                    jr $ra
+
+#########################################################################################
+# SYSCALL === SYSCALL === SYSCALL === SYSCALL === SYSCALL === SYSCALL === SYSCALL === 
+#########################################################################################
+SYSCALL:
+                    addi $sp, $sp, -4
+                    sw $ra, 0($sp)                    
+                    
+                    la $t0, vet_data                        # e. base vetor_data
+                    
+                    li $t1, 2                                 # indice de $v0 no vetor
+                    mul $t2, $t1, 4                           # offset
+                    addu $t2, $t0, $t2                        # end. base + offset
+                    lw $t3, 0($t2)                            # $t3 = valor de $v0
+                    
+                    li $t1, 4                                 # indice de $a0 no vetor
+                    mul $t2, $t1, 4                           # offset
+                    addu $t2, $t0, $t2                         # end. base + offset
+                    lw $t4, 0($t2)                            # $t4 = valor de $a0
+                    
+                    li $v0, 4                                # print string
+                    la $t0, str_aux_syscall
+                    move $a0, $t0
+                    syscall
+                    
+                    move $v0, $t3
+                    move $a0, $t4
+                    syscall
+                    
                     lw $ra, 0($sp)
                     addi $sp, $sp, 4
                     jr $ra
