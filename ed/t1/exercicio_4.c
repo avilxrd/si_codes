@@ -42,6 +42,12 @@ void preenche_matriz(Matriz* matriz)
     for (int i=0; i<matriz->x; i++) for (int j=0; j<matriz->y; j++) for (int k=0; k<matriz->z; k++) matriz->valores[i][j][k] = rand()%9;
 }
 
+// adicionei uma funcao para adicionar um elemento em um x, y, z da matriz
+void insere_matriz(int x, int y, int z, int valor, Matriz *matriz)
+{
+    matriz->valores[x][y][z] = valor; 
+}
+
 // 4. Impressão das camadas (z = profundidade)
 void imprime_matriz(Matriz* matriz)
 {
@@ -63,7 +69,11 @@ void imprime_matriz(Matriz* matriz)
         }
     }
 }
-
+// adicionei uma funcao para imprimir apenas uma camada da matriz
+void imprime_valor(Matriz *matriz, int x, int y, int z)
+{
+    printf("Matriz[%d][%d][%d]: %d\n", x, y, z, matriz->valores[x][y][z]);
+}
 
 int main() 
 {
@@ -79,8 +89,41 @@ int main()
     printf("\nProfundidade da Matriz          (z): ");
     scanf("%d", &z);
     Matriz* matriz = cria_matriz(x, y, z);
-    preenche_matriz(matriz);
-    imprime_matriz(matriz);
+    // preenche_matriz(matriz);
+    // imprime_matriz(matriz);
+    int controle=0;
+    int opcao=0;
+    while (controle == 0)
+    {
+        printf("\n0. encerrar\t1. inserir valor\t2. imprimir uma camada da matriz\t3.imprimir toda a matriz\n");
+        scanf("%d", &opcao);
+        if (opcao == 0) break;
+        if (opcao == 1) 
+        {
+            int valor;
+            printf("\nQual valor inserir? ");
+            scanf("%d", &valor);
+            printf("\nPosicao (x): ");
+            scanf("%d", &x);
+            printf("\nPosicao (y): ");
+            scanf("%d", &y);
+            printf("\nPosicao (z): ");
+            scanf("%d", &z);
+            insere_matriz(x, y, z, valor, matriz);
+        }
+        if (opcao == 2)
+        {
+            printf("\nPosicao (x): ");
+            scanf("%d", &x);
+            printf("\nPosicao (y): ");
+            scanf("%d", &y);
+            printf("\nPosicao (z): ");
+            scanf("%d", &z);
+            imprime_valor(matriz, x, y, z);
+        }
+        if (opcao == 3) imprime_matriz(matriz);
+    };
+    printf("\nencerrando o programa\n");
 
     return 0;
 }

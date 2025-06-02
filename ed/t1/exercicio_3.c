@@ -205,9 +205,8 @@ int verifica_identidade(Matriz* matriz)
         }
     }
 
-    return 0;
+    return -1;
 }
-
 
 int main()
 {
