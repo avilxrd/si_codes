@@ -1,59 +1,78 @@
 #include "pilhas.h"
 
-Pilha* cria_pilha(int max)
+#define CAPACIDADE_INICIAL 10
+
+Pilha* cria_pilha()
 {
     Pilha *pilha = (Pilha*) malloc(sizeof(Pilha));
+    if (!pilha) 
+    {
+        printf("erro ao alocar a pilha\n");
+        exit(1);
+    }
+
     pilha->topo = -1;
-    pilha->elementos = (char*) malloc (max * sizeof(char));
+    pilha->capacidade = CAPACIDADE_INICIAL;
+    pilha->elementos = (int*) malloc(pilha->capacidade * sizeof(int));
+
+    if (!pilha->elementos) 
+    {
+        printf("erro ao alocar elementos da pilha\n");
+        exit(1);
+    }
+
     return pilha;
 }
 
 int pilha_vazia(Pilha *pilha)
 {
-    if (pilha->topo == -1)
-    {
-        printf("\nPilha vazia!\n");
-        return 1;
-    }
-    return 0;
+    return pilha->topo == -1;
 }
-
-// int pilha_cheia(Pilha *pilha)
-// {
-//     if (pilha->topo == pilha->max_elementos -1)
-//     {
-//         printf("\nPilha cheia!\n");
-//         return 1;
-//     }
-//     return 0;
-// }
 
 int pop(Pilha *pilha)
 {
-    if (pilha_vazia(pilha) == 1)
+    if (pilha_vazia(pilha)) 
     {
-        printf("\nNão foi feito o pop()\n");
-        return 0;
+        printf("Pilha vazia!\n");
+        exit(1);
     }
-    pilha->elementos[pilha->topo] = '0';
-    pilha->topo--;
+    return pilha->elementos[pilha->topo--];
 }
 
-Pilha* push(Pilha *pilha, const char valor)
+Pilha* push(Pilha *pilha, const int valor)
 {
-    // if (pilha_cheia(pilha) == 1)
-    // {
-    //     printf("\nNão foi feito o push()\n");
-    //     return pilha;
-    // }
-    pilha->topo++;
-    pilha->elementos[pilha->topo] = valor;
+    // realoca a pilha quando necessario
+    if (pilha->topo + 1 >= pilha->capacidade) 
+    {
+        pilha->capacidade *= 2;
+        pilha->elementos = realloc(pilha->elementos, pilha->capacidade * sizeof(int));
+        if (!pilha->elementos) 
+        {
+            printf("erro ao realocar elementos da pilha\n");
+            exit(1);
+        }
+    }
 
+    pilha->elementos[++pilha->topo] = valor;
     return pilha;
 }
 
 void imprime_pilha(Pilha *pilha)
 {
-    if (pilha_vazia(pilha) == 1) return;
-    for (int i=pilha->topo; i>=0; i--) printf("\n[%d] %c", i, pilha->elementos[i]);
+    if (pilha_vazia(pilha)) 
+    {
+        printf("pilha vazia\n");
+        return;
+    }
+
+    for (int i=pilha->topo; i>=0; i--) printf("[%d] %d\n", i, pilha->elementos[i]);   
+}
+
+void libera_pilha(Pilha *pilha)
+{
+    if (pilha) 
+    {
+        free(pilha->elementos);
+        free(pilha);
+    }
 }

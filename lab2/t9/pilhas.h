@@ -2,22 +2,20 @@
 #include <stdlib.h>
 #include <ctype.h> 
 
-struct pilha
-{
-    // int max_elementos;
+typedef struct pilha {
     int topo;
-    char *elementos;
-};
-typedef struct pilha Pilha;
+    int capacidade;
+    int *elementos;
+} Pilha;
 
-Pilha* cria_pilha(int max);
+Pilha* cria_pilha();
 
 int pilha_vazia(Pilha *pilha);
 
-// int pilha_cheia(Pilha *pilha);
-
 int pop(Pilha *pilha);
 
-Pilha* push(Pilha *pilha, const char valor);
+Pilha* push(Pilha *pilha, int valor);
 
 void imprime_pilha(Pilha *pilha);
+
+void libera_pilha(Pilha *pilha);
