@@ -4,38 +4,47 @@
 // notação polonesa -> retorna o resultado da operação
 int calculadora_polonesa(const char *not_polonesa)
 {
-    int i=0;
     Pilha *pilha = cria_pilha();
-    while (not_polonesa[i] != '\n')
+    char *copia = strdup(not_polonesa);
+    char *token = strtok(copia, " \t\n");
+    int i=0;
+    while (token != NULL)
     {
-        //1. le um caractere
-        int c = not_polonesa[i];
+        char *end;
+        long val = strtol(token, &end, 10);
+
         //2. é dígito? sim! adiciona na pilha
-        if (isdigit(c))
-        {
-            pilha = push(pilha, (c -'0'));
-            i++;
-        }
-        else if (c == ' ')
-        {
-            i++;
-            continue;
-        }
-        //3. é dígito? nao! pega os dois ultimos valores da pilha
-        //e realiza a operação com eles
-        else 
+        if (*end == '\0') pilha = push(pilha, (int)val);
+        else if (strlen(token) == 1)
         {
             int num_2 = pop(pilha);
             int num_1 = pop(pilha);
-            //4. armazena o resultado da operação na pilha
-            if      (c == '*') pilha = push(pilha, num_1*num_2);
-            else if (c == '/') pilha = push(pilha, num_1/num_2);
-            else if (c == '+') pilha = push(pilha, num_1+num_2);
-            else if (c == '-') pilha = push(pilha, num_1-num_2);
-            i++;
+            switch(token[0])
+            {
+                case '+': pilha = push(pilha, num_1+num_2); break;
+                case '-': pilha = push(pilha, num_1-num_2); break;
+                case '*': pilha = push(pilha, num_1*num_2); break;
+                case '/': pilha = push(pilha, num_1/num_2); break;
+                default: 
+                    printf("[%c] operador desconhecido\n", token[0]);
+                    libera_pilha(pilha);
+                    free(copia);
+                    exit(1);
+            }
         }
+        else
+        {
+            fprintf(stderr, "Entrada inválida: %s\n", token);
+            libera_pilha(pilha);
+            free(copia);
+            exit(1);
+        }
+        token = strtok(NULL, " \t\n");
     }
-    return pilha->elementos[pilha->topo];
+    int resultado = pop(pilha);
+    libera_pilha(pilha);
+    free(copia);
+    return resultado;
 }
 
 int main()
@@ -43,7 +52,7 @@ int main()
     // ex. de teste. res = 766
     // 2*(3+(4*(5+(6*(7+8)))))
     // 2 3 4 5 6 7 8 + * + * + *
-    
+
     char str[255];
     printf("\ndigite em notacao polonesa: ");
     fgets(str, sizeof(str), stdin);
