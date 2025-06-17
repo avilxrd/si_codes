@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define COR_VERDE    "\033[32m"
+#define COR_AMARELO  "\033[33m"
+#define COR_VERMELHO "\033[31m"
+#define COR_BRANCO   "\033[37m"
+
 struct elemento_fila
 {
     char descricao_elemento[255];
@@ -31,7 +36,7 @@ void promove_elemento(FilaPrio *fila, int filho)
 {
     Elemento temp;
     int pai = (filho - 1) / 2;
-    while ((filho > 0) && (fila->elementos_fila[pai].prioridade))
+    while ((filho > 0) && (fila->elementos_fila[filho].prioridade > fila->elementos_fila[pai].prioridade))
     {
         temp = fila->elementos_fila[filho];
         fila->elementos_fila[filho] = fila->elementos_fila[pai];
@@ -100,47 +105,68 @@ void imprime_heap(FilaPrio *fila)
         return;
     }
 
-    int nivel = 0;
-    int elementos_no_nivel = 1;
-    int i = 0;
-
-    while (i < fila->quantidade)
+    for (int i = 0; i < fila->quantidade; i++)
     {
-        printf("Nível %d: ", nivel);
-        for (int j = 0; j < elementos_no_nivel && i < fila->quantidade; j++, i++)
-        {
-            printf("[%s, %d] ", fila->elementos_fila[i].descricao_elemento, fila->elementos_fila[i].prioridade);
-        }
+        int esq = 2 * i + 1;
+        int dir = 2 * i + 2;
+        printf("%sNó%s\t", COR_AMARELO, COR_BRANCO);
+        printf("[ %s | %s%d%s ] ", fila->elementos_fila[i].descricao_elemento, COR_VERDE, fila->elementos_fila[i].prioridade, COR_BRANCO);
+
+        if (esq < fila->quantidade)
+            printf("%s➚%s Filho esquerda: [%s, %d] ", COR_VERMELHO, COR_BRANCO, fila->elementos_fila[esq].descricao_elemento, fila->elementos_fila[esq].prioridade);
+        else printf("%s➚%s Filho esquerda: [%svazio%s] ", COR_VERMELHO, COR_BRANCO, COR_VERMELHO, COR_BRANCO);
+
+        if (dir < fila->quantidade)
+            printf("%s➘%s Filho direita: [%s, %d] ", COR_VERMELHO, COR_BRANCO, fila->elementos_fila[dir].descricao_elemento, fila->elementos_fila[dir].prioridade);
+        else printf("%s➘%s Filho direita: [%svazio%s] ", COR_VERMELHO, COR_BRANCO, COR_VERMELHO, COR_BRANCO);
+
         printf("\n");
-        nivel++;
-        elementos_no_nivel *= 2;
     }
+}
+
+void mostra_aviso()
+{
+    printf("\nobs: na nossa implementação, um Nó consiste em duas informações: \n");
+    printf("\n%schar%s descricao[%s255%s]\t\t//string com a descrição do elemento", COR_AMARELO, COR_BRANCO, COR_VERMELHO, COR_BRANCO);
+    printf("\n%sint%s  prioridade\t\t\t//int com a prioridade do elemento\n", COR_AMARELO, COR_BRANCO);
+    printf("\n\npara facilitar, ao 'printar' um nó utilizaremos o seguinte formato: \n\n");
+    printf("[ %sDescrição%s | %sPrioridade%s ] \n\n", COR_AMARELO, COR_BRANCO, COR_AMARELO, COR_BRANCO);
+}
+
+Elemento criar_elemento()
+{
+    Elemento elemento;
+    printf("\n%sDigite a prioridade%s: ", COR_AMARELO, COR_BRANCO);
+    scanf("%d", &elemento.prioridade);
+    printf("\n%sDigite a descricao%s:  ", COR_AMARELO, COR_BRANCO);
+    scanf("%s", &elemento.descricao_elemento);
+    return elemento;
 }
 
 int main()
 {
-    Elemento e1 = {"prio 1", 1};
-    Elemento e2 = {"prio 2", 2};
-    Elemento e3 = {"prio 3", 3};
-    Elemento e4 = {"prio 4", 4};
-    Elemento e5 = {"prio 5", 5};
-    Elemento e6 = {"prio 6", 6};
-    Elemento e7 = {"prio 7", 7};
-    Elemento e8 = {"prio 8", 8};
+    FilaPrio *fila = (FilaPrio*) malloc(sizeof(FilaPrio));
+    fila->quantidade = 0;
+    fila->elementos_fila = (Elemento*)malloc(sizeof(Elemento) * MAX);
 
-    FilaPrio fila;
-    fila.quantidade = 0;
-    fila.elementos_fila = malloc(sizeof(Elemento) * MAX);
-
-    insere_fila_prioridade(&fila, e1);
-    insere_fila_prioridade(&fila, e2);
-    insere_fila_prioridade(&fila, e3);
-    insere_fila_prioridade(&fila, e4);
-    insere_fila_prioridade(&fila, e5);
-    insere_fila_prioridade(&fila, e6);
-    insere_fila_prioridade(&fila, e7);
-    insere_fila_prioridade(&fila, e8);
-
-    imprime_heap(&fila);
+    while(1)
+    {
+        printf("\n%s0%s. Sair   %s1%s. Mostrar heap (nós)   %s2%s. Inserir elemento   %s3%s. Remover elemento   \n\n-> ", COR_AMARELO, COR_BRANCO, COR_AMARELO, COR_BRANCO, COR_AMARELO, COR_BRANCO, COR_AMARELO, COR_BRANCO);
+        int opcao;
+        scanf("%d", &opcao);
+        if (opcao == 0) break;
+        else
+        {
+            if      (opcao == 1) imprime_heap(fila);
+            else if (opcao == 2)
+            {
+                Elemento elemento = criar_elemento();
+                insere_fila_prioridade(fila, elemento);
+            }
+            else if (opcao == 3) remove_fila_prioridade(fila);
+            else break;
+        }
+    }
+    printf("\nencerrando...\n");
 
 }
