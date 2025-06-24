@@ -73,15 +73,22 @@ void imprimir_grafo(Grafo *grafo)
     printf("\n");
 }
 
-static void reach_r(Grafo *grafo, vertice x, vertice y)
+void arquivo_para_grafo(Grafo *grafo, FILE *file)
 {
-    
+    char linha[255];
+    while (fgets(linha, sizeof(linha), file))
+    {
+        char filme[100], ator[100];
+        strtok(filme, ",");
+        strtok(ator,  ",");
+        
+    }
 }
 
 #define NUM_VERTICES 6
 int main()
 {
-    
+    FILE *file = fopen("filmes.csv", "r");
     Grafo *grafo = inicializa_grafo(NUM_VERTICES);
     static int visitados[NUM_VERTICES];
 
