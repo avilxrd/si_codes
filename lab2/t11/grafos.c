@@ -8,7 +8,7 @@ struct grafo
 {
     int num_vertices;
     int num_arestas;
-    int **matriz_adj;
+    int **matriz_adj; 
 };
 
 typedef struct grafo Grafo;
@@ -90,13 +90,13 @@ int main()
 {
     FILE *file = fopen("filmes.csv", "r");
     Grafo *grafo = inicializa_grafo(NUM_VERTICES);
-    static int visitados[NUM_VERTICES];
+    // static int visitados[NUM_VERTICES];
 
-    inserir_arco_grafo(grafo, 1, 4);
-    inserir_arco_grafo(grafo, 1, 5);
-    inserir_arco_grafo(grafo, 2, 4);
-    inserir_arco_grafo(grafo, 2, 6);
-    inserir_arco_grafo(grafo, 3, 6);
+    // inserir_arco_grafo(grafo, 1, 4);
+    // inserir_arco_grafo(grafo, 1, 5);
+    // inserir_arco_grafo(grafo, 2, 4);
+    // inserir_arco_grafo(grafo, 2, 6);
+    // inserir_arco_grafo(grafo, 3, 6);
 
     imprimir_grafo(grafo);
 
