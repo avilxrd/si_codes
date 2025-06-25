@@ -45,4 +45,8 @@ void imprime_lista(Node* lista);
 
 Node* arquivo_lista(Node *lista, FILE *file);
 
+<<<<<<< HEAD
 Pessoa* busca_lista(Node *lista, char *cpf);
+=======
+Pessoa* busca_lista(Node *lista, char *cpf);
+>>>>>>> 565076e3e7dd920a397b5e85567ae8a40a9d67c9
