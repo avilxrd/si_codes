@@ -1,6 +1,0 @@
-#echo "compilando"
-clear
-gcc main.c -o main
-
-#echo "executando"
-#./main
