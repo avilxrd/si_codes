@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define COR_VERDE    "\033[32m"
+#define COR_AMARELO  "\033[33m"
+#define COR_VERMELHO "\033[31m"
+#define COR_BRANCO   "\033[37m"
+
 typedef struct No {
     int id;
     struct No* prox;
@@ -80,12 +85,12 @@ void buscar_filmes_do_ator(Grafo *grafo, char* nome)
     for (int i = 0; i < grafo->tamanho; i++) {
         if (strcmp(grafo->lista[i].nome, nome) == 0 && grafo->lista[i].tipo == 1) {
             encontrado = 1;
-            printf("\nFilmes com %s:\n", grafo->lista[i].nome);
+            printf("\nfilmes com %s%s%s:\n\n", COR_AMARELO, grafo->lista[i].nome, COR_BRANCO);
             No* p = grafo->lista[i].adj;
             int tem_filmes = 0;
             while (p) 
             {
-                printf("  - %s\n", grafo->lista[p->id].nome);
+                printf(" %s->%s %s\n", COR_VERDE, COR_BRANCO, grafo->lista[p->id].nome);
                 tem_filmes = 1;
                 p = p->prox;
             }
@@ -93,7 +98,8 @@ void buscar_filmes_do_ator(Grafo *grafo, char* nome)
             break;
         }
     }
-    if (!encontrado) printf("\nAtor \"%s\" não encontrado no grafo.\n", nome);
+    if (!encontrado) printf("\n%sator %s%s%s %snão encontrado no grafo%s\n", COR_VERMELHO, COR_AMARELO, nome, COR_BRANCO, COR_VERMELHO, COR_BRANCO);
+    printf("\n");
 }
 
 void menu(Grafo *grafo) 
@@ -103,25 +109,24 @@ void menu(Grafo *grafo)
 
     do 
     {
-        printf("\n1. buscar ator\t\t0. sair");
+        printf("(%s0%s) sair\t(%s1%s) buscar um ator\n%s->%s ", COR_VERMELHO, COR_BRANCO, COR_AMARELO, COR_BRANCO, COR_AMARELO, COR_BRANCO);
         char linha_opcao[16];
-        printf("\n= ");
         fgets(linha_opcao, sizeof(linha_opcao), stdin);
         sscanf(linha_opcao, "%d", &opcao);
 
         switch (opcao) 
         {
             case 1:
-                printf("\nNome do ator: ");
+                printf("nome do ator (%scase sensitive%s): ", COR_VERMELHO, COR_BRANCO);
                 fgets(buffer, sizeof(buffer), stdin);
                 buffer[strcspn(buffer, "\n")] = '\0';
                 buscar_filmes_do_ator(grafo, buffer);
                 break;
             case 0:
-                printf("Encerrando...\n");
+                printf("%sencerrando...%s\n", COR_VERMELHO, COR_BRANCO);
                 break;
             default:
-                printf("Opção inválida.\n");
+                printf("%sopção inválida%s\n", COR_VERMELHO, COR_BRANCO);
         }
     } while (opcao != 0);
 }
@@ -139,6 +144,7 @@ int main()
     inicializar_grafo(grafo);
 
     char linha[512];
+    system("clear || cls");
     while (fgets(linha, sizeof(linha), arq)) 
     {
         linha[strcspn(linha, "\r\n")] = '\0';
