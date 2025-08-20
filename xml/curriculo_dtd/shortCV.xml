@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cv SYSTEM "shortCV.dtd">
+
+<cv> 
+    <nome>Miguel Avila de Oliveira</nome>
+    <sexo>Masculino</sexo>
+    <dataNascimento>16/08/2004</dataNascimento>
+    
+    <end>
+        <rua>Rua dos Andradas</rua>
+        <nro>277</nro>
+        <bairro>Passo d'Areia</bairro>
+        <cep>97020-040</cep>
+        <cidade>Santa Maria</cidade>
+        <estado>Rio Grande do Sul</estado>
+        <pais>Brasil</pais>
+    </end>
+    
+    <instituicao>
+        <nome>Universidade Federal de Santa Maria</nome>
+        <!-- <end></end> -->
+    </instituicao>
+    
+    <fone>
+        <telefone>(55) 99123-4313</telefone>
+        <!-- <ramal></ramal> -->
+        <!-- <fax></fax> -->
+    </fone>
+    <email>miguelaviladeoliveira@gmail.com</email>
+    <url>miguel.com.br</url>
+    
+    <titulacao>
+        <nome>Tec. em Informática para Internet</nome>
+        <instituicao>
+            <nome>CTISM</nome>
+            <end>
+                <rua>Av. Roraima</rua>
+                <cidade>Santa Maria</cidade>
+            </end>
+        </instituicao>
+        <tese>Relatório de Estágio</tese>
+        <orientador>
+            <nome>Fabio</nome>
+            <sobrenome>Franciscato</sobrenome>
+        </orientador>
+    </titulacao>
+
+    <pubs>
+        <pub>
+            <autores>
+                <autor>
+                    <sobrenome>Avila de Oliveira</sobrenome>
+                    <nome>Miguel</nome>
+                </autor>
+            </autores>
+            <titulo>Relatorio de Estagio</titulo>
+            <evento>CTISM</evento>
+            <end>
+                <cidade>Santa Maria</cidade>
+            </end>
+            <ano>2025</ano>
+        </pub>
+    </pubs>
+
+</cv>

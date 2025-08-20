@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT cv (nome, sexo, dataNascimento, end, instituicao, fone, email, url, titulacao+, pubs) >
+<!ELEMENT nome (#PCDATA) >
+<!ELEMENT sexo (#PCDATA) >
+<!ELEMENT dataNascimento (#PCDATA) >
+  
+<!ELEMENT end (rua?, nro?, bairro?, cep?, cidade, estado?, pais?) >
+<!ELEMENT rua (#PCDATA) >
+<!ELEMENT nro (#PCDATA) >
+<!ELEMENT bairro (#PCDATA) >
+<!ELEMENT cep (#PCDATA) >
+<!ELEMENT cidade (#PCDATA) >
+<!ELEMENT estado (#PCDATA) >
+<!ELEMENT pais (#PCDATA) >
+
+<!ELEMENT instituicao (nome, end?) >
+<!ELEMENT fone (telefone, ramal?, fax?) >
+<!ELEMENT telefone (#PCDATA) >
+<!ELEMENT ramal (#PCDATA) >
+<!ELEMENT fax (#PCDATA) >
+<!ELEMENT email (#PCDATA) >
+<!ELEMENT url (#PCDATA) >
+
+<!ELEMENT titulacao (nome, instituicao, tese, orientador) >
+<!ELEMENT tese (#PCDATA) >
+<!ELEMENT orientador (nome, sobrenome) >
+
+<!ELEMENT pubs (pub+) >
+<!ELEMENT pub (autores, titulo, evento, end, ano) >
+<!ELEMENT titulo (#PCDATA) >
+<!ELEMENT autores (autor+) >
+<!ELEMENT autor (sobrenome, nome) >
+<!ELEMENT sobrenome (#PCDATA) >
+<!ELEMENT evento (#PCDATA) >
+<!ELEMENT ano (#PCDATA) >
