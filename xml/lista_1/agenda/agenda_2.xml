@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE agenda SYSTEM "agenda.dtd">
+
+<agenda>
+
+    <grupo gid="amigos">
+        <entrada id="e1" tipo="pessoa">
+            <nome>Pessoa 1</nome>
+            <telefone>5599998888</telefone>
+        </entrada>
+        <ref entref="e2"/>
+    </grupo>
+
+    <entrada id="e2" tipo="pessoa">
+        <nome>Pessoa 2</nome>
+        <telefone>5588889999</telefone>
+    </entrada>
+
+</agenda>

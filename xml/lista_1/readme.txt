@@ -1,0 +1,1 @@
+Professor, as atividades 1 e 2 eu realizei na outra aula, mas não estou com os arquivos agora, quando eu chegar em casa eu envio por email
