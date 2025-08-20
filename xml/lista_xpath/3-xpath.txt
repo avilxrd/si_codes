@@ -1,0 +1,9 @@
+- Em quais tags “ingrediente” é citado a palavra “margarina”?
+
+//ingrediente[contains(., 'Margarina')]
+
+- Quais as receitas que estão em português?
+
+//receita[@língua="pt"]
+
+- Quantas receitas existem no documento XML?

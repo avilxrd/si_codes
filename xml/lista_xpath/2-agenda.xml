@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<agenda>
+
+    <grupo gid="amigos">
+        <entrada id="e1" tipo="pessoa">
+            <nome>Pessoa 1</nome>
+            <telefone>1111111111</telefone>
+        </entrada>
+        <ref entref="e2"/>
+    </grupo>
+
+    <entrada id="e2" tipo="pessoa">
+        <nome>Pessoa 2</nome>
+        <telefone>2222222222</telefone>
+    </entrada>
+
+    <entrada id="e3" tipo="pessoa">
+        <nome>Pessoa 3</nome>
+        <telefone>3333333333</telefone>
+    </entrada>
+
+    <entrada id="e4" tipo="pessoa">
+        <nome>Robert José</nome>
+        <telefone>4444444444</telefone>
+    </entrada>
+
+    <entrada id="e5" tipo="pessoa">
+        <nome>Jonas Librelotto</nome>
+        <telefone>5555555555</telefone>
+    </entrada>
+
+    <entrada id="e6" tipo="pessoa">
+        <nome>Pessoa 6</nome>
+        <telefone>6666666666</telefone>
+    </entrada>
+
+    <entrada id="e7" tipo="pessoa">
+        <nome>Pessoa 7</nome>
+        <telefone>7777777777</telefone>
+    </entrada>
+
+</agenda>

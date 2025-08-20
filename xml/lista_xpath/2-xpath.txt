@@ -1,0 +1,22 @@
+- Selecione todas as entradas de telefone com o indicativo 555.
+
+//telefone[starts-with(text(), '555')]
+
+- Selecione todas as entradas que não possuem o telefone com o indicativo
+555.
+
+//telefone[not(starts-with(text(), '555'))]
+
+- Selecione todas as entradas de pessoas com nome contendo "Librelotto" ou
+"José".
+
+//nome[contains(., 'Librelotto')] | //nome[contains(., 'José')]
+
+- Selecione os identificadores das entradas pertencentes a grupos.
+
+//grupo/@gid
+
+- Selecione os identificadores das entradas que não são do tipo
+"pessoa".
+
+//entrada[not(@tipo='pessoa')]

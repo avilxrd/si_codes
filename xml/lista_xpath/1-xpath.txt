@@ -1,0 +1,15 @@
+- Selecione o terceiro verso da última quadra.
+
+//quadra[last()]/verso[3]
+
+- Selecione todos os nomes.
+
+//nome
+
+- Selecione os versos do segundo terceto.
+
+//terno[2]/verso
+
+- Selecione os nomes ou lugares começados pela letra L
+
+//lugar[starts-with(text(), 'L')] | //nome[starts-with(text(), 'L')] 

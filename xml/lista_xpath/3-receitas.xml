@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE livro-de-receitas SYSTEM "receitas.dtd"> -->
+
+<livro-de-receitas>
+    <abertura>
+        <autor>Giovani Rubert Librelotto</autor>
+        <data>15 de Março de 2006</data>
+        <local>UNIFRA - Centro Universitario Franciscano</local>
+    </abertura>
+    <receitas>
+        <receita língua="pt" classificação="doce">
+            <título>Mousse de chocolate</título>
+            <ingredientes>
+                <ingrediente>200g de chocolate de culinária</ingrediente>
+                <ingrediente>50g de margarina</ingrediente>
+                <ingrediente>meia dúzia de ovos</ingrediente>
+                <ingrediente>4 colheres de sopa de açucar</ingrediente>
+            </ingredientes>
+            <preparação>
+                <instrução>Separam-se as gemas das claras.</instrução>
+                <instrução>Derrete-se o chocolate com a margarina.</instrução>
+                <instrução>Adicionam-se as gemas.</instrução>
+                <instrução>Mistura-se o açucar no chocolate.</instrução>
+                <instrução>Batem-se as claras em castelo.</instrução>
+                <instrução>Mistura-se tudo no recipiente final.</instrução>
+            </preparação>
+        </receita>
+
+        <receita língua="pt" classificação="doce">
+            <título>Bolo de Cenoura</título>
+            <ingredientes>
+                <ingrediente ing="cenoura">3 cenouras</ingrediente>
+                <ingrediente>4 ovos</ingrediente>
+                <ingrediente>1/2 xicara de óleo</ingrediente>
+                <ingrediente>2 xícaras de açúcar</ingrediente>
+                <ingrediente>1 colher de sopa de fermento para bolo</ingrediente>
+                <ingrediente>2 e 1/2 xícaras de farinha</ingrediente>
+            </ingredientes>
+            <preparação>
+                <instrução>Cozinhar e cortar as cenouras</instrução>
+                <instrução>Bater as cenouras no liquidificador com o óleo e os ovos </instrução>
+                <instrução>Transferir para um outro recipiente </instrução>
+                <instrução>Misturar o açúcar, a farinha e o fermento </instrução>
+                <instrução>Assar a 180° por 40 minutos</instrução>
+            </preparação>
+        </receita>
+
+        <receita língua="pt" classificação="salgado">
+            <título>Strogonofe de Carne</título>
+            <ingredientes>
+                <ingrediente>1 cebola</ingrediente>
+                <ingrediente>1 tomate</ingrediente>
+                <ingrediente>1kg de carne</ingrediente>
+                <ingrediente>1 dente de alho</ingrediente>
+                <ingrediente>1 caixa de creme de leite</ingrediente>
+                <ingrediente>Temperos à gosto</ingrediente>
+            </ingredientes>
+            <preparação>
+                <instrução>Picar a cebola, o alho e o tomate</instrução>
+                <instrução>Cortar a carne em tiras</instrução>
+                <instrução>Fritar a carne</instrução>
+                <instrução>Reservar a carne</instrução>
+                <instrução>Fritar a cebola e o alho</instrução>
+                <instrução>Adicionar a carne e o tomate</instrução>
+                <instrução>Temperar</instrução>
+                <instrução>Quando formar o molho, desligar</instrução>
+                <instrução>Adicionar o creme de leite quando for servir</instrução>
+            </preparação>
+        </receita>
+
+        <!-- Receita 4 -->
+        <receita língua="pt" classificação="salgado">
+            <título>Omelete Simples</título>
+            <ingredientes>
+                <ingrediente>2 ovos</ingrediente>
+                <ingrediente>Sal a gosto</ingrediente>
+                <ingrediente>Pimenta-do-reino a gosto</ingrediente>
+                <ingrediente>1 colher de sopa de óleo</ingrediente>
+                <ingrediente>1 colher de sopa de leite</ingrediente>
+            </ingredientes>
+            <preparação>
+                <instrução>Bater os ovos com o leite, sal e pimenta</instrução>
+                <instrução>Esquentar o óleo em uma frigideira</instrução>
+                <instrução>Despejar a mistura na frigideira</instrução>
+                <instrução>Virar quando dourar de um lado</instrução>
+                <instrução>Servir quente</instrução>
+            </preparação>
+        </receita>
+
+        <!-- Receita 5 -->
+        <receita língua="pt" classificação="doce">
+            <título>Brigadeiro</título>
+            <ingredientes>
+                <ingrediente>1 lata de leite condensado</ingrediente>
+                <ingrediente>1 colher de sopa de margarina</ingrediente>
+                <ingrediente>3 colheres de sopa de chocolate em pó</ingrediente>
+                <ingrediente>Chocolate granulado para enrolar</ingrediente>
+            </ingredientes>
+            <preparação>
+                <instrução>Colocar o leite condensado, a margarina e o chocolate em uma panela</instrução>
+                <instrução>Cozinhar em fogo médio, mexendo sempre</instrução>
+                <instrução>Retirar do fogo quando começar a desgrudar do fundo</instrução>
+                <instrução>Deixar esfriar</instrução>
+                <instrução>Fazer bolinhas e passar no granulado</instrução>
+            </preparação>
+        </receita>
+    </receitas>
+</livro-de-receitas>
