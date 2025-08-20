@@ -52,6 +52,14 @@
                     <sobrenome>Avila de Oliveira</sobrenome>
                     <nome>Miguel</nome>
                 </autor>
+                <autor>
+                    <sobrenome>Monteiro Longo</sobrenome>
+                    <nome>Nicolas</nome>
+                </autor>
+                <autor>
+                    <sobrenome>Brabos Azevedo</sobrenome>
+                    <nome>Davi</nome>
+                </autor>
             </autores>
             <titulo>Relatorio de Estagio</titulo>
             <evento>CTISM</evento>
@@ -60,6 +68,26 @@
             </end>
             <ano>2025</ano>
         </pub>
+
+        <pub>
+            <autores>
+                <autor>
+                    <sobrenome>Avila de Oliveira</sobrenome>
+                    <nome>Miguel</nome>
+                </autor>
+                <autor>
+                    <sobrenome>Brabos Azevedo</sobrenome>
+                    <nome>Davi</nome>
+                </autor>
+            </autores>
+            <titulo>Publicação 2</titulo>
+            <evento>Evento 2</evento>
+            <end>
+                <cidade>Blumenau</cidade>
+            </end>
+            <ano>2025</ano>
+        </pub>
+
     </pubs>
 
 </cv>

@@ -1,0 +1,19 @@
+- qual é o título da graduação ou TCC?
+
+/cv/titulacao/nome
+
+- onde foi obtido o título de graduação?
+
+/cv/titulacao/instituicao/nome
+
+- quais cidades foram publicados os artigos do CV?
+
+//pub/end/cidade
+
+- quem são os co-autores que publicaram no CV?
+
+//pub/autores
+
+- qual é o local de realização da graduação?
+
+/cv/titulacao/instituicao/end/cidade
